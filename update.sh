@@ -7,6 +7,6 @@ if [ $# -ne 1 ]; then
 	echo "Please enter a branch name"
     exit 1
 fi
-git remote set-url origin git@github.com:cse1531S1/cs1531S2-group-project.git
+git remote set-url origin git@github.com:cse1531S1/cs1531-group-project.git
 git pull origin $1
 git remote set-url origin $existing_remote
