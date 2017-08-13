@@ -18,7 +18,6 @@
    // actually i prefer clone the repository with ssh keys
    $ git clone https://github.com/cse1531S1/survey-system-h17a-bots
    $ cd survey-system-h17a-bots
-   // after activation there would be a (venv) before the dollar sign like '(venv) $'
    ```
 
 4. setup and activate the virtual environment
@@ -27,6 +26,7 @@
    (venv) $ virtualenv --python=python3 venv
    // activate the virtual environment
    (venv) $ source venv/bin/activate
+   // after activation there would be a (venv) before the dollar sign like '(venv) $'
    ```
 
 5. install project dependencies
