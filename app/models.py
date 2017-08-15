@@ -107,4 +107,10 @@ class Answer(db.Model):
     __tablename__ = 'answers'
     id = db.Column(db.Integer, primary_key=True)
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    question_id = db.Column(db.Integer, db.ForeignKey('questions.id'))
+    survey_id = db.Column(db.Integer, db.ForeignKey('surveys.id'))
     content = db.Column(db.String(512))
+
+    def __repr__(self):
+        return '<Answer {} given by {} for Survey {} Question {}>'.format(
+            self.id, self.owner_id, self.survey_id, self.question_id)
