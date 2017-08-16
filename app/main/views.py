@@ -44,7 +44,8 @@ def select_questions(survey_id):
             question = Question.query.filter_by(id=int(data)).first()
             survey.questions.append(question)
         db.session.add(survey)
-        return "successful"
+        flash("Questions have been successfully added to the survey")
+        return url_for('.index')
 
     return render_template('select_questions.html', questions=questions)
 
@@ -59,8 +60,8 @@ def create_question():
         db.session.add(question)
         db.session.commit()
         print(question.id)
-        return "successful"
-        # return redirect(url_for('.create_question', user=current_user))
+        flash("The question is successfully created")
+        return redirect(url_for('.create_question'))
 
     return render_template('create_question.html')
 
@@ -73,7 +74,7 @@ def create_survey():
         survey = Survey(description=survey_name, owner_id=current_user.id)
         db.session.add(survey)
         db.session.commit()
-        print(survey.id)
+        flash("The survey is successfully created, Please add questions to the survey now.")
         return redirect(url_for('.select_questions', survey_id=survey.id))
 
     return render_template('create_survey.html')
@@ -107,16 +108,19 @@ def question_pool():
 def delete_question(id):
     question_to_delete = Question.query.filter_by(id=id).first()
 
-    if current_user.id != question_to_delete.owner_id:
-        if current_user.is_admin is not True:
-            flash("You don't have the permission to delete this question")
+    if request.method == 'POST':
+        if current_user.id != question_to_delete.owner_id:
+            if current_user.is_admin is not True:
+                flash("You don't have the permission to delete this question")
+                return redirect(url_for('.question_pool'))
+
+        if question_to_delete.surveys.first() is not None:
+            flash("The question is already in use, can't delete")
             return redirect(url_for('.question_pool'))
 
-    if question_to_delete.surveys is not None:
-        flash("The question is already in use, can't delete")
+        db.session.delete(question_to_delete)
+        db.session.commit()
+        flash("Delete the question successfully")
         return redirect(url_for('.question_pool'))
 
-    db.session.delete(question_to_delete)
-    db.session.commit()
-    flash("Delete the question successfully")
-    return redirect(url_for('.question_pool'))
+    return render_template('delete_question.html', question=question_to_delete)

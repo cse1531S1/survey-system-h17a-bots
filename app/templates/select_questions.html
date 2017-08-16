@@ -5,9 +5,11 @@
     <div class='radio'>
         {% for question in questions %}
         <div class='row'>
-            <label>
-                <input type="checkbox" name="optionCheckboxes" id="optionCheckboxes" value={{ question.id }} />{{ question.description }}
-            </label>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="optionCheckboxes" id="optionCheckboxes" value={{ question.id }} />{{ question.description }}
+                </label>
+            </div>
         </div>
         {% endfor %}
         <button id="sub" type="submit">Submit</button>

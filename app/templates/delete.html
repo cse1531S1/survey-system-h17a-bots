@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block page_content %}
+
+<form action="" method="post" accept-charset="utf-8">
+    <div>
+        Are you sure to delete the question {{ question.description }}
+    </div>
+    <a type="button" id="" href={{ url_for("main.index") }} class='btn btn-default'> Cancel</a>
+    <button id="" type="submit" class='btn btn-danger'> Confirm </button>
+</form>
+{% endblock %}
