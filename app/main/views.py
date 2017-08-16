@@ -38,6 +38,7 @@ def select_questions(survey_id):
     if request.method == 'POST':
         for question in survey.questions.all():
             survey.questions.remove(question)
+
         datas = request.form.getlist('optionCheckboxes')
         for data in datas:
             question = Question.query.filter_by(id=int(data)).first()
@@ -76,3 +77,22 @@ def create_survey():
         return redirect(url_for('.select_questions', survey_id=survey.id))
 
     return render_template('create_survey.html')
+
+
+@main.route('/answer/<int:id>', methods=['GET', 'POST'])
+def answer(id):
+    survey = Survey.query.filter_by(id=id).first()
+    questions = survey.questions.all()
+
+    if request.method == 'POST':
+        datas = request.form.getlist('answer')
+        print(datas)
+        for data, question in zip(datas, questions):
+            new_answer = Answer(owner_id=current_user.id,
+                                question_id=question.id, survey_id=survey.id, content=data)
+            db.session.add(new_answer)
+
+        db.session.commit()
+        return "successful"
+
+    return render_template('answer_survey.html', survey=survey, questions=questions)
