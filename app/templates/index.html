@@ -1,1 +1,10 @@
 welcome
+<div class="row">
+  <a href="{{ url_for('main.create_question') }}">Create questions</a>
+</div>
+<div class="row">
+  <a href="{{ url_for('main.create_survey') }}">Create survey</a>
+</div>
+<div class="row">
+  <a href="{{ url_for('main.user', id=current_user.id) }}">view survey</a>
+</div>

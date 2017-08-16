@@ -11,19 +11,34 @@ from . import main
 @main.route('/', methods=['GET'])
 @login_required
 def index():
-    return redirect(url_for('.create_survey'))
+    return render_template('index.html')
+
+
+@main.route('/user/<int:id>')
+@login_required
+def user(id):
+    if current_user.is_admin:
+        surveys = Survey.query.all()
+    else:
+        surveys = Survey.query.filter_by(owner_id=current_user.id)
+
+    return render_template('user.html', surveys=surveys)
 
 
 @main.route('/select_questions/<int:survey_id>', methods=['GET', 'POST'])
 @login_required
 def select_questions(survey_id):
+    survey = Survey.query.filter_by(id=survey_id).first()
+
+    if current_user.id != survey.owner_id and not current_user.is_administrator():
+        return redirect(url_for('.index'))
+
     questions = Question.query.all()
-    if survey_id is None:
-        return redirect(url_for('.create_survey'))
 
     if request.method == 'POST':
+        for question in survey.questions.all():
+            survey.questions.remove(question)
         datas = request.form.getlist('optionCheckboxes')
-        survey = Survey.query.filter_by(id=survey_id).first()
         for data in datas:
             question = Question.query.filter_by(id=int(data)).first()
             survey.questions.append(question)

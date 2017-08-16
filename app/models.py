@@ -86,6 +86,7 @@ class Survey(db.Model):
     # 1 : multiple choices
     q_type = db.Column(db.Integer, default=1)
     description = db.Column(db.String(512))
+    classinfo = db.Column(db.String(64))
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     timestamp = db.Column(db.DateTime(), default=datetime.utcnow)
 
