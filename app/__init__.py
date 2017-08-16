@@ -9,6 +9,7 @@ from flask_login import LoginManager
 from flask_mail import Mail
 from config import Config
 
+
 config = Config()
 bootstrap = Bootstrap()
 moment = Moment()

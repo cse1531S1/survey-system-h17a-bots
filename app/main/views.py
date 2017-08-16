@@ -3,9 +3,12 @@
 
 from flask import request, redirect, render_template, abort, url_for, session, flash
 from flask_login import login_required, current_user
-from ..models import User, Survey, Question, Answer
+from sqlalchemy import desc
+from ..models import User, Survey, Question, Answer, Answer_rep
 from .. import db
 from . import main
+from datetime import datetime
+import builtins
 
 
 @main.route('/', methods=['GET'])
@@ -86,15 +89,21 @@ def answer(id):
     questions = survey.questions.all()
 
     if request.method == 'POST':
+        answer_rep = Answer_rep(survey_id=survey.id, owner_id=current_user.id)
+        db.session.add(answer_rep)
+        db.session.commit()
+
         datas = request.form.getlist('answer')
         print(datas)
         for data, question in zip(datas, questions):
-            new_answer = Answer(owner_id=current_user.id,
-                                question_id=question.id, survey_id=survey.id, content=data)
+            new_answer = Answer(rep_id=answer_rep.id,
+                                question_id=question.id, content=data)
             db.session.add(new_answer)
 
         db.session.commit()
-        return "successful"
+        flash('You successfully submit your response')
+        return redirect(url_for('.index'))
+    return render_template('answer_survey.html', survey=survey)
 
 
 @main.route('/question_pool', methods=['GET', 'POST'])
@@ -146,3 +155,16 @@ def delete_survey(id):
         return redirect(url_for('.index'))
 
     return render_template('delete_survey.html', survey=survey_to_delete)
+
+
+@main.route('/survey/<int:id>', methods=['GET'])
+@login_required
+def survey(id):
+
+    survey = Survey.query.filter_by(id=id).first_or_404()
+    answer_reps = Answer_rep.query.filter_by(survey_id=id).all()
+    for rep in answer_reps:
+        print(rep.answers.all())
+    # print(answer_reps)
+
+    return render_template('survey_details.html', survey=survey, answer_reps=answer_reps, zip=builtins.zip)

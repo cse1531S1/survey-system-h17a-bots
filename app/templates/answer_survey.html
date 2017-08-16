@@ -10,8 +10,8 @@
 
 
 <form  method="post">
-    <div class=''>
-        {% for question in questions %}
+    <div>
+        {% for question in survey.questions.all() %}
         <div class='row'>
             <div>
                 {{ question.description }}
@@ -21,7 +21,7 @@
             </label>
         </div>
         {% endfor %}
-        <button id="sub" type="submit">Submit</button>
+        <button class="btn btn-default"id="sub" type="submit">Submit</button>
     </div>
 </form>
 {% endblock %}

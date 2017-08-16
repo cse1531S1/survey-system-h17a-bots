@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block page_content %}
+
+Survey: {{ survey.description }}
+
+{% for answer_rep in answer_reps %}
+<p>
+Answer given by : {{ answer_rep.owner_id }}
+</p>
+{% for question, answer in zip(survey.questions.all(), answer_rep.answers.all())%}
+<p>
+{{ question.description }} : {{ answer.content }}
+</p>
+{% endfor %}
+{% endfor %}
+
+{% endblock %}
