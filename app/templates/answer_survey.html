@@ -1,25 +1,27 @@
-answer a survey
+{% extends "base.html" %}
+{% block page_content %}
 
 <div>
-  <h1>
-    Survey Name:{{ survey.description }}
-  </h1>
+    <h1>
+        Survey Name:{{ survey.description }}
+    </h1>
 </div>
 <h3>Questions</h3>
 
 
 <form  method="post">
-  <div class='radio'>
-    {% for question in questions %}
-    <div class='row'>
-      <div>
-        {{ question.description }}
-      </div>
-      <label>
-        <input type="text" name="answer" id="answer" value="" />
-      </label>
+    <div class='radio'>
+        {% for question in questions %}
+        <div class='row'>
+            <div>
+                {{ question.description }}
+            </div>
+            <label>
+                <input type="text" name="answer" id="answer" value="" />
+            </label>
+        </div>
+        {% endfor %}
+        <button id="sub" type="submit">Submit</button>
     </div>
-    {% endfor %}
-    <button id="sub" type="submit">Submit</button>
-  </div>
 </form>
+{% endblock %}

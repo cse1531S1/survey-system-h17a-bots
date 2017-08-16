@@ -1,0 +1,57 @@
+.profile-thumbnail {
+  position: absolute;
+}
+
+.profile-header {
+  min-height: 260px;
+  margin-left: 280px;
+}
+
+.posts {
+  list-style-type: none;
+  padding: 0px;
+  margin: 16px 0px 0px 0px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.post {
+  padding: 8px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.post-date {
+  float: right;
+}
+
+.post-author {
+  font-weight: bold;
+}
+
+.post-thumbnail {
+  position: absolute;
+}
+
+.post-content {
+  margin-left: 48px;
+  min-height: 48px;
+}
+
+#button-delete {
+  padding-top: 7px;
+}
+
+.mask:hover {
+  background-color: #f0f0f0;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.submit-btn {
+  paddint-top: 15px;
+}
+
+.log-button {
+  padding-top: 8px;
+}
