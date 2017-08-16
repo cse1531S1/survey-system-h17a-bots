@@ -1,0 +1,23 @@
+answer a survey
+
+<div>
+  {{ survey.description }}
+</div>
+<h3>Questions</h3>
+
+
+<form  method="post">
+  <div class='radio'>
+    {% for question in questions %}
+    <div class='row'>
+      <div>
+        {{ question.description }}
+      </div>
+      <label>
+        <input type="text" name="answer" id="answer" value="" />
+      </label>
+    </div>
+    {% endfor %}
+    <button id="sub" type="submit">Submit</button>
+  </div>
+</form>
