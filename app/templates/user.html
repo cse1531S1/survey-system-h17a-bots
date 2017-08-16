@@ -1,15 +1,17 @@
-view surveys
+{% extends "base.html" %}
+{% block page_content %}
 
 <div>
-  {% for survey in surveys %}
-  <div class='row'>
-    <h3>Survey:  {{ survey.description }}</h3>  <a type='button' href="{{ url_for('main.select_questions', survey_id=survey.id) }}">edit</a>
-    <h3>Questions in that survey</h3>
-    {% for question in survey.questions.all() %}
-    <p>
-    {{ question.description }}
-    </p>
+    {% for survey in surveys %}
+    <div class='row'>
+        <h3>Survey:  {{ survey.description }}</h3>  <a type='button' href="{{ url_for('main.select_questions', survey_id=survey.id) }}">edit</a>
+        <h3>Questions in that survey</h3>
+        {% for question in survey.questions.all() %}
+        <p>
+        {{ question.description }}
+        </p>
+        {% endfor %}
+    </div>
     {% endfor %}
-  </div>
-  {% endfor %}
 </div>
+{% endblock %}
