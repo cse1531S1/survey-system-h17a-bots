@@ -2,7 +2,6 @@
 # encoding: utf-8
 
 from flask import Flask
-from flask import render_template
 from flask_bootstrap import Bootstrap
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
