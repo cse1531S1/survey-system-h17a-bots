@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
-from flask import request, redirect, render_template, abort, url_for, session
+from flask import request, redirect, render_template, abort, url_for, session, flash
 from flask_login import login_required, current_user
 from ..models import User, Survey, Question, Answer
 from .. import db
@@ -95,4 +95,28 @@ def answer(id):
         db.session.commit()
         return "successful"
 
-    return render_template('answer_survey.html', survey=survey, questions=questions)
+
+@main.route('/question_pool', methods=['GET', 'POST'])
+@login_required
+def question_pool():
+    questions = Question.query.all()
+    return render_template('question_pool.html', questions=questions)
+
+
+@main.route('/delete_question/<int:id>', methods=['GET', 'POST'])
+def delete_question(id):
+    question_to_delete = Question.query.filter_by(id=id).first()
+
+    if current_user.id != question_to_delete.owner_id:
+        if current_user.is_admin is not True:
+            flash("You don't have the permission to delete this question")
+            return redirect(url_for('.question_pool'))
+
+    if question_to_delete.surveys is not None:
+        flash("The question is already in use, can't delete")
+        return redirect(url_for('.question_pool'))
+
+    db.session.delete(question_to_delete)
+    db.session.commit()
+    flash("Delete the question successfully")
+    return redirect(url_for('.question_pool'))
