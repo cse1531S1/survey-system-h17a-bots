@@ -1,0 +1,14 @@
+view surveys
+
+<div>
+  {% for survey in surveys %}
+  <div class='row'>
+    {{ survey.description }} <a type='button' href="{{ url_for('main.select_questions', survey_id=survey.id) }}">edit</a>
+    {% for question in survey.questions.all() %}
+    <p>
+    {{ question.description }}
+    </p>
+    {% endfor %}
+  </div>
+  {% endfor %}
+</div>
