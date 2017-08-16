@@ -45,7 +45,7 @@ def select_questions(survey_id):
             survey.questions.append(question)
         db.session.add(survey)
         flash("Questions have been successfully added to the survey")
-        return url_for('.index')
+        return redirect(url_for('.index'))
 
     return render_template('select_questions.html', questions=questions)
 
@@ -124,3 +124,25 @@ def delete_question(id):
         return redirect(url_for('.question_pool'))
 
     return render_template('delete_question.html', question=question_to_delete)
+
+
+@main.route('/delete_survey/<int:id>', methods=['GET', 'POST'])
+def delete_survey(id):
+    survey_to_delete = Survey.query.filter_by(id=id).first()
+    answers_to_delete = Answer.query.filter_by(survey_id=id).all()
+
+    if request.method == 'POST':
+        if current_user.id != survey_to_delete.owner_id:
+            if current_user.is_admin is not True:
+                flash("You don't have the permission to delete this question")
+                return redirect(url_for('.question_pool'))
+
+        for answer in answers_to_delete:
+            db.session.delete(answer)
+
+        db.session.delete(survey_to_delete)
+        db.session.commit()
+        flash("Delete the survey successfully")
+        return redirect(url_for('.index'))
+
+    return render_template('delete_survey.html', survey=survey_to_delete)
