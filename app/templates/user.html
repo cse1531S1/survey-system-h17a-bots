@@ -1,17 +1,43 @@
 {% extends "base.html" %}
 {% block page_content %}
 
-<div>
-    {% for survey in surveys %}
-    <div class='row'>
-        <h3>Survey:  {{ survey.description }}</h3>  <a type='button' href="{{ url_for('main.select_questions', survey_id=survey.id) }}">edit</a>
-        <h3>Questions in that survey</h3>
-        {% for question in survey.questions.all() %}
-        <p>
-        {{ question.description }}
-        </p>
-        {% endfor %}
+<div class='page-geader'>
+  <h1>{{ current_user.username }}</h1>
+
+  <div class="container">
+
+    <div class='posts'>
+      {% for survey in surveys %}
+      <div class='post row'>
+        <div class='col-md-10'>
+          <!-- <div class='post-thumbnail'> -->
+          <!-- {{ survey.description }}  <a type='button' href="{{ url_for('main.select_questions', survey_id=survey.id) }}">edit</a> -->
+          <!-- </div> -->
+
+          <div class="post-content">
+
+            <div class="post-author">
+              <a href="{{ url_for('.user', id=survey.owner_id) }}">{{ survey.owner }}</a>
+              <p>
+              Survey: {{ survey.description }}
+              </p>
+            </div>
+
+            <div class="post-body">
+              {% for question in survey.questions.all() %}
+              <p>
+              {{ question.description }}
+              </p>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        <div class="col-md-1" id="button-delete">
+          <a type="button" class="btn btn-info" href="{{ url_for('main.select_questions', survey_id=survey.id) }}">Modify</a>
+        </div>
+      </div>
+      {% endfor %}
     </div>
-    {% endfor %}
+  </div>
 </div>
 {% endblock %}
