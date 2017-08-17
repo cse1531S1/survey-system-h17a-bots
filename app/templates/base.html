@@ -20,19 +20,15 @@
     </div>
     <div class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-        <li><a href="/">Home</a></li>
+        {% if current_user.is_authenticated %}
         <li>
-          <a href="{{ url_for('main.create_survey') }}">Create a Survey</a>
+            <a href="{{ url_for('main.user', id=current_user.id) }}">View surveys</a>
         </li>
         <li>
           <a href="{{ url_for('main.create_question') }}">Create a Question</a>
         </li>
         <li>
           <a href="{{ url_for('main.question_pool') }}">Question Pool</a>
-        </li>
-        {% if current_user.is_authenticated %}
-        <li>
-          <a href="{{ url_for('main.user', id=current_user.id) }}">User</a>
         </li>
         {% endif %}
 
