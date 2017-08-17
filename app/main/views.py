@@ -10,7 +10,6 @@ import builtins
 
 
 @main.route('/', methods=['GET'])
-@login_required
 def index():
     return render_template('index.html')
 
@@ -26,10 +25,15 @@ def user(id):
     return render_template('user.html', surveys=surveys)
 
 
-@main.route('/select_questions/<int:survey_id>', methods=['GET', 'POST'])
+@main.route('/select_questions/<int:id>', methods=['GET', 'POST'])
 @login_required
-def select_questions(survey_id):
-    survey = Survey.query.filter_by(id=survey_id).first()
+def select_questions(id):
+    """
+    this function is view function for choosing questions for a survey
+    and is also used for modifying a survey
+    @id = survey id
+    """
+    survey = Survey.query.filter_by(id=id).first()
 
     if current_user.id != survey.owner_id and not current_user.is_administrator():
         return redirect(url_for('.index'))
@@ -76,13 +80,17 @@ def create_survey():
         db.session.add(survey)
         db.session.commit()
         flash("The survey is successfully created, Please add questions to the survey now.")
-        return redirect(url_for('.select_questions', survey_id=survey.id))
+        return redirect(url_for('.select_questions', id=survey.id))
 
     return render_template('create_survey.html')
 
 
 @main.route('/answer/<int:id>', methods=['GET', 'POST'])
 def answer(id):
+    """
+    this function is the view function for answering a survey
+    @id : the id for a survey
+    """
     survey = Survey.query.filter_by(id=id).first()
     questions = survey.questions.all()
 
@@ -114,13 +122,16 @@ def question_pool():
 
 @main.route('/delete_question/<int:id>', methods=['GET', 'POST'])
 def delete_question(id):
+    """
+    the functio is the view function for deleting a question
+    @id : id for a question
+    """
     question_to_delete = Question.query.filter_by(id=id).first()
 
     if request.method == 'POST':
-        if current_user.id != question_to_delete.owner_id:
-            if current_user.is_admin is not True:
-                flash("You don't have the permission to delete this question")
-                return redirect(url_for('.question_pool'))
+        if current_user.id != question_to_delete.owner_id or current_user.is_admin is not True:
+            flash("You don't have the permission to delete this question")
+            return redirect(url_for('.question_pool'))
 
         if question_to_delete.surveys.first() is not None:
             flash("The question is already in use, can't delete")
@@ -136,15 +147,18 @@ def delete_question(id):
 
 @main.route('/delete_survey/<int:id>', methods=['GET', 'POST'])
 def delete_survey(id):
+    """
+    the functio is the view function for deleting a survey
+    @id : id for a survey
+    """
     survey_to_delete = Survey.query.filter_by(id=id).first()
     answer_of_survey_to_delete = Answer_of_Survey.query.filter_by(
         survey_id=id).all()
 
     if request.method == 'POST':
-        if current_user.id != survey_to_delete.owner_id:
-            if current_user.is_admin is not True:
-                flash("You don't have the permission to delete this question")
-                return redirect(url_for('.question_pool'))
+        if current_user.id != survey_to_delete.owner_id or current_user.is_admin is not True:
+            flash("You don't have the permission to delete this survey")
+            return redirect(url_for('.question_pool'))
 
         for answer_of_survey in answer_of_survey_to_delete:
             for answer in answer_of_survey.answers.all():
@@ -162,6 +176,10 @@ def delete_survey(id):
 @main.route('/survey/<int:id>', methods=['GET'])
 @login_required
 def survey_detail(id):
+    """
+    the function is the view function for survey detail page
+    @id : the id of a survey
+    """
 
     survey = Survey.query.filter_by(id=id).first_or_404()
     answer_of_survey = Answer_of_Survey.query.filter_by(survey_id=id).all()
@@ -169,4 +187,5 @@ def survey_detail(id):
         print(rep.answers.all())
     # print(answer_reps)
 
-    return render_template('survey_details.html', survey=survey, answer_of_survey=answer_of_survey, zip=builtins.zip)
+    return render_template('survey_details.html', survey=survey,
+                           answer_of_survey=answer_of_survey, zip=builtins.zip)
