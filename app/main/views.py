@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
-from flask import request, redirect, render_template, abort, url_for, session, flash
+from flask import request, redirect, render_template, url_for, flash
 from flask_login import login_required, current_user
-from sqlalchemy import desc
-from ..models import User, Survey, Question, Answer, Answer_rep
+from ..models import Survey, Question, Answer, Answer_rep
 from .. import db
 from . import main
-from datetime import datetime
 import builtins
 
 

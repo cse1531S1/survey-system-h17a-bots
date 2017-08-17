@@ -2,49 +2,57 @@
 {% block page_content %}
 
 <div class='page-header'>
-    <h1>{{ current_user.username }}</h1>
+  <h1>{{ current_user.username }}</h1>
 
-    <div class="container">
+  <div class="container">
 
-        <div class='posts'>
-            {% for survey in surveys %}
-            <div class='post row'>
-                <div class='col-md-10'>
-                    <div class="post-content">
+    <div class='posts'>
+      {% for survey in surveys %}
+      <div class='post row'>
+        <div class='col-md-9'>
+          <div class="post-content">
 
-                        <div class="post-author">
-                            <a href="{{ url_for('.user', id=survey.owner_id) }}">{{ survey.owner.username }}</a>
-                            <p>
-                            Survey: {{ survey.description }}
-                            </p>
-                        </div>
-
-                        <div class="post-body">
-                            <p>
-                            Questions in the survey:
-                            <div class="col-md-1">
-                            </div>
-                            <div class="col-md-9">
-                            </p>
-                            {% for question in survey.questions.all() %}
-                            <p>
-                            {{ question.description }}
-                            </p>
-                            {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-1" id="button-delete">
-                    <a type="button" class="btn btn-info" href="{{ url_for('main.select_questions', survey_id=survey.id) }}">Modify</a>
-                </div>
-
-                <div class="col-md-1" id="button-delete">
-                    <a type="button" class="btn btn-danger" href="{{ url_for('main.delete_survey', id=survey.id) }}">Delete</a>
-                </div>
+            <div class="post-author">
+              <a href="{{ url_for('.user', id=survey.owner_id) }}">{{ survey.owner.username }}</a>
+              <p>
+              Survey: {{ survey.description }}
+              </p>
+              <p>
+              Link to answer this survey: <a href="{{ url_for("main.answer", id=survey.id )}}">{{ url_for("main.answer", id=survey.id) }}</a>
+              </p>
             </div>
-            {% endfor %}
+
+            <div class="post-body">
+              <p>
+              Questions in the survey:
+              <div class="col-md-1">
+              </div>
+              <div class="col-md-9">
+              </p>
+              {% for question in survey.questions.all() %}
+              <p>
+              {{ question.description }}
+              </p>
+              {% endfor %}
+              </div>
+            </div>
+          </div>
         </div>
+
+        <div class="col-md-1" id="button-delete">
+          <a type="button" class="btn btn-info" href="{{ url_for('main.survey', id=survey.id) }}">Result</a>
+        </div>
+
+        <div class="col-md-1" id="button-delete">
+          <a type="button" class="btn btn-info" href="{{ url_for('main.select_questions', survey_id=survey.id) }}">Modify</a>
+        </div>
+
+        <div class="col-md-1" id="button-delete">
+          <a type="button" class="btn btn-danger" href="{{ url_for('main.delete_survey', id=survey.id) }}">Delete</a>
+        </div>
+      </div>
+      {% endfor %}
     </div>
+  </div>
 </div>
 {% endblock %}
