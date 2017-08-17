@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block page_content %}
+
+<form  method="post">
+    <div class="row">
+        <input class="form-control" type="text" name="title" id="title" value="{{ survey.description }}" placeholder="Enter the title of the survey" required/>
+    </div>
+
+    <div class="text-center">
+        <h3>Choose questions for the survey</h3>
+    </div>
+    <div class='radio text-center'>
+        {% for question in questions %}
+        <div class='row'>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="optionCheckboxes" id="optionCheckboxes" value={{ question.id }} />{{ question.description }}
+                </label>
+            </div>
+        </div>
+        {% endfor %}
+        <button id="sub" type="submit">Submit</button>
+    </div>
+</form>
+{% endblock %}

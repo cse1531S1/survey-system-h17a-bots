@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
-from flask import request, redirect, render_template, url_for, flash
+from flask import request, redirect, render_template, url_for, flash, abort
 from flask_login import login_required, current_user
 from ..models import Survey, Question, Answer, Answer_of_Survey
 from .. import db
@@ -55,6 +55,39 @@ def select_questions(id):
     return render_template('select_questions.html', questions=questions)
 
 
+@main.route('/modify_survey/<int:id>', methods=['GET', 'POST'])
+@login_required
+def modify_survey(id):
+    """
+    this function is view function for choosing questions for a survey
+    and is also used for modifying a survey
+    @id = survey id
+    """
+    survey = Survey.query.filter_by(id=id).first()
+
+    if current_user.id != survey.owner_id and not current_user.is_administrator():
+        return redirect(url_for('.index'))
+
+    questions = Question.query.all()
+
+    if request.method == 'POST':
+        title = request.form['title']
+        survey.description = title
+
+        for question in survey.questions.all():
+            survey.questions.remove(question)
+
+        datas = request.form.getlist('optionCheckboxes')
+        for data in datas:
+            question = Question.query.filter_by(id=int(data)).first()
+            survey.questions.append(question)
+        db.session.add(survey)
+        flash("You successfully modified the survey")
+        return redirect(url_for('.index'))
+
+    return render_template('modify_survey.html', questions=questions, survey=survey)
+
+
 @main.route('/create_question', methods=['GET', 'POST'])
 @login_required
 def create_question():
@@ -92,6 +125,8 @@ def answer(id):
     @id : the id for a survey
     """
     survey = Survey.query.filter_by(id=id).first()
+    if survey is None:
+        abort(404)
     questions = survey.questions.all()
 
     if request.method == 'POST':
