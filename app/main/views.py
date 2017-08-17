@@ -138,7 +138,7 @@ def delete_question(id):
 @main.route('/delete_survey/<int:id>', methods=['GET', 'POST'])
 def delete_survey(id):
     survey_to_delete = Survey.query.filter_by(id=id).first()
-    answers_to_delete = Answer.query.filter_by(survey_id=id).all()
+    answer_reps_to_delete = Answer_rep.query.filter_by(survey_id=id).all()
 
     if request.method == 'POST':
         if current_user.id != survey_to_delete.owner_id:
@@ -146,8 +146,10 @@ def delete_survey(id):
                 flash("You don't have the permission to delete this question")
                 return redirect(url_for('.question_pool'))
 
-        for answer in answers_to_delete:
-            db.session.delete(answer)
+        for answer_rep in answer_reps_to_delete:
+            for answer in answer_rep.answers.all():
+                db.session.delete(answer)
+            db.session.delete(answer_rep)
 
         db.session.delete(survey_to_delete)
         db.session.commit()
