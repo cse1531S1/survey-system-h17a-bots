@@ -3,11 +3,11 @@
 
 Survey: {{ survey.description }}
 
-{% for answer_rep in answer_reps %}
+{% for an_answer_of_survey in answer_of_survey %}
 <p>
-Answer given by : {{ answer_rep.owner_id }}
+Answer given by : {{ an_answer_of_survey.owner.username }}
 </p>
-{% for question, answer in zip(survey.questions.all(), answer_rep.answers.all())%}
+{% for question, answer in zip(survey.questions.all(), an_answer_of_survey.answers.all())%}
 <p>
 {{ question.description }} : {{ answer.content }}
 </p>

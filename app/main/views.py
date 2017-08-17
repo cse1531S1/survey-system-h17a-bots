@@ -3,7 +3,7 @@
 
 from flask import request, redirect, render_template, url_for, flash
 from flask_login import login_required, current_user
-from ..models import Survey, Question, Answer, Answer_rep
+from ..models import Survey, Question, Answer, Answer_of_Survey
 from .. import db
 from . import main
 import builtins
@@ -87,14 +87,15 @@ def answer(id):
     questions = survey.questions.all()
 
     if request.method == 'POST':
-        answer_rep = Answer_rep(survey_id=survey.id, owner_id=current_user.id)
-        db.session.add(answer_rep)
+        answer_of_survey = Answer_of_Survey(
+            survey_id=survey.id, owner_id=current_user.id)
+        db.session.add(answer_of_survey)
         db.session.commit()
 
         datas = request.form.getlist('answer')
         print(datas)
         for data, question in zip(datas, questions):
-            new_answer = Answer(rep_id=answer_rep.id,
+            new_answer = Answer(rep_id=answer_of_survey.id,
                                 question_id=question.id, content=data)
             db.session.add(new_answer)
 
@@ -136,7 +137,8 @@ def delete_question(id):
 @main.route('/delete_survey/<int:id>', methods=['GET', 'POST'])
 def delete_survey(id):
     survey_to_delete = Survey.query.filter_by(id=id).first()
-    answer_reps_to_delete = Answer_rep.query.filter_by(survey_id=id).all()
+    answer_of_survey_to_delete = Answer_of_Survey.query.filter_by(
+        survey_id=id).all()
 
     if request.method == 'POST':
         if current_user.id != survey_to_delete.owner_id:
@@ -144,10 +146,10 @@ def delete_survey(id):
                 flash("You don't have the permission to delete this question")
                 return redirect(url_for('.question_pool'))
 
-        for answer_rep in answer_reps_to_delete:
-            for answer in answer_rep.answers.all():
+        for answer_of_survey in answer_of_survey_to_delete:
+            for answer in answer_of_survey.answers.all():
                 db.session.delete(answer)
-            db.session.delete(answer_rep)
+            db.session.delete(answer_of_survey)
 
         db.session.delete(survey_to_delete)
         db.session.commit()
@@ -159,12 +161,12 @@ def delete_survey(id):
 
 @main.route('/survey/<int:id>', methods=['GET'])
 @login_required
-def survey(id):
+def survey_detail(id):
 
     survey = Survey.query.filter_by(id=id).first_or_404()
-    answer_reps = Answer_rep.query.filter_by(survey_id=id).all()
-    for rep in answer_reps:
+    answer_of_survey = Answer_of_Survey.query.filter_by(survey_id=id).all()
+    for rep in answer_of_survey:
         print(rep.answers.all())
     # print(answer_reps)
 
-    return render_template('survey_details.html', survey=survey, answer_reps=answer_reps, zip=builtins.zip)
+    return render_template('survey_details.html', survey=survey, answer_of_survey=answer_of_survey, zip=builtins.zip)
