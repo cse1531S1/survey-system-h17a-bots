@@ -42,3 +42,17 @@
    ```
 
 
+### FAQ
+
+1. HOW COULD I INIT THE DATABASE?
+
+```shell
+// remember active the virtual environment first
+$ python manage.py shell
+// then you will be in the intractive python shell
+>> db.drop_all()
+// press enter
+>> db.create_all()
+// WOOHOO! a brand new database is initialised
+```
+
