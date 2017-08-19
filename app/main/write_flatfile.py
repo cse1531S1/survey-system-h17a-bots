@@ -17,7 +17,7 @@ def wirte_flatfile(id, app):
                 username = an_answer_of_survey.owner.username
                 dic = {question.description: answer.content for question in survey.questions.all()
                        for answer in an_answer_of_survey.answers.all()}
-                print(dic)
+                # print(dic)
                 writer.writerow(
                     [survey.description, username, dic])
 
