@@ -97,7 +97,7 @@ def create_question():
                             owner_id=current_user.id)
         db.session.add(question)
         db.session.commit()
-        print(question.id)
+        # print(question.id)
         flash("The question is successfully created")
         return redirect(url_for('.create_question'))
 
@@ -136,7 +136,7 @@ def answer(id):
         db.session.commit()
 
         datas = request.form.getlist('answer')
-        print(datas)
+        # print(datas)
         for data, question in zip(datas, questions):
             new_answer = Answer(rep_id=answer_of_survey.id,
                                 question_id=question.id, content=data)
@@ -218,8 +218,9 @@ def survey_detail(id):
 
     survey = Survey.query.filter_by(id=id).first_or_404()
     answer_of_survey = Answer_of_Survey.query.filter_by(survey_id=id).all()
-    for rep in answer_of_survey:
-        print(rep.answers.all())
+
+    # for rep in answer_of_survey:
+    # print(rep.answers.all())
     # print(answer_reps)
 
     return render_template('survey_details.html', survey=survey,

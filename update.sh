@@ -1,5 +1,5 @@
 #!/bin/sh
-	
+
 existing_remote=`git remote -v | egrep -o "[git@ | https\:\/\/]*github.com.*git" | uniq`
 
 if [ $# -ne 1 ]; then

@@ -12,7 +12,9 @@
     <div class='radio text-center'>
         {% for question in questions %}
         <div class='row'>
-            <div class="checkbox">
+            <div class="col-md-3">
+            </div>
+            <div class="checkbox col-md-6 text-left">
                 <label>
                     <input type="checkbox" name="optionCheckboxes" id="optionCheckboxes" value={{ question.id }} />{{ question.description }}
                 </label>
