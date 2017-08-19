@@ -6,6 +6,7 @@ from flask_login import login_required, current_user
 from ..models import Survey, Question, Answer, Answer_of_Survey
 from .. import db
 from . import main
+from .wirte_flatfile import write_flatfile_async
 import builtins
 
 
@@ -225,3 +226,11 @@ def survey_detail(id):
 
     return render_template('survey_details.html', survey=survey,
                            answer_of_survey=answer_of_survey, zip=builtins.zip)
+
+
+@main.route('/survey_save/<int:id>')
+@login_required
+def survey_save(id):
+    write_flatfile_async(id)
+    flash("Save the survey result to csv file successfully!")
+    return redirect(url_for('.survey_detail', id=id))
