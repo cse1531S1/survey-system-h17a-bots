@@ -1,9 +1,10 @@
 # PROJECT
 
 
+Before making your contribution please check our working progress [here](https://docs.google.com/document/d/1TzG5yQ7I7R_76ya9ORNKC6MaxUXVMQIUMHUQFK8QuIs/edit).
+
 
 ---
-
 
 
 ### Setup Instruction
