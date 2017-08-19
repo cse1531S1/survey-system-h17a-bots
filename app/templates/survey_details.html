@@ -14,4 +14,5 @@ Answer given by : {{ an_answer_of_survey.owner.username }}
 {% endfor %}
 {% endfor %}
 
+<a href="{{ url_for('main.survey_save', id=survey.id)}}">Save result to csv?</a>
 {% endblock %}
