@@ -6,7 +6,7 @@ from flask_login import login_required, current_user
 from ..models import Survey, Question, Answer, Answer_of_Survey
 from .. import db
 from . import main
-from .wirte_flatfile import write_flatfile_async
+from .write_flatfile import write_flatfile_async
 import builtins
 
 
