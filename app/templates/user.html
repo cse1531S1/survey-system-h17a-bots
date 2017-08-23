@@ -40,11 +40,11 @@
         </div>
 
         <div class="col-md-1" id="button-delete">
-          <a type="button" class="btn btn-info" href="{{ url_for('main.survey', id=survey.id) }}">Result</a>
+          <a type="button" class="btn btn-info" href="{{ url_for('main.survey_detail', id=survey.id) }}">Result</a>
         </div>
 
         <div class="col-md-1" id="button-delete">
-          <a type="button" class="btn btn-info" href="{{ url_for('main.select_questions', survey_id=survey.id) }}">Modify</a>
+          <a type="button" class="btn btn-info" href="{{ url_for('main.modify_survey', id=survey.id) }}">Modify</a>
         </div>
 
         <div class="col-md-1" id="button-delete">

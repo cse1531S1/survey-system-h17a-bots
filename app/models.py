@@ -16,7 +16,7 @@ class User(UserMixin, db.Model):
     last_login = db.Column(db.DateTime(), default=datetime.utcnow)
     surveys = db.relationship('Survey', backref='owner', lazy='dynamic')
     questions = db.relationship('Question', backref='owner', lazy='dynamic')
-    answers = db.relationship('Answer_rep', backref='owner', lazy='dynamic')
+    answers = db.relationship('Answer_of_Survey', backref='owner', lazy='dynamic')
 
     is_admin = db.Column(db.Boolean, default=False)
 
@@ -113,15 +113,15 @@ class Answer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     question_id = db.Column(db.Integer, db.ForeignKey('questions.id'))
     content = db.Column(db.String(512))
-    rep_id = db.Column(db.Integer, db.ForeignKey('answer_reps.id'))
+    rep_id = db.Column(db.Integer, db.ForeignKey('answer_of_survey.id'))
 
     def __repr__(self):
-        return '<Answer {} Question {}>'.format(
+        return '<Answer {} for Question {}>'.format(
             self.id, self.question_id)
 
 
-class Answer_rep(db.Model):
-    __tablename__ = 'answer_reps'
+class Answer_of_Survey(db.Model):
+    __tablename__ = 'answer_of_survey'
     id = db.Column(db.Integer, primary_key=True)
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     timestamp = db.Column(db.DateTime(), default=datetime.utcnow)
@@ -129,5 +129,5 @@ class Answer_rep(db.Model):
     answers = db.relationship('Answer', backref='rep', lazy='dynamic')
 
     def __repr__(self):
-        return '<Answer_rep {} given by {} Survey {}>'.format(
+        return '<Answer_of_Survey {} given by {} Survey {}>'.format(
             self.id, self.owner_id, self.survey_id)

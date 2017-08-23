@@ -2,26 +2,26 @@
 {% block page_content %}
 
 <div class='row'>
-    <h1>
-        Survey Name:{{ survey.description }}
-    </h1>
+  <h1>
+    Survey Name:{{ survey.description }}
+  </h1>
 </div>
 <h3>Questions</h3>
 
 
 <form  method="post">
-    <div>
-        {% for question in survey.questions.all() %}
-        <div class='row'>
-            <div>
-                {{ question.description }}
-            </div>
-            <label>
-                <input class="form-control" type="text" name="answer" id="answer" value="" required/>
-            </label>
-        </div>
-        {% endfor %}
-        <button class="btn btn-default"id="sub" type="submit">Submit</button>
+  <div>
+    {% for question in survey.questions.all() %}
+    <div class='row'>
+      <div>
+        {{ question.description }}
+      </div>
+      <label>
+        <input class="form-control" type="text" name="answer" id="answer" value="" required/>
+      </label>
     </div>
+    {% endfor %}
+    <button class="btn btn-default"id="sub" type="submit">Submit</button>
+  </div>
 </form>
 {% endblock %}

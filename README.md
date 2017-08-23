@@ -1,9 +1,10 @@
 # PROJECT
 
 
+Before making your contribution please check our working progress [here](https://docs.google.com/document/d/1TzG5yQ7I7R_76ya9ORNKC6MaxUXVMQIUMHUQFK8QuIs/edit).
+
 
 ---
-
 
 
 ### Setup Instruction
@@ -41,4 +42,18 @@
    (venv) $ python manage.py runserver
    ```
 
+
+### FAQ
+
+1. HOW COULD I INIT THE DATABASE?
+
+```shell
+// remember activate the virtual environment first
+$ python manage.py shell
+// then you will be in the intractive python shell
+>> db.drop_all()
+// press enter
+>> db.create_all()
+// WOOHOO! a brand new database is initialised
+```
 
