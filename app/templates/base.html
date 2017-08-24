@@ -1,13 +1,20 @@
+
 <head>
   <meta charset="utf-8">
   <title>Group HD</title>
   <!-- <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon"> -->
   <!-- <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon"> -->
   <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}"/>
+  <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-theme.css') }}"/>
   <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}"/>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
+
 </head>
 
 <div class="navbar navbar-inverse" role="navigation">
+
+
   <div class="container">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -22,7 +29,7 @@
       <ul class="nav navbar-nav">
         {% if current_user.is_authenticated %}
         <li>
-            <a href="{{ url_for('main.user', id=current_user.id) }}">View Surveys</a>
+          <a href="{{ url_for('main.user', id=current_user.id) }}">View Surveys</a>
         </li>
         <li>
           <a href="{{ url_for('main.create_survey') }}">Create a Survey</a>
@@ -47,12 +54,17 @@
   </div>
 </div>
 
+{% block content %}
 <div class="container">
   {% for message in get_flashed_messages() %}
   <div class="alert alert-warning">
-    <button type="button" class="close" data-dismiss="alert">&times;</button> {{ message }}
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    {{ message }}
   </div>
   {% endfor %}
 
-  {% block page_content %}{% endblock %}
+  {% block page_content %} {% endblock %}
+</div>
+{% endblock %}
+
 </div>
