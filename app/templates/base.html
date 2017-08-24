@@ -22,7 +22,7 @@
       <ul class="nav navbar-nav">
         {% if current_user.is_authenticated %}
         <li>
-            <a href="{{ url_for('main.user', id=current_user.id) }}">View surveys</a>
+            <a href="{{ url_for('main.user', id=current_user.id) }}">View Surveys</a>
         </li>
         <li>
           <a href="{{ url_for('main.create_survey') }}">Create a Survey</a>
