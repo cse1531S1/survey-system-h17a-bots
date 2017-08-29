@@ -6,6 +6,11 @@ from flask_login import UserMixin, AnonymousUserMixin
 from .import db, login_manager
 from datetime import datetime
 
+"""
+the database model will be demonstrated as a DRM diagram
+so there won't be any comment
+"""
+
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
