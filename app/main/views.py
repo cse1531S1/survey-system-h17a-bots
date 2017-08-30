@@ -6,7 +6,7 @@ from flask_login import login_required, current_user
 from ..models import Survey, Question, Answer, Answer_of_Survey
 from .. import db
 from . import main
-from .write_flatfile import write_flatfile_async
+from .flatfile import write_flatfile_async, read_course
 import builtins
 
 
@@ -45,7 +45,7 @@ def select_questions(id):
         for question in survey.questions.all():
             survey.questions.remove(question)
 
-        datas = request.form.getlist('optionCheckboxes')
+        datas = request.form.getlist('to[]')
         for data in datas:
             question = Question.query.filter_by(id=int(data)).first()
             survey.questions.append(question)
@@ -70,6 +70,7 @@ def modify_survey(id):
         return redirect(url_for('.index'))
 
     questions = Question.query.all()
+    questions_in_survey = survey.questions.all()
 
     if request.method == 'POST':
         title = request.form['title']
@@ -78,7 +79,7 @@ def modify_survey(id):
         for question in survey.questions.all():
             survey.questions.remove(question)
 
-        datas = request.form.getlist('optionCheckboxes')
+        datas = request.form.getlist('to[]')
         for data in datas:
             question = Question.query.filter_by(id=int(data)).first()
             survey.questions.append(question)
@@ -86,7 +87,7 @@ def modify_survey(id):
         flash("You successfully modified the survey")
         return redirect(url_for('.index'))
 
-    return render_template('modify_survey.html', questions=questions, survey=survey)
+    return render_template('modify_survey.html', questions=questions, survey=survey, questions_in_survey=questions_in_survey)
 
 
 @main.route('/create_question', methods=['GET', 'POST'])
@@ -110,13 +111,16 @@ def create_question():
 def create_survey():
     if request.method == 'POST':
         survey_name = request.form['title']
-        survey = Survey(description=survey_name, owner_id=current_user.id)
+        course = request.form['course']
+        survey = Survey(description=survey_name,
+                        owner_id=current_user.id, course=course, active=True)
         db.session.add(survey)
         db.session.commit()
         flash("The survey is successfully created, Please add questions to the survey now.")
         return redirect(url_for('.select_questions', id=survey.id))
 
-    return render_template('create_survey.html')
+    courses = read_course()
+    return render_template('create_survey.html', courses=courses)
 
 
 @main.route('/answer/<int:id>', methods=['GET', 'POST'])

@@ -6,6 +6,11 @@ from flask_login import UserMixin, AnonymousUserMixin
 from .import db, login_manager
 from datetime import datetime
 
+"""
+the database model will be demonstrated as a DRM diagram
+so there won't be any comment
+"""
+
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -16,7 +21,8 @@ class User(UserMixin, db.Model):
     last_login = db.Column(db.DateTime(), default=datetime.utcnow)
     surveys = db.relationship('Survey', backref='owner', lazy='dynamic')
     questions = db.relationship('Question', backref='owner', lazy='dynamic')
-    answers = db.relationship('Answer_of_Survey', backref='owner', lazy='dynamic')
+    answers = db.relationship(
+        'Answer_of_Survey', backref='owner', lazy='dynamic')
 
     is_admin = db.Column(db.Boolean, default=False)
 
@@ -87,8 +93,9 @@ class Survey(db.Model):
     # 1 : multiple choices
     q_type = db.Column(db.Integer, default=1)
     description = db.Column(db.String(512))
-    classinfo = db.Column(db.String(64))
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    course = db.Column(db.String(32))
+    active = db.Column(db.Boolean())
     timestamp = db.Column(db.DateTime(), default=datetime.utcnow)
 
     questions = db.relationship('Question', secondary=Survey_Question, backref=db.backref(

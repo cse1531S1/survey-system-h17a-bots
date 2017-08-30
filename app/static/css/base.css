@@ -72,28 +72,30 @@
   opacity: .5;
 }
 
-button.close {
-  -webkit-appearance: none;
-  padding: 0;
-  cursor: pointer;
-  background: transparent;
-  border: 0;
+.selectwidthauto {
+  width: auto !important;
 }
-.alert-dismissable .close,
-.alert-dismissible .close {
-  position: relative;
-  top: -2px;
-  right: -21px;
-  color: inherit;
+
+.input-mini {
+  width: 60px;
 }
-.alert-dismissable,
-.alert-dismissible {
-  padding-right: 35px;
+
+.input-small {
+  width: 90px;
 }
-.alert-dismissable .close,
-.alert-dismissible .close {
-  position: relative;
-  top: -2px;
-  right: -21px;
-  color: inherit;
+
+.input-medium {
+  width: 150px;
+}
+
+.input-large {
+  width: 210px;
+}
+
+.input-xlarge {
+  width: 270px;
+}
+
+.input-xxlarge {
+  width: 530px;
 }
