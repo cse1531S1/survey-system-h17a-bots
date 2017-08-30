@@ -2,16 +2,12 @@
 {% block page_content %}
 
 <form action="" method="post" accept-charset="utf-8">
-    <div class="col-md-2">
+  <div class="col-md-8 col-sm-offset-2">
+    <input class="form-control" type="text" name="title" id="title" value="" placeholder="Enter the title of question?" required/>
+    <br />
+    <div class='text-center'>
+      <button id="" type="submit" class='btn btn-default'> submit </button>
     </div>
-    <div class="col-md-8">
-        <input class="form-control" type="text" name="title" id="title" value="" placeholder="Enter the title of question?" required/>
-        <br />
-        <div class='text-center'>
-            <button id="" type="submit" class='btn btn-default'> submit </button>
-        </div>
-    </div>
-    <div class="col-md-2">
-    </div>
+  </div>
 </form>
 {% endblock %}
