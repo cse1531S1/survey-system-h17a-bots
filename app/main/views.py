@@ -87,7 +87,8 @@ def modify_survey(id):
         flash("You successfully modified the survey")
         return redirect(url_for('.index'))
 
-    return render_template('modify_survey.html', questions=questions, survey=survey, questions_in_survey=questions_in_survey)
+    return render_template('modify_survey.html', questions=questions,
+                           survey=survey, questions_in_survey=questions_in_survey)
 
 
 @main.route('/create_question', methods=['GET', 'POST'])
@@ -141,7 +142,7 @@ def answer(id):
         db.session.commit()
 
         datas = request.form.getlist('answer')
-        # print(datas)
+        print(datas)
         for data, question in zip(datas, questions):
             new_answer = Answer(rep_id=answer_of_survey.id,
                                 question_id=question.id, content=data)

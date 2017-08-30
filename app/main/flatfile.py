@@ -33,7 +33,7 @@ def write_flatfile_async(id):
 def read_course():
     with open('courses.csv', 'r') as file_in:
         result = map(str, csv.reader(file_in))
-        # match "COMP1010 17s1" like string
+        # match "ZZZZ9999 99z9" like string
         pattern = r'..([A-Z]{4}[0-9]{4}\s[0-9]{2}[a-z][0-9])..'
         result = [re.match(pattern, i).group(1)
                   for i in result if re.match(pattern, i)]
