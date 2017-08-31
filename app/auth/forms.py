@@ -17,11 +17,11 @@ class LoginForm(Form):
 
 
 class RegistForm(Form):
-    username = StringField('username', validators=[Required(), Length(1, 64)])
+    username = StringField('Username', validators=[Required(), Length(1, 64)])
     password = PasswordField('Password', validators=[Required(), EqualTo(
         'password_confirm', message='Password must match.')])
     password_confirm = PasswordField(
-        'password confirm', validators=[Required()])
+        'Confirm your password', validators=[Required()])
     submit = SubmitField('Register')
 
     def validate_email(self, field):
