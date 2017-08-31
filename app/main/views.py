@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
-from flask import request, redirect, render_template, url_for, flash, abort
+from flask import request, redirect, render_template, url_for, flash
 from flask_login import login_required, current_user
 from ..models import Survey, Question, Answer, Answer_of_Survey
 from .. import db
@@ -34,7 +34,7 @@ def select_questions(id):
     and is also used for modifying a survey
     @id = survey id
     """
-    survey = Survey.query.filter_by(id=id).first()
+    survey = Survey.query.filter_by(id=id).first_or_404()
 
     if current_user.id != survey.owner_id and not current_user.is_administrator():
         return redirect(url_for('.index'))
@@ -64,7 +64,7 @@ def modify_survey(id):
     and is also used for modifying a survey
     @id = survey id
     """
-    survey = Survey.query.filter_by(id=id).first()
+    survey = Survey.query.filter_by(id=id).first_or_404()
 
     if current_user.id != survey.owner_id and not current_user.is_administrator():
         return redirect(url_for('.index'))
@@ -144,11 +144,13 @@ def answer(hash_str):
         db.session.add(answer_of_survey)
         db.session.commit()
 
-        datas = request.form.getlist('answer')
-        print(datas)
-        for data, question in zip(datas, questions):
+        #  datas = request.form.getlist('answer')
+        #  print(datas)
+        for question in questions:
+            answer_data = request.form[str(question.id)]
+            print(answer_data)
             new_answer = Answer(rep_id=answer_of_survey.id,
-                                question_id=question.id, content=data)
+                                question_id=question.id, content=answer_data)
             db.session.add(new_answer)
 
         db.session.commit()
@@ -170,7 +172,7 @@ def delete_question(id):
     the functio is the view function for deleting a question
     @id : id for a question
     """
-    question_to_delete = Question.query.filter_by(id=id).first()
+    question_to_delete = Question.query.filter_by(id=id).first_or_404()
 
     if request.method == 'POST':
         if current_user.id != question_to_delete.owner_id and current_user.is_admin is not True:
@@ -195,7 +197,7 @@ def delete_survey(id):
     the functio is the view function for deleting a survey
     @id : id for a survey
     """
-    survey_to_delete = Survey.query.filter_by(id=id).first()
+    survey_to_delete = Survey.query.filter_by(id=id).first_or_404()
     answer_of_survey_to_delete = Answer_of_Survey.query.filter_by(
         survey_id=id).all()
 

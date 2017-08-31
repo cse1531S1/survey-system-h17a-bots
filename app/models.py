@@ -90,7 +90,7 @@ class Survey(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     id_hash = db.Column(db.String(128))
 
-    description = db.Column(db.String(512))
+    description = db.Column(db.String(512), unique=True)
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     course = db.Column(db.String(32))
     active = db.Column(db.Boolean())
@@ -107,7 +107,7 @@ class Question(db.Model):
     __tablename__ = 'questions'
     id = db.Column(db.Integer, primary_key=True)
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    description = db.Column(db.String(512))
+    description = db.Column(db.String(512), unique=True)
 
     # q_type : question type
     # 1 : multiple choices
