@@ -169,7 +169,7 @@ def delete_question(id):
     question_to_delete = Question.query.filter_by(id=id).first()
 
     if request.method == 'POST':
-        if current_user.id != question_to_delete.owner_id or current_user.is_admin is not True:
+        if current_user.id != question_to_delete.owner_id and current_user.is_admin is not True:
             flash("You don't have the permission to delete this question")
             return redirect(url_for('.question_pool'))
 
@@ -196,7 +196,7 @@ def delete_survey(id):
         survey_id=id).all()
 
     if request.method == 'POST':
-        if current_user.id != survey_to_delete.owner_id or current_user.is_admin is not True:
+        if current_user.id != survey_to_delete.owner_id and current_user.is_admin is not True:
             flash("You don't have the permission to delete this survey")
             return redirect(url_for('.question_pool'))
 
