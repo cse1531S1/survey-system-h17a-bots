@@ -1,18 +1,22 @@
 {% extends "base.html" %}
 {% block page_content %}
 
-Survey: {{ survey.description }}
+<h2 class="text-center">Survey result of: {{ survey.description }}</h2>
 
 {% for an_answer_of_survey in answer_of_survey %}
-<p>
-Answer given by : {{ an_answer_of_survey.owner.username }}
-</p>
-{% for question, answer in zip(survey.questions.all(), an_answer_of_survey.answers.all())%}
-<p>
-{{ question.description }} : {{ answer.content }}
-</p>
-{% endfor %}
+<div class="result-body">
+    <h5 class="text-center">
+        Answer given by : {{ an_answer_of_survey.owner.username }}
+    </h5>
+    {% for question, answer in zip(survey.questions.all(), an_answer_of_survey.answers.all())%}
+    <p class="result-detail">
+    {{ question.description }} : {{ answer.content }}
+    </p>
+    {% endfor %}
+</div>
 {% endfor %}
 
-<a href="{{ url_for('main.survey_save', id=survey.id)}}">Save result to csv?</a>
+<div class="row text-center">
+    <a class="btn btn-info" href="{{ url_for('main.survey_save', id=survey.id)}}">Save result to csv</a>
+</div>
 {% endblock %}

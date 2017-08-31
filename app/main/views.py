@@ -154,6 +154,7 @@ def answer(hash_str):
             db.session.add(new_answer)
 
         db.session.commit()
+        file_operation.write_flatfile_async(survey.id)
         flash('You successfully submit your response')
         return redirect(url_for('.index'))
     return render_template('answer_survey.html', survey=survey)

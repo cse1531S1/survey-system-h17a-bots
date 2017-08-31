@@ -1,12 +1,3 @@
-.profile-thumbnail {
-  position: absolute;
-}
-
-.profile-header {
-  min-height: 260px;
-  margin-left: 280px;
-}
-
 .posts {
   list-style-type: none;
   padding: 0px;
@@ -17,10 +8,6 @@
 .post {
   padding: 8px;
   border-bottom: 1px solid #e0e0e0;
-}
-
-.post-date {
-  float: right;
 }
 
 .post-author {
@@ -63,15 +50,6 @@
   opacity: .2;
 }
 
-.close:hover,
-.close:focus {
-  color: #000;
-  text-decoration: none;
-  cursor: pointer;
-  filter: alpha(opacity=50);
-  opacity: .5;
-}
-
 .selectwidthauto {
   width: auto !important;
 }
@@ -98,4 +76,17 @@
 
 .input-xxlarge {
   width: 530px;
+}
+
+
+.result-body {
+  list-style-type: none;
+  padding: 0px;
+  margin: 16px 0px 0px 0px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.result-detail {
+  padding: 5px;
+  /* border-bottom: 1px solid #e0e0e0; */
 }
