@@ -6,7 +6,7 @@ from flask_login import login_required, current_user
 from ..models import Survey, Question, Answer, Answer_of_Survey
 from .. import db
 from . import main
-from .flatfile import write_flatfile_async, read_course
+from .flatfile import file_operation
 import builtins
 
 
@@ -87,7 +87,8 @@ def modify_survey(id):
         flash("You successfully modified the survey")
         return redirect(url_for('.index'))
 
-    return render_template('modify_survey.html', questions=questions, survey=survey, questions_in_survey=questions_in_survey)
+    return render_template('modify_survey.html', questions=questions,
+                           survey=survey, questions_in_survey=questions_in_survey)
 
 
 @main.route('/create_question', methods=['GET', 'POST'])
@@ -119,7 +120,7 @@ def create_survey():
         flash("The survey is successfully created, Please add questions to the survey now.")
         return redirect(url_for('.select_questions', id=survey.id))
 
-    courses = read_course()
+    courses = file_operation.read_course()
     return render_template('create_survey.html', courses=courses)
 
 
@@ -141,7 +142,7 @@ def answer(id):
         db.session.commit()
 
         datas = request.form.getlist('answer')
-        # print(datas)
+        print(datas)
         for data, question in zip(datas, questions):
             new_answer = Answer(rep_id=answer_of_survey.id,
                                 question_id=question.id, content=data)
@@ -235,6 +236,6 @@ def survey_detail(id):
 @main.route('/survey_save/<int:id>')
 @login_required
 def survey_save(id):
-    write_flatfile_async(id)
-    flash("Save the survey result to csv file successfully!")
+    file_operation.write_flatfile_async(id)
+    file_operation.flash("Save the survey result to csv file successfully!")
     return redirect(url_for('.survey_detail', id=id))

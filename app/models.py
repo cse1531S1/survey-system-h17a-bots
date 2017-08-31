@@ -89,9 +89,6 @@ class Survey(db.Model):
     __tablename__ = 'surveys'
     id = db.Column(db.Integer, primary_key=True)
 
-    # q_type : question type
-    # 1 : multiple choices
-    q_type = db.Column(db.Integer, default=1)
     description = db.Column(db.String(512))
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     course = db.Column(db.String(32))
@@ -110,6 +107,10 @@ class Question(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     description = db.Column(db.String(512))
+
+    # q_type : question type
+    # 1 : multiple choices
+    q_type = db.Column(db.Integer, default=1)
 
     def __repr__(self):
         return '<Question {}>'.format(self.id)
