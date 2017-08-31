@@ -3,7 +3,7 @@
 
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, AnonymousUserMixin
-from .import db, login_manager
+from . import db, login_manager
 from datetime import datetime
 
 """
@@ -88,6 +88,7 @@ Survey_Question = db.Table('survey_question',
 class Survey(db.Model):
     __tablename__ = 'surveys'
     id = db.Column(db.Integer, primary_key=True)
+    id_hash = db.Column(db.String(128))
 
     description = db.Column(db.String(512))
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))

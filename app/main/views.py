@@ -6,7 +6,7 @@ from flask_login import login_required, current_user
 from ..models import Survey, Question, Answer, Answer_of_Survey
 from .. import db
 from . import main
-from .flatfile import file_operation
+from .flatfile import file_operation, generate_id_hash
 import builtins
 
 
@@ -117,6 +117,11 @@ def create_survey():
                         owner_id=current_user.id, course=course, active=True)
         db.session.add(survey)
         db.session.commit()
+        print(survey.id)
+        survey.id_hash = generate_id_hash(survey.id)
+        print(survey.id_hash)
+        db.session.add(survey)
+        db.session.commit()
         flash("The survey is successfully created, Please add questions to the survey now.")
         return redirect(url_for('.select_questions', id=survey.id))
 
@@ -124,18 +129,16 @@ def create_survey():
     return render_template('create_survey.html', courses=courses)
 
 
-@main.route('/answer/<int:id>', methods=['GET', 'POST'])
-def answer(id):
+@main.route('/answer/<hash_str>', methods=['GET', 'POST'])
+def answer(hash_str):
     """
     this function is the view function for answering a survey
     @id : the id for a survey
     """
-    survey = Survey.query.filter_by(id=id).first()
-    if survey is None:
-        abort(404)
-    questions = survey.questions.all()
+    survey = Survey.query.filter_by(id_hash=hash_str).first_or_404()
 
     if request.method == 'POST':
+        questions = survey.questions.all()
         answer_of_survey = Answer_of_Survey(
             survey_id=survey.id, owner_id=current_user.id)
         db.session.add(answer_of_survey)
@@ -225,10 +228,6 @@ def survey_detail(id):
     survey = Survey.query.filter_by(id=id).first_or_404()
     answer_of_survey = Answer_of_Survey.query.filter_by(survey_id=id).all()
 
-    # for rep in answer_of_survey:
-    # print(rep.answers.all())
-    # print(answer_reps)
-
     return render_template('survey_details.html', survey=survey,
                            answer_of_survey=answer_of_survey, zip=builtins.zip)
 
@@ -237,5 +236,5 @@ def survey_detail(id):
 @login_required
 def survey_save(id):
     file_operation.write_flatfile_async(id)
-    file_operation.flash("Save the survey result to csv file successfully!")
+    flash("Save the survey result to csv file successfully!")
     return redirect(url_for('.survey_detail', id=id))

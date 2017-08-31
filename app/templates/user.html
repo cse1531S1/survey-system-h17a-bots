@@ -15,7 +15,7 @@
                         Survey: {{ survey.description }}
                         </p>
                         <p>
-                        Link to answer this survey: <a href="{{ url_for("main.answer", id=survey.id )}}">{{ url_for("main.answer", id=survey.id) }}</a>
+                        Link to answer this survey: <a href="{{ url_for("main.answer", hash_str=survey.id_hash )}}">{{ url_for("main.answer", hash_str=survey.id_hash) }}</a>
                         </p>
                     </div>
 

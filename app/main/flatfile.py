@@ -4,6 +4,8 @@
 from threading import Thread
 from ..models import Answer_of_Survey, Survey
 from flask import current_app
+from hashlib import sha1
+import hashlib
 import re
 import csv
 
@@ -30,6 +32,12 @@ class file_operation(object):
         thr = Thread(target=wirte_flatfile, args=[id, app])
         thr.start()
         return thr
+
+
+def generate_id_hash(id):
+    m = hashlib.sha256()
+    m.update(str(id).encode('utf-8'))
+    return m.hexdigest()
 
 
 def wirte_flatfile(id, app):
