@@ -8,6 +8,30 @@ import re
 import csv
 
 
+class file_operation(object):
+
+    """
+    this is the class for file operation
+    """
+
+    @staticmethod
+    def read_course():
+        with open('courses.csv', 'r') as file_in:
+            result = map(str, csv.reader(file_in))
+            # match "ZZZZ9999 99z9" like string
+            pattern = r'..([A-Z]{4}[0-9]{4}\s[0-9]{2}[a-z][0-9])..'
+            result = [re.match(pattern, i).group(1)
+                      for i in result if re.match(pattern, i)]
+            return result
+
+    @staticmethod
+    def write_flatfile_async(id):
+        app = current_app._get_current_object()
+        thr = Thread(target=wirte_flatfile, args=[id, app])
+        thr.start()
+        return thr
+
+
 def wirte_flatfile(id, app):
     with app.app_context():
         survey = Survey.query.filter_by(id=id).first_or_404()
@@ -21,20 +45,3 @@ def wirte_flatfile(id, app):
                 # print(dic)
                 writer.writerow(
                     [survey.description, username, dic])
-
-
-def write_flatfile_async(id):
-    app = current_app._get_current_object()
-    thr = Thread(target=wirte_flatfile, args=[id, app])
-    thr.start()
-    return thr
-
-
-def read_course():
-    with open('courses.csv', 'r') as file_in:
-        result = map(str, csv.reader(file_in))
-        # match "ZZZZ9999 99z9" like string
-        pattern = r'..([A-Z]{4}[0-9]{4}\s[0-9]{2}[a-z][0-9])..'
-        result = [re.match(pattern, i).group(1)
-                  for i in result if re.match(pattern, i)]
-        return result

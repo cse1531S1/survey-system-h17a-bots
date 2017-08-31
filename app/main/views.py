@@ -6,7 +6,7 @@ from flask_login import login_required, current_user
 from ..models import Survey, Question, Answer, Answer_of_Survey
 from .. import db
 from . import main
-from .flatfile import write_flatfile_async, read_course
+from .flatfile import file_operation
 import builtins
 
 
@@ -120,7 +120,7 @@ def create_survey():
         flash("The survey is successfully created, Please add questions to the survey now.")
         return redirect(url_for('.select_questions', id=survey.id))
 
-    courses = read_course()
+    courses = file_operation.read_course()
     return render_template('create_survey.html', courses=courses)
 
 
@@ -236,6 +236,6 @@ def survey_detail(id):
 @main.route('/survey_save/<int:id>')
 @login_required
 def survey_save(id):
-    write_flatfile_async(id)
-    flash("Save the survey result to csv file successfully!")
+    file_operation.write_flatfile_async(id)
+    file_operation.flash("Save the survey result to csv file successfully!")
     return redirect(url_for('.survey_detail', id=id))
