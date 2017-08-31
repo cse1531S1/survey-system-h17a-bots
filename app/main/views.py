@@ -70,7 +70,6 @@ def modify_survey(id):
         return redirect(url_for('.index'))
 
     questions = Question.query.all()
-    questions_in_survey = survey.questions.all()
 
     if request.method == 'POST':
         title = request.form['title']
@@ -88,7 +87,7 @@ def modify_survey(id):
         return redirect(url_for('.index'))
 
     return render_template('modify_survey.html', questions=questions,
-                           survey=survey, questions_in_survey=questions_in_survey)
+                           survey=survey)
 
 
 @main.route('/create_question', methods=['GET', 'POST'])

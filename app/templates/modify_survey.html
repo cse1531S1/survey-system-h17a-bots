@@ -10,7 +10,8 @@
             },
             fireSearch: function(value) {
                 return value.length > 1;
-            }
+            },
+            keepRenderingSort: true,
         });
     });
 </script>
@@ -51,7 +52,7 @@
 
                 <div class="col-sm-5">
                     <select name="to[]" id="multiselect_to" class="form-control" size="8" multiple="multiple">
-                        {% for question in questions_in_survey %}
+                        {% for question in survey.questions.all()%}
                         <option value="{{ question.id }}">{{ question.description }}</option>
                         {% endfor %}
                     </select>
