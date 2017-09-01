@@ -17,6 +17,7 @@ class LoginForm(Form):
 
 
 class RegistForm(Form):
+    # TODO change username to email
     username = StringField('Username', validators=[Required(), Length(1, 64)])
     password = PasswordField('Password', validators=[Required(), EqualTo(
         'password_confirm', message='Password must match.')])

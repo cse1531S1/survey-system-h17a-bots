@@ -6,7 +6,7 @@ from flask_login import login_required, current_user
 from ..models import Survey, Question, Answer, Answer_of_Survey
 from .. import db
 from . import main
-from .flatfile import file_operation, generate_id_hash
+from .flatfile import file_operation
 import builtins
 
 
@@ -19,9 +19,9 @@ def index():
 @login_required
 def user(id):
     if current_user.is_admin:
-        surveys = Survey.query.all()
+        surveys = Survey.get_all()
     else:
-        surveys = Survey.query.filter_by(owner_id=current_user.id)
+        surveys = Survey.get_by_owner_id(current_user.id)
 
     return render_template('user.html', surveys=surveys)
 
@@ -34,22 +34,17 @@ def select_questions(id):
     and is also used for modifying a survey
     @id = survey id
     """
-    survey = Survey.query.filter_by(id=id).first_or_404()
+    survey = Survey.get_by_id(id)
 
     if current_user.id != survey.owner_id and not current_user.is_administrator():
         return redirect(url_for('.index'))
 
-    questions = Question.query.all()
+    questions = Question.get_all()
 
     if request.method == 'POST':
-        for question in survey.questions.all():
-            survey.questions.remove(question)
-
-        datas = request.form.getlist('to[]')
-        for data in datas:
-            question = Question.query.filter_by(id=int(data)).first()
-            survey.questions.append(question)
-        db.session.add(survey)
+        survey.remove_all_questions()
+        selected = request.form.getlist('to[]')
+        survey.set_questions(selected)
         flash("Questions have been successfully added to the survey")
         return redirect(url_for('.index'))
 
@@ -64,25 +59,19 @@ def modify_survey(id):
     and is also used for modifying a survey
     @id = survey id
     """
-    survey = Survey.query.filter_by(id=id).first_or_404()
+    survey = Survey.get_by_id(id)
 
     if current_user.id != survey.owner_id and not current_user.is_administrator():
         return redirect(url_for('.index'))
 
-    questions = Question.query.all()
+    questions = Question.get_all()
 
     if request.method == 'POST':
         title = request.form['title']
         survey.description = title
-
-        for question in survey.questions.all():
-            survey.questions.remove(question)
-
-        datas = request.form.getlist('to[]')
-        for data in datas:
-            question = Question.query.filter_by(id=int(data)).first()
-            survey.questions.append(question)
-        db.session.add(survey)
+        survey.remove_all_questions()
+        selected = request.form.getlist('to[]')
+        survey.set_questions(selected)
         flash("You successfully modified the survey")
         return redirect(url_for('.index'))
 
@@ -95,11 +84,8 @@ def modify_survey(id):
 def create_question():
     if request.method == 'POST':
         question_description = request.form['title']
-        question = Question(description=question_description,
-                            owner_id=current_user.id)
-        db.session.add(question)
-        db.session.commit()
-        # print(question.id)
+        Question.create_question(description=question_description,
+                                 owner_id=current_user.id)
         flash("The question is successfully created")
         return redirect(url_for('.create_question'))
 
@@ -112,15 +98,8 @@ def create_survey():
     if request.method == 'POST':
         survey_name = request.form['title']
         course = request.form['course']
-        survey = Survey(description=survey_name,
-                        owner_id=current_user.id, course=course, active=True)
-        db.session.add(survey)
-        db.session.commit()
-        print(survey.id)
-        survey.id_hash = generate_id_hash(survey.id)
-        print(survey.id_hash)
-        db.session.add(survey)
-        db.session.commit()
+        survey = Survey.create_survey(description=survey_name,
+                                      owner_id=current_user.id, course=course, active=True)
         flash("The survey is successfully created, Please add questions to the survey now.")
         return redirect(url_for('.select_questions', id=survey.id))
 
@@ -134,7 +113,7 @@ def answer(hash_str):
     this function is the view function for answering a survey
     @id : the id for a survey
     """
-    survey = Survey.query.filter_by(id_hash=hash_str).first_or_404()
+    survey = Survey.get_by_hash(hash_str)
 
     if request.method == 'POST':
         questions = survey.questions.all()
@@ -143,8 +122,6 @@ def answer(hash_str):
         db.session.add(answer_of_survey)
         db.session.commit()
 
-        #  datas = request.form.getlist('answer')
-        #  print(datas)
         for question in questions:
             answer_data = request.form[str(question.id)]
             print(answer_data)
@@ -183,8 +160,7 @@ def delete_question(id):
             flash("The question is already in use, can't delete")
             return redirect(url_for('.question_pool'))
 
-        db.session.delete(question_to_delete)
-        db.session.commit()
+        Question.delete_by_id(id)
         flash("Delete the question successfully")
         return redirect(url_for('.question_pool'))
 
@@ -211,8 +187,7 @@ def delete_survey(id):
                 db.session.delete(answer)
             db.session.delete(answer_of_survey)
 
-        db.session.delete(survey_to_delete)
-        db.session.commit()
+        Survey.delete_by_id(id)
         flash("Delete the survey successfully")
         return redirect(url_for('.index'))
 
@@ -227,7 +202,7 @@ def survey_detail(id):
     @id : the id of a survey
     """
 
-    survey = Survey.query.filter_by(id=id).first_or_404()
+    survey = Survey.get_by_id(id)
     answer_of_survey = Answer_of_Survey.query.filter_by(survey_id=id).all()
 
     return render_template('survey_details.html', survey=survey,

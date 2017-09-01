@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, AnonymousUserMixin
 from . import db, login_manager
 from datetime import datetime
+import hashlib
 
 """
 the database model will be demonstrated as a DRM diagram
@@ -12,7 +13,25 @@ so there won't be any comment
 """
 
 
-class User(UserMixin, db.Model):
+class DatabaseUtil:
+    @staticmethod
+    def get_by_id(id):
+        pass
+
+    @staticmethod
+    def get_by_owner_id(id):
+        pass
+
+    @staticmethod
+    def get_all(id):
+        pass
+
+    @staticmethod
+    def delete_by_id(id):
+        pass
+
+
+class User(UserMixin, db.Model, DatabaseUtil):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, index=True)
@@ -24,6 +43,7 @@ class User(UserMixin, db.Model):
     answers = db.relationship(
         'Answer_of_Survey', backref='owner', lazy='dynamic')
 
+    # TODO User_role class
     is_admin = db.Column(db.Boolean, default=False)
 
     @property
@@ -57,10 +77,16 @@ class User(UserMixin, db.Model):
         self.last_login = datetime.utcnow()
         db.session.add(self)
 
+    def generate_id_hash(id):
+        m = hashlib.sha256()
+        m.update(str(id).encode('utf-8'))
+        return m.hexdigest()
+
 
 class AnoymousUser(AnonymousUserMixin):
     id = 0
     is_admin = False
+    username = 'AnoymousUser'
 
     def can(self):
         return False
@@ -85,7 +111,7 @@ Survey_Question = db.Table('survey_question',
                            )
 
 
-class Survey(db.Model):
+class Survey(db.Model, DatabaseUtil):
     __tablename__ = 'surveys'
     id = db.Column(db.Integer, primary_key=True)
     id_hash = db.Column(db.String(128))
@@ -99,11 +125,61 @@ class Survey(db.Model):
     questions = db.relationship('Question', secondary=Survey_Question, backref=db.backref(
         'surveys', lazy='dynamic'), lazy='dynamic')
 
+    @staticmethod
+    def get_by_id(id):
+        rtn = Survey.query.filter_by(id=id).first_or_404()
+        return rtn
+
+    @staticmethod
+    def get_by_hash(id):
+        rtn = Survey.query.filter_by(id_hash=id).first_or_404()
+        return rtn
+
+    @staticmethod
+    def get_by_owner_id(id):
+        rtn = Survey.query.filter_by(owner_id=id).all()
+        return rtn
+
+    @staticmethod
+    def get_all():
+        rtn = Survey.query.all()
+        return rtn
+
+    @staticmethod
+    def delete_by_id(id):
+        to_delete = Survey.query.filter_by(id=id).first()
+        db.session.delete(to_delete)
+        db.session.commit()
+
+    @staticmethod
+    def create_survey(description, owner_id, course, active):
+        new = Survey(description=description, owner_id=owner_id,
+                     course=course, active=active)
+        db.session.add(new)
+        db.session.commit()
+        new.id_hash = User.generate_id_hash(new.id)
+        db.session.add(new)
+        db.session.commit()
+        return new
+
+    def set_questions(self, question_ids):
+        for question_id in question_ids:
+            question = Question.get_by_id(int(question_id))
+            self.questions.append(question)
+        db.session.add(self)
+        db.session.commit()
+
+    def remove_all_questions(self):
+        for question in self.questions.all():
+            self.questions.remove(question)
+        db.session.add(self)
+        db.session.commit()
+
     def __repr__(self):
         return '<Survey {} belongs to {}>'.format(self.id, self.owner_id)
 
 
-class Question(db.Model):
+class Question(db.Model, DatabaseUtil):
     __tablename__ = 'questions'
     id = db.Column(db.Integer, primary_key=True)
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
@@ -113,11 +189,33 @@ class Question(db.Model):
     # 1 : multiple choices
     q_type = db.Column(db.Integer, default=1)
 
+    @staticmethod
+    def delete_by_id(id):
+        to_delete = Question.query.filter_by(id=id).first()
+        db.session.delete(to_delete)
+        db.session.commit()
+
+    @staticmethod
+    def get_all():
+        rtn = Question.query.all()
+        return rtn
+
+    @staticmethod
+    def get_by_id(id):
+        rtn = Question.query.filter_by(id=id).first_or_404()
+        return rtn
+
+    @staticmethod
+    def create_question(description, owner_id):
+        new = Question(description=description, owner_id=owner_id)
+        db.session.add(new)
+        db.session.commit()
+
     def __repr__(self):
         return '<Question {}>'.format(self.id)
 
 
-class Answer(db.Model):
+class Answer(db.Model, DatabaseUtil):
     __tablename__ = 'answers'
     id = db.Column(db.Integer, primary_key=True)
     question_id = db.Column(db.Integer, db.ForeignKey('questions.id'))
@@ -129,7 +227,7 @@ class Answer(db.Model):
             self.id, self.question_id)
 
 
-class Answer_of_Survey(db.Model):
+class Answer_of_Survey(db.Model, DatabaseUtil):
     __tablename__ = 'answer_of_survey'
     id = db.Column(db.Integer, primary_key=True)
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
