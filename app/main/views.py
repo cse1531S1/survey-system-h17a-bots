@@ -194,6 +194,7 @@ def survey_detail(id):
     """
 
     survey = Survey.get_by_id(id)
+    file_operation.write_flatfile_async(id)
     answer_of_survey = Answer_of_Survey.query.filter_by(survey_id=id).all()
 
     return render_template('survey_details.html', survey=survey,
