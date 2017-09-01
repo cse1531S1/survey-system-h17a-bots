@@ -82,6 +82,11 @@ class User(UserMixin, db.Model, DatabaseUtil):
         m.update(str(id).encode('utf-8'))
         return m.hexdigest()
 
+    @staticmethod
+    def get_by_id(id):
+        rtn = User.query.filter_by(id=id).first_or_404()
+        return rtn
+
 
 class AnoymousUser(AnonymousUserMixin):
     id = 0
@@ -152,7 +157,7 @@ class Survey(db.Model, DatabaseUtil):
         db.session.commit()
 
     @staticmethod
-    def create_survey(description, owner_id, course, active):
+    def create(description, owner_id, course, active):
         new = Survey(description=description, owner_id=owner_id,
                      course=course, active=active)
         db.session.add(new)
@@ -174,6 +179,13 @@ class Survey(db.Model, DatabaseUtil):
             self.questions.remove(question)
         db.session.add(self)
         db.session.commit()
+
+    def check_permission(self, id):
+        current_user = User.get_by_id(id)
+        if current_user.id != self.owner_id and current_user.is_admin is not True:
+            return False
+        else:
+            return True
 
     def __repr__(self):
         return '<Survey {} belongs to {}>'.format(self.id, self.owner_id)
@@ -206,7 +218,7 @@ class Question(db.Model, DatabaseUtil):
         return rtn
 
     @staticmethod
-    def create_question(description, owner_id):
+    def create(description, owner_id):
         new = Question(description=description, owner_id=owner_id)
         db.session.add(new)
         db.session.commit()
@@ -222,6 +234,14 @@ class Answer(db.Model, DatabaseUtil):
     content = db.Column(db.String(512))
     rep_id = db.Column(db.Integer, db.ForeignKey('answer_of_survey.id'))
 
+    @staticmethod
+    def create(answer_of_survey_id, question_id, answer_content):
+        new = Answer(rep_id=answer_of_survey_id,
+                     question_id=question_id, content=answer_content)
+        db.session.add(new)
+        db.session.commit()
+        return new
+
     def __repr__(self):
         return '<Answer {} for Question {}>'.format(
             self.id, self.question_id)
@@ -234,6 +254,38 @@ class Answer_of_Survey(db.Model, DatabaseUtil):
     timestamp = db.Column(db.DateTime(), default=datetime.utcnow)
     survey_id = db.Column(db.Integer, db.ForeignKey('surveys.id'))
     answers = db.relationship('Answer', backref='rep', lazy='dynamic')
+
+    @staticmethod
+    def get_by_survey_id(id):
+        rtn = Answer_of_Survey.query.filter_by(survey_id=id).all()
+        return rtn
+
+    @staticmethod
+    def get_by_id(id):
+        rtn = Answer_of_Survey.query.filter_by(id=id).first_or_404()
+        return rtn
+
+    @staticmethod
+    def delete_by_id(id):
+        answer_of_survey_to_delete = Answer_of_Survey.get_by_id(id)
+        for answer in answer_of_survey_to_delete.answers.all():
+            db.session.delete(answer)
+        db.session.delete(answer_of_survey_to_delete)
+
+    @staticmethod
+    def delete_by_survey_id(id):
+        answer_of_survey_to_delete = Answer_of_Survey.get_by_survey_id(id)
+        for answer_of_survey in answer_of_survey_to_delete:
+            for answer in answer_of_survey.answers.all():
+                db.session.delete(answer)
+            db.session.delete(answer_of_survey)
+
+    @staticmethod
+    def create(survey_id, owner_id):
+        new = Answer_of_Survey(survey_id=survey_id, owner_id=owner_id)
+        db.session.add(new)
+        db.session.commit()
+        return new
 
     def __repr__(self):
         return '<Answer_of_Survey {} given by {} Survey {}>'.format(

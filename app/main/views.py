@@ -84,8 +84,8 @@ def modify_survey(id):
 def create_question():
     if request.method == 'POST':
         question_description = request.form['title']
-        Question.create_question(description=question_description,
-                                 owner_id=current_user.id)
+        Question.create(description=question_description,
+                        owner_id=current_user.id)
         flash("The question is successfully created")
         return redirect(url_for('.create_question'))
 
@@ -98,8 +98,8 @@ def create_survey():
     if request.method == 'POST':
         survey_name = request.form['title']
         course = request.form['course']
-        survey = Survey.create_survey(description=survey_name,
-                                      owner_id=current_user.id, course=course, active=True)
+        survey = Survey.create(description=survey_name,
+                               owner_id=current_user.id, course=course, active=True)
         flash("The survey is successfully created, Please add questions to the survey now.")
         return redirect(url_for('.select_questions', id=survey.id))
 
@@ -117,17 +117,13 @@ def answer(hash_str):
 
     if request.method == 'POST':
         questions = survey.questions.all()
-        answer_of_survey = Answer_of_Survey(
+        answer_of_survey = Answer_of_Survey.create(
             survey_id=survey.id, owner_id=current_user.id)
-        db.session.add(answer_of_survey)
-        db.session.commit()
 
         for question in questions:
-            answer_data = request.form[str(question.id)]
-            print(answer_data)
-            new_answer = Answer(rep_id=answer_of_survey.id,
-                                question_id=question.id, content=answer_data)
-            db.session.add(new_answer)
+            answer_content = request.form[str(question.id)]
+            Answer.create(answer_of_survey_id=answer_of_survey.id,
+                          question_id=question.id, answer_content=answer_content)
 
         db.session.commit()
         file_operation.write_flatfile_async(survey.id)
@@ -173,20 +169,13 @@ def delete_survey(id):
     the functio is the view function for deleting a survey
     @id : id for a survey
     """
-    survey_to_delete = Survey.query.filter_by(id=id).first_or_404()
-    answer_of_survey_to_delete = Answer_of_Survey.query.filter_by(
-        survey_id=id).all()
+    survey_to_delete = Survey.get_by_id(id)
 
     if request.method == 'POST':
-        if current_user.id != survey_to_delete.owner_id and current_user.is_admin is not True:
+        if survey_to_delete.check_permission(current_user.id) is not True:
             flash("You don't have the permission to delete this survey")
             return redirect(url_for('.question_pool'))
-
-        for answer_of_survey in answer_of_survey_to_delete:
-            for answer in answer_of_survey.answers.all():
-                db.session.delete(answer)
-            db.session.delete(answer_of_survey)
-
+        Answer_of_Survey.delete_by_survey_id(survey_to_delete.id)
         Survey.delete_by_id(id)
         flash("Delete the survey successfully")
         return redirect(url_for('.index'))

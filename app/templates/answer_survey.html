@@ -2,56 +2,56 @@
 {% block page_content %}
 
 <div class="container">
-  <div class='row'>
-    <h3 class="center-align">
-      Survey Name: {{ survey.description }}
-    </h3>
-    <h5>Questions: </h5>
-  </div>
-
-
-  <form  method="post">
-    <div>
-      {% for question in survey.questions.all() %}
-      <div class='row question'>
-        <h5>
-          {{ question.description }}
-        </h5>
-        {% if question.q_type == 1 %}
-        <div class="row center-align">
-          <div class="col s2">
-            <input name="{{ question.id }}" type="radio" id="{{ question.id }}a1" value="Very Strongly Agree"/>
-            <label for="{{ question.id }}a1">Very Strongly Agree </label>
-          </div>
-          <div class="col s2">
-            <input name="{{ question.id }}" type="radio" id="{{ question.id }}a2" value="Strongly Agree"/>
-            <label for="{{ question.id }}a2">Strongly Agree </label>
-          </div>
-          <div class="col s2">
-            <input name="{{ question.id }}" type="radio" id="{{ question.id }}a3" value="Agree"/>
-            <label for="{{ question.id }}a3">Agree </label>
-          </div>
-          <div class="col s2">
-            <input name="{{ question.id }}" type="radio" id="{{ question.id }}a4" value="Disagree"/>
-            <label for="{{ question.id }}a4">Disagree </label>
-          </div>
-          <div class="col s2">
-            <input name="{{ question.id }}" type="radio" id="{{ question.id }}a5" value="Strongly Disagree"/>
-            <label for="{{ question.id }}a5">Strongly Disagree </label>
-          </div>
-          <div class="col s2">
-            <input name="{{ question.id }}" type="radio" id="{{ question.id }}a6" value="Very Strongly Disagree"/>
-            <label for="{{ question.id }}a6">Very Strongly Disagree </label>
-          </div>
-        </div>
-        {% endif %}
-      </div>
-      {% endfor %}
-
-      <div class="center-align row">
-        <button class="btn btn-default"id="sub" type="submit">Submit</button>
-      </div>
+    <div class='row'>
+        <h3 class="center-align">
+            Survey Name: {{ survey.description }}
+        </h3>
+        <h5>Questions: </h5>
     </div>
-  </form>
+
+
+    <form  method="post">
+        <div>
+            {% for question in survey.questions.all() %}
+            <div class='row question'>
+                <h5>
+                    {{ question.description }}
+                </h5>
+                {% if question.q_type == 1 %}
+                <div class="row center-align">
+                    <div class="col s2">
+                        <input required name="{{ question.id }}" type="radio" id="{{ question.id }}a1" value="Very Strongly Agree"/>
+                        <label for="{{ question.id }}a1">Very Strongly Agree </label>
+                    </div>
+                    <div class="col s2">
+                        <input required name="{{ question.id }}" type="radio" id="{{ question.id }}a2" value="Strongly Agree"/>
+                        <label for="{{ question.id }}a2">Strongly Agree </label>
+                    </div>
+                    <div class="col s2">
+                        <input required name="{{ question.id }}" type="radio" id="{{ question.id }}a3" value="Agree"/>
+                        <label for="{{ question.id }}a3">Agree </label>
+                    </div>
+                    <div class="col s2">
+                        <input required name="{{ question.id }}" type="radio" id="{{ question.id }}a4" value="Disagree"/>
+                        <label for="{{ question.id }}a4">Disagree </label>
+                    </div>
+                    <div class="col s2">
+                        <input required name="{{ question.id }}" type="radio" id="{{ question.id }}a5" value="Strongly Disagree"/>
+                        <label for="{{ question.id }}a5">Strongly Disagree </label>
+                    </div>
+                    <div class="col s2">
+                        <input required name="{{ question.id }}" type="radio" id="{{ question.id }}a6" value="Very Strongly Disagree"/>
+                        <label for="{{ question.id }}a6">Very Strongly Disagree </label>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <div class="center-align row">
+                <button class="btn btn-default"id="sub" type="submit">Submit</button>
+            </div>
+        </div>
+    </form>
 </div>
 {% endblock %}
