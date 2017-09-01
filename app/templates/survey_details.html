@@ -17,6 +17,6 @@
 {% endfor %}
 
 <div class="row text-center">
-    <a class="btn btn-info" href="{{ url_for('main.survey_save', id=survey.id)}}">Save result to csv</a>
+    <a class="btn btn-info" href="{{ url_for('main.download_csv', filename=str(survey.id)+'.csv')}}">Download result</a>
 </div>
 {% endblock %}

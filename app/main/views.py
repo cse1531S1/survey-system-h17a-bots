@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
-from flask import request, redirect, render_template, url_for, flash
+from flask import request, redirect, render_template, url_for, flash, send_from_directory
 from flask_login import login_required, current_user
 from ..models import Survey, Question, Answer, Answer_of_Survey
 from .. import db
 from . import main
 from .flatfile import file_operation
+from config import basedir
 import builtins
+import os
 
 
 @main.route('/', methods=['GET'])
@@ -195,7 +197,7 @@ def survey_detail(id):
     answer_of_survey = Answer_of_Survey.query.filter_by(survey_id=id).all()
 
     return render_template('survey_details.html', survey=survey,
-                           answer_of_survey=answer_of_survey, zip=builtins.zip)
+                           answer_of_survey=answer_of_survey, zip=builtins.zip, str=builtins.str)
 
 
 @main.route('/survey_save/<int:id>')
@@ -204,3 +206,10 @@ def survey_save(id):
     file_operation.write_flatfile_async(id)
     flash("Save the survey result to csv file successfully!")
     return redirect(url_for('.survey_detail', id=id))
+
+
+@login_required
+@main.route('/download/<filename>')
+def download_csv(filename):
+    path = os.path.join(basedir)
+    return send_from_directory(path, filename)

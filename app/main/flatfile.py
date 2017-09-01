@@ -39,7 +39,10 @@ def wirte_flatfile(id, app):
         with open(str(survey.id) + '.csv', 'w') as csv_file:
             writer = csv.writer(csv_file)
             for an_answer_of_survey in answer_of_survey:
-                username = an_answer_of_survey.owner.username
+                try:
+                    username = an_answer_of_survey.owner.username
+                except AttributeError:
+                    username = "Anonymous"
                 dic = {question.description: answer.content for question in survey.questions.all()
                        for answer in an_answer_of_survey.answers.all()}
                 # print(dic)
