@@ -30,6 +30,10 @@ class DatabaseUtil:
     def delete_by_id(id):
         pass
 
+    @staticmethod
+    def create(id):
+        pass
+
 
 class User(UserMixin, db.Model, DatabaseUtil):
     __tablename__ = 'users'
