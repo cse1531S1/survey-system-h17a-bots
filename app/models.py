@@ -87,12 +87,6 @@ class User(UserMixin, db.Model, DatabaseUtil):
         self.last_login = datetime.utcnow()
         db.session.add(self)
 
-    def generate_id_hash(id):
-        m = hashlib.sha256()
-        m.update(str(id).encode('utf-8'))
-        return m.hexdigest()
-
-
 class AnoymousUser(AnonymousUserMixin):
     id = 0
     is_admin = False
