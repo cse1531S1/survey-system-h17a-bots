@@ -6,7 +6,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 from . import auth
 from ..models import db
 from ..models import User
-from .forms import LoginForm, RegistForm
+from .forms import LoginForm, RegistForm, ChangePasswordForm
 from .auth_util import verify_password
 
 
@@ -46,3 +46,18 @@ def logout():
 def before_request():
     if current_user.is_authenticated:
         current_user.ping()
+
+@auth.route('/chage-password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    form = ChangePasswordForm()
+    if form.validate_on_submit():
+        if verify_password(current_user, form.old_password.data):
+            current_user.password = form.new_password.data
+            db.session.add(current_user)
+            flash('Your password has been updated.')
+            return redirect(url_for('main.index'))
+        else:
+            flash('Invalid password.')
+    return render_template("auth/change_password.html", form=form)
+        
