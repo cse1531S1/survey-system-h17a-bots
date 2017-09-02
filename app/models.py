@@ -87,6 +87,7 @@ class User(UserMixin, db.Model, DatabaseUtil):
         self.last_login = datetime.utcnow()
         db.session.add(self)
 
+
 class AnoymousUser(AnonymousUserMixin):
     id = 0
     is_admin = False
@@ -140,7 +141,7 @@ class Survey(db.Model, DatabaseUtil):
                      course=course, active=active)
         db.session.add(new)
         db.session.commit()
-        new.id_hash = User.generate_id_hash(new.id)
+        new.id_hash = Survey.generate_id_hash(new.id)
         db.session.add(new)
         db.session.commit()
         return new
@@ -164,6 +165,11 @@ class Survey(db.Model, DatabaseUtil):
             return False
         else:
             return True
+
+    def generate_id_hash(id):
+        m = hashlib.sha256()
+        m.update(str(id).encode('utf-8'))
+        return m.hexdigest()
 
     def __repr__(self):
         return '<Survey {} belongs to {}>'.format(self.id, self.owner_id)
