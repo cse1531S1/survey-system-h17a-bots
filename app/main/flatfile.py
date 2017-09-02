@@ -8,7 +8,7 @@ import re
 import csv
 
 
-class file_operation(object):
+class FileOperation(object):
 
     """
     this is the class for file operation
@@ -27,24 +27,24 @@ class file_operation(object):
     @staticmethod
     def write_flatfile_async(id):
         app = current_app._get_current_object()
-        thr = Thread(target=wirte_flatfile, args=[id, app])
+        thr = Thread(target=FileOperation.write_flatfile, args=[id, app])
         thr.start()
         return thr
 
-
-def wirte_flatfile(id, app):
-    with app.app_context():
-        survey = Survey.query.filter_by(id=id).first_or_404()
-        answer_of_survey = AnswerSurveyLink.query.filter_by(survey_id=id).all()
-        with open(str(survey.id) + '.csv', 'w') as csv_file:
-            writer = csv.writer(csv_file)
-            for an_answer_of_survey in answer_of_survey:
-                try:
-                    username = an_answer_of_survey.owner.username
-                except AttributeError:
-                    username = "Anonymous"
-                dic = {question.description: answer.content for question in survey.questions.all()
-                       for answer in an_answer_of_survey.answers.all()}
-                # print(dic)
-                writer.writerow(
-                    [survey.description, username, dic])
+    def write_flatfile(id, app):
+        with app.app_context():
+            survey = Survey.query.filter_by(id=id).first_or_404()
+            answer_of_survey = AnswerSurveyLink.query.filter_by(
+                survey_id=id).all()
+            with open(str(survey.id) + '.csv', 'w') as csv_file:
+                writer = csv.writer(csv_file)
+                for an_answer_of_survey in answer_of_survey:
+                    try:
+                        username = an_answer_of_survey.owner.username
+                    except AttributeError:
+                        username = "Anonymous"
+                    dic = {question.description: answer.content for question in survey.questions.all()
+                           for answer in an_answer_of_survey.answers.all()}
+                    # print(dic)
+                    writer.writerow(
+                        [survey.description, username, dic])
