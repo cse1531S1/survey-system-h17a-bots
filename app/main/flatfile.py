@@ -31,6 +31,7 @@ class FileOperation(object):
         thr.start()
         return thr
 
+    @staticmethod
     def write_flatfile(id, app):
         with app.app_context():
             survey = Survey.query.filter_by(id=id).first_or_404()
