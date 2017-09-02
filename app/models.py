@@ -203,8 +203,8 @@ class Answer(db.Model, DatabaseUtil):
     rep_id = db.Column(db.Integer, db.ForeignKey('answer_survey_link.id'))
 
     @classmethod
-    def create(cls, answer_of_survey_id, question_id, answer_content):
-        new = cls(rep_id=answer_of_survey_id,
+    def create(cls, answer_survey_link_id, question_id, answer_content):
+        new = cls(rep_id=answer_survey_link_id,
                   question_id=question_id, content=answer_content)
         db.session.add(new)
         db.session.commit()

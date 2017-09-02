@@ -124,7 +124,7 @@ def answer(hash_str):
 
         for question in questions:
             answer_content = request.form[str(question.id)]
-            Answer.create(answer_of_survey_id=answer_survey_link.id,
+            Answer.create(answer_survey_link_id=answer_survey_link.id,
                           question_id=question.id, answer_content=answer_content)
 
         db.session.commit()
