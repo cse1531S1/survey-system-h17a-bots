@@ -36,8 +36,8 @@ class DatabaseUtil:
         db.session.delete(to_delete)
         db.session.commit()
 
-    @staticmethod
-    def create(id):
+    @classmethod
+    def create(cls):
         pass
 
 
@@ -51,7 +51,7 @@ class User(UserMixin, db.Model, DatabaseUtil):
     surveys = db.relationship('Survey', backref='owner', lazy='dynamic')
     questions = db.relationship('Question', backref='owner', lazy='dynamic')
     answers = db.relationship(
-        'Answer_of_Survey', backref='owner', lazy='dynamic')
+        'AnswerSurveyLink', backref='owner', lazy='dynamic')
 
     # TODO User_role class
     is_admin = db.Column(db.Boolean, default=False)
@@ -135,13 +135,13 @@ class Survey(db.Model, DatabaseUtil):
         rtn = Survey.query.filter_by(id_hash=id).first_or_404()
         return rtn
 
-    @staticmethod
-    def create(description, owner_id, course, active):
-        new = Survey(description=description, owner_id=owner_id,
-                     course=course, active=active)
+    @classmethod
+    def create(cls, description, owner_id, course, active):
+        new = cls(description=description, owner_id=owner_id,
+                  course=course, active=active)
         db.session.add(new)
         db.session.commit()
-        new.id_hash = Survey.generate_id_hash(new.id)
+        new.id_hash = cls.generate_id_hash(new.id)
         db.session.add(new)
         db.session.commit()
         return new
@@ -185,9 +185,9 @@ class Question(db.Model, DatabaseUtil):
     # 1 : multiple choices
     q_type = db.Column(db.Integer, default=1)
 
-    @staticmethod
-    def create(description, owner_id):
-        new = Question(description=description, owner_id=owner_id)
+    @classmethod
+    def create(cls, description, owner_id):
+        new = cls(description=description, owner_id=owner_id)
         db.session.add(new)
         db.session.commit()
 
@@ -200,12 +200,12 @@ class Answer(db.Model, DatabaseUtil):
     id = db.Column(db.Integer, primary_key=True)
     question_id = db.Column(db.Integer, db.ForeignKey('questions.id'))
     content = db.Column(db.String(512))
-    rep_id = db.Column(db.Integer, db.ForeignKey('answer_of_survey.id'))
+    rep_id = db.Column(db.Integer, db.ForeignKey('answer_survey_link.id'))
 
-    @staticmethod
-    def create(answer_of_survey_id, question_id, answer_content):
-        new = Answer(rep_id=answer_of_survey_id,
-                     question_id=question_id, content=answer_content)
+    @classmethod
+    def create(cls, answer_of_survey_id, question_id, answer_content):
+        new = cls(rep_id=answer_of_survey_id,
+                  question_id=question_id, content=answer_content)
         db.session.add(new)
         db.session.commit()
         return new
@@ -215,41 +215,41 @@ class Answer(db.Model, DatabaseUtil):
             self.id, self.question_id)
 
 
-class Answer_of_Survey(db.Model, DatabaseUtil):
-    __tablename__ = 'answer_of_survey'
+class AnswerSurveyLink(db.Model, DatabaseUtil):
+    __tablename__ = 'answer_survey_link'
     id = db.Column(db.Integer, primary_key=True)
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     timestamp = db.Column(db.DateTime(), default=datetime.utcnow)
     survey_id = db.Column(db.Integer, db.ForeignKey('surveys.id'))
     answers = db.relationship('Answer', backref='rep', lazy='dynamic')
 
-    @staticmethod
-    def get_by_survey_id(id):
-        rtn = Answer_of_Survey.query.filter_by(survey_id=id).all()
+    @classmethod
+    def get_by_survey_id(cls, id):
+        rtn = cls.query.filter_by(survey_id=id).all()
         return rtn
 
     @classmethod
     def delete_by_id(cls, id):
-        answer_of_survey_to_delete = cls.get_by_id(id)
-        for answer in answer_of_survey_to_delete.answers.all():
+        answer_survey_link_to_delete = cls.get_by_id(id)
+        for answer in answer_survey_link_to_delete.answers.all():
             db.session.delete(answer)
-        db.session.delete(answer_of_survey_to_delete)
+        db.session.delete(answer_survey_link_to_delete)
 
-    @staticmethod
-    def delete_by_survey_id(id):
-        answer_of_survey_to_delete = Answer_of_Survey.get_by_survey_id(id)
-        for answer_of_survey in answer_of_survey_to_delete:
-            for answer in answer_of_survey.answers.all():
+    @classmethod
+    def delete_by_survey_id(cls, id):
+        answer_survey_link_to_delete = cls.get_by_survey_id(id)
+        for answer_survey_link in answer_survey_link_to_delete:
+            for answer in answer_survey_link.answers.all():
                 db.session.delete(answer)
-            db.session.delete(answer_of_survey)
+            db.session.delete(answer_survey_link)
 
-    @staticmethod
-    def create(survey_id, owner_id):
-        new = Answer_of_Survey(survey_id=survey_id, owner_id=owner_id)
+    @classmethod
+    def create(cls, survey_id, owner_id):
+        new = cls(survey_id=survey_id, owner_id=owner_id)
         db.session.add(new)
         db.session.commit()
         return new
 
     def __repr__(self):
-        return '<Answer_of_Survey {} given by {} Survey {}>'.format(
+        return '<AnswerSurveyLink {} given by {} Survey {}>'.format(
             self.id, self.owner_id, self.survey_id)

@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 from threading import Thread
-from ..models import Answer_of_Survey, Survey
+from ..models import AnswerSurveyLink, Survey
 from flask import current_app
 import re
 import csv
@@ -35,7 +35,7 @@ class file_operation(object):
 def wirte_flatfile(id, app):
     with app.app_context():
         survey = Survey.query.filter_by(id=id).first_or_404()
-        answer_of_survey = Answer_of_Survey.query.filter_by(survey_id=id).all()
+        answer_of_survey = AnswerSurveyLink.query.filter_by(survey_id=id).all()
         with open(str(survey.id) + '.csv', 'w') as csv_file:
             writer = csv.writer(csv_file)
             for an_answer_of_survey in answer_of_survey:

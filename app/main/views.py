@@ -3,7 +3,7 @@
 
 from flask import request, redirect, render_template, url_for, flash, send_from_directory
 from flask_login import login_required, current_user
-from ..models import Survey, Question, Answer, Answer_of_Survey
+from ..models import Survey, Question, Answer, AnswerSurveyLink
 from .. import db
 from . import main
 from .flatfile import file_operation
@@ -119,12 +119,12 @@ def answer(hash_str):
 
     if request.method == 'POST':
         questions = survey.questions.all()
-        answer_of_survey = Answer_of_Survey.create(
+        answer_survey_link = AnswerSurveyLink.create(
             survey_id=survey.id, owner_id=current_user.id)
 
         for question in questions:
             answer_content = request.form[str(question.id)]
-            Answer.create(answer_of_survey_id=answer_of_survey.id,
+            Answer.create(answer_of_survey_id=answer_survey_link.id,
                           question_id=question.id, answer_content=answer_content)
 
         db.session.commit()
@@ -177,7 +177,7 @@ def delete_survey(id):
         if survey_to_delete.check_permission(current_user.id) is not True:
             flash("You don't have the permission to delete this survey")
             return redirect(url_for('.question_pool'))
-        Answer_of_Survey.delete_by_survey_id(survey_to_delete.id)
+        AnswerSurveyLink.delete_by_survey_id(survey_to_delete.id)
         Survey.delete_by_id(id)
         flash("Delete the survey successfully")
         return redirect(url_for('.index'))
@@ -195,10 +195,10 @@ def survey_detail(id):
 
     survey = Survey.get_by_id(id)
     file_operation.write_flatfile_async(id)
-    answer_of_survey = Answer_of_Survey.query.filter_by(survey_id=id).all()
+    answer_survey_link = AnswerSurveyLink.query.filter_by(survey_id=id).all()
 
     return render_template('survey_details.html', survey=survey,
-                           answer_of_survey=answer_of_survey, zip=builtins.zip, str=builtins.str)
+                           answer_survey_link=answer_survey_link, zip=builtins.zip, str=builtins.str)
 
 
 @main.route('/survey_save/<int:id>')
