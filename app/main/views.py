@@ -105,7 +105,7 @@ def create_survey():
         flash("The survey is successfully created, Please add questions to the survey now.")
         return redirect(url_for('.select_questions', id=survey.id))
 
-    courses = file_operation.read_course()
+    courses = FileOperation.read_course()
     return render_template('create_survey.html', courses=courses)
 
 
@@ -128,7 +128,7 @@ def answer(hash_str):
                           question_id=question.id, answer_content=answer_content)
 
         db.session.commit()
-        file_operation.write_flatfile_async(survey.id)
+        FileOperation.write_flatfile_async(survey.id)
         flash('You successfully submit your response')
         return redirect(url_for('.index'))
     return render_template('answer_survey.html', survey=survey)
@@ -194,7 +194,7 @@ def survey_detail(id):
     """
 
     survey = Survey.get_by_id(id)
-    file_operation.write_flatfile_async(id)
+    FileOperation.write_flatfile_async(id)
     answer_survey_link = AnswerSurveyLink.query.filter_by(survey_id=id).all()
 
     return render_template('survey_details.html', survey=survey,
@@ -204,7 +204,7 @@ def survey_detail(id):
 @main.route('/survey_save/<int:id>')
 @login_required
 def survey_save(id):
-    file_operation.write_flatfile_async(id)
+    FileOperation.write_flatfile_async(id)
     flash("Save the survey result to csv file successfully!")
     return redirect(url_for('.survey_detail', id=id))
 
