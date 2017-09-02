@@ -14,21 +14,27 @@ so there won't be any comment
 
 
 class DatabaseUtil:
-    @staticmethod
-    def get_by_id(id):
-        pass
+    """
+    this class is the class of helper functions will be inherited
+    by all other database model classes
+    """
+    @classmethod
+    def get_by_id(cls, id):
+        return cls.query.filter_by(id=id).first()
 
-    @staticmethod
-    def get_by_owner_id(id):
-        pass
+    @classmethod
+    def get_by_owner_id(cls, id):
+        return cls.query.filter_by(owner_id=id).all()
 
-    @staticmethod
-    def get_all(id):
-        pass
+    @classmethod
+    def get_all(cls):
+        return cls.query.all()
 
-    @staticmethod
-    def delete_by_id(id):
-        pass
+    @classmethod
+    def delete_by_id(cls, id):
+        to_delete = cls.query.filter_by(id=id).first()
+        db.session.delete(to_delete)
+        db.session.commit()
 
     @staticmethod
     def create(id):
@@ -86,11 +92,6 @@ class User(UserMixin, db.Model, DatabaseUtil):
         m.update(str(id).encode('utf-8'))
         return m.hexdigest()
 
-    @staticmethod
-    def get_by_id(id):
-        rtn = User.query.filter_by(id=id).first_or_404()
-        return rtn
-
 
 class AnoymousUser(AnonymousUserMixin):
     id = 0
@@ -135,30 +136,9 @@ class Survey(db.Model, DatabaseUtil):
         'surveys', lazy='dynamic'), lazy='dynamic')
 
     @staticmethod
-    def get_by_id(id):
-        rtn = Survey.query.filter_by(id=id).first_or_404()
-        return rtn
-
-    @staticmethod
     def get_by_hash(id):
         rtn = Survey.query.filter_by(id_hash=id).first_or_404()
         return rtn
-
-    @staticmethod
-    def get_by_owner_id(id):
-        rtn = Survey.query.filter_by(owner_id=id).all()
-        return rtn
-
-    @staticmethod
-    def get_all():
-        rtn = Survey.query.all()
-        return rtn
-
-    @staticmethod
-    def delete_by_id(id):
-        to_delete = Survey.query.filter_by(id=id).first()
-        db.session.delete(to_delete)
-        db.session.commit()
 
     @staticmethod
     def create(description, owner_id, course, active):
@@ -206,22 +186,6 @@ class Question(db.Model, DatabaseUtil):
     q_type = db.Column(db.Integer, default=1)
 
     @staticmethod
-    def delete_by_id(id):
-        to_delete = Question.query.filter_by(id=id).first()
-        db.session.delete(to_delete)
-        db.session.commit()
-
-    @staticmethod
-    def get_all():
-        rtn = Question.query.all()
-        return rtn
-
-    @staticmethod
-    def get_by_id(id):
-        rtn = Question.query.filter_by(id=id).first_or_404()
-        return rtn
-
-    @staticmethod
     def create(description, owner_id):
         new = Question(description=description, owner_id=owner_id)
         db.session.add(new)
@@ -264,14 +228,9 @@ class Answer_of_Survey(db.Model, DatabaseUtil):
         rtn = Answer_of_Survey.query.filter_by(survey_id=id).all()
         return rtn
 
-    @staticmethod
-    def get_by_id(id):
-        rtn = Answer_of_Survey.query.filter_by(id=id).first_or_404()
-        return rtn
-
-    @staticmethod
-    def delete_by_id(id):
-        answer_of_survey_to_delete = Answer_of_Survey.get_by_id(id)
+    @classmethod
+    def delete_by_id(cls, id):
+        answer_of_survey_to_delete = cls.get_by_id(id)
         for answer in answer_of_survey_to_delete.answers.all():
             db.session.delete(answer)
         db.session.delete(answer_of_survey_to_delete)
