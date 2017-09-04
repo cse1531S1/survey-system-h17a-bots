@@ -3,7 +3,7 @@
 <body>
     <div align="center">
         {% if current_user.is_authenticated %}
-        <a href="{{ url_for('main.create_survey') }}" class="btn btn-primary">Create your own survey</a>
+        <a href="{{ url_for('main.survey') }}" class="btn btn-primary">Create your own survey</a>
         {% else %}
         <a href="{{ url_for('auth.login') }}" class="btn btn-primary">Create your own survey</a>
         {% endif %}

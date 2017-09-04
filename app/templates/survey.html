@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block page_content %}
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $(".select").select2();
+    });
+    jQuery(document).ready(function($) {
+        $('#multiselect').multiselect({
+            search: {
+                left: '<input type="text" name="q" class="form-control" placeholder="Search..." /></br>',
+                right: '<input type="text" name="q" class="form-control" placeholder="Search..." /></br>',
+            },
+            fireSearch: function(value) {
+                return value.length > 1;
+            }
+        });
+    });
+</script>
+
+<form action="" method="post" accept-charset="utf-8">
+    <div class="text-center">
+        <p>Choose a Course:</p>
+        <select name="course" id="course form-control" class="select input-large">
+            {% for course in courses %}
+            <option value="{{ course }}">{{ course }}</option>
+            {% endfor %}
+            <option selected="selected">{{ selected_course }}</option>
+            
+        </select>
+
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <input class="form-control" type="text" name="title" id="title" value="{{ description }}" placeholder="Enter the title of the survey" required/>
+        </div>
+    </div>
+
+    <br />
+    <div class="col-md-2">
+    </div>
+    <div class="col-md-8 text-center">
+        <div class="text-center">
+            <p>Choose questions for the survey</p>
+            <br />
+        </div>
+        <div class="row">
+            <div class="col-sm-5">
+                <select name="from[]" id="multiselect" class="form-control" size="8" multiple="multiple">
+                    {% for question in questions %}
+                    <option value="{{ question.id }}">{{ question.description }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-sm-2">
+                <br />
+                <br />
+                <br />
+                <button type="button" id="multiselect_rightAll" class="btn btn-block"><i class="glyphicon glyphicon-forward"></i></button>
+                <button type="button" id="multiselect_rightSelected" class="btn btn-block"><i class="glyphicon glyphicon-chevron-right"></i></button>
+                <button type="button" id="multiselect_leftSelected" class="btn btn-block"><i class="glyphicon glyphicon-chevron-left"></i></button>
+                <button type="button" id="multiselect_leftAll" class="btn btn-block"><i class="glyphicon glyphicon-backward"></i></button>
+            </div>
+
+            <div class="col-sm-5">
+                <select name="to[]" id="multiselect_to" class="form-control" size="8" multiple="multiple">
+                    {% for question in selected_questions %}
+                    <option value="{{ question.id }}">{{ question.description }}</option>
+                    {% endfor %}
+                </select>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <button type="button" id="multiselect_move_up" class="btn btn-block"><i class="glyphicon glyphicon-arrow-up"></i></button>
+                    </div>
+                    <div class="col-sm-6">
+                        <button type="button" id="multiselect_move_down" class="btn btn-block col-sm-6"><i class="glyphicon glyphicon-arrow-down"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <br />
+            <br />
+            <button id="sub" type="submit" class="btn btn-default">Submit</button>
+        </div>
+
+    </div>
+    <div class="col-md-2">
+    </div>
+    <br />
+
+</form>
+{% endblock %}
