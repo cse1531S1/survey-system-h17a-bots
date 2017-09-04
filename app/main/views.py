@@ -94,7 +94,7 @@ def create_question():
         Question.create(description=question_description,
                         owner_id=current_user.id)
         flash("The question is successfully created")
-        return redirect(url_for('.create_question'))
+        return redirect(url_for('.question_pool'))
 
     return render_template('create_question.html')
 

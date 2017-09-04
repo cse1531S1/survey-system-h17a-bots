@@ -180,7 +180,7 @@ class Question(db.Model, DatabaseUtil):
     __tablename__ = 'questions'
     id = db.Column(db.Integer, primary_key=True)
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    description = db.Column(db.String(512), unique=True)
+    description = db.Column(db.String(512))
 
     # q_type : question type
     # 1 : multiple choices
