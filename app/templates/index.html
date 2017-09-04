@@ -1,8 +1,12 @@
 {% extends "base.html" %}
 {% block page_content %}
 <body>
-    <h1 class="row">
-        <a href="{{ url_for('main.create_survey') }}">Create your own survey</a>
-    </h1>
+    <div align="center">
+        {% if current_user.is_authenticated %}
+        <a href="{{ url_for('main.create_survey') }}" class="btn btn-primary">Create your own survey</a>
+        {% else %}
+        <a href="{{ url_for('auth.login') }}" class="btn btn-primary">Create your own survey</a>
+        {% endif %}
+    </div>
 </body>
 {% endblock %}
