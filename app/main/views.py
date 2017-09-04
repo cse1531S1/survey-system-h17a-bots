@@ -37,16 +37,18 @@ def create_survey():
     questions = Question.get_all()
 
     if request.method == 'POST':
-        title = request.form['title']
-        course = request.form['course']
-        survey = Survey.create(description=title, owner_id=current_user.id, 
+        try:
+            title = request.form['title']
+            course = request.form['course']
+            survey = Survey.create(description=title, owner_id=current_user.id, 
                     course=course, active=True)
-        id = survey.id
-        survey.remove_all_questions()
-        selected = request.form.getlist('to[]')
-        survey.set_questions(selected)
-        flash("You successfully created the survey")
-        return redirect(url_for('.index'))
+            survey.remove_all_questions()
+            selected = request.form.getlist('to[]')
+            survey.set_questions(selected)
+            flash("You successfully created the survey")
+            return redirect(url_for('.index'))
+        except:
+            pass
 
     courses = FileOperation.read_course()
     return render_template('survey.html', courses=courses, 
@@ -93,7 +95,7 @@ def create_question():
         Question.create(description=question_description,
                         owner_id=current_user.id)
         flash("The question is successfully created")
-        return redirect(url_for('.create_question'))
+        return redirect(url_for('.question_pool'))
 
     return render_template('create_question.html')
 
