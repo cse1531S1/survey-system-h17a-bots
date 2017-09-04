@@ -45,7 +45,7 @@ def create_survey():
         survey.remove_all_questions()
         selected = request.form.getlist('to[]')
         survey.set_questions(selected)
-        flash("You successfully modified the survey")
+        flash("You successfully created the survey")
         return redirect(url_for('.index'))
 
     courses = FileOperation.read_course()

@@ -23,9 +23,12 @@
         <p>Choose a Course:</p>
         <select name="course" id="course form-control" class="select input-large">
             {% for course in courses %}
-            <option value="{{ course }}">{{ course }}</option>
+                {% if course == selected_course %}
+                <option selected="selected">{{ selected_course }}</option>
+                {% else %}
+                <option value="{{ course }}">{{ course }}</option>
+                {% endif %}
             {% endfor %}
-            <option selected="selected">{{ selected_course }}</option>
             
         </select>
 
