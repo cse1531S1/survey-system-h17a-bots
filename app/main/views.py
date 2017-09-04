@@ -29,32 +29,19 @@ def user(id):
 
 
 @main.route('/survey/', methods=['GET', 'POST'])
-@main.route('/survey/<int:id>', methods=['GET', 'POST'])
 @login_required
-def survey(id=0):
+def create_survey():
     """
-    this function is view function for choosing questions for a survey
-    and is also used for modifying a survey
-    @id = survey id
+    this function is view function for create a survey
     """
-    if id != 0:
-        survey = Survey.get_by_id(id)
-
-        if current_user.id != survey.owner_id and not current_user.is_administrator():
-            return redirect(url_for('.index'))
-
     questions = Question.get_all()
 
     if request.method == 'POST':
         title = request.form['title']
         course = request.form['course']
-        if id != 0:
-            survey.description = title
-            survey.course = course
-        else:
-            survey = Survey.create(description=title, owner_id=current_user.id, 
+        survey = Survey.create(description=title, owner_id=current_user.id, 
                     course=course, active=True)
-            id = survey.id
+        id = survey.id
         survey.remove_all_questions()
         selected = request.form.getlist('to[]')
         survey.set_questions(selected)
@@ -62,15 +49,40 @@ def survey(id=0):
         return redirect(url_for('.index'))
 
     courses = FileOperation.read_course()
-    if id != 0:
-        return render_template('survey.html', questions=questions,
-                survey=survey, courses=courses, description=survey.description,
-                selected_questions = survey.questions.all(),
-                selected_course = survey.course)
-    else:
-        return render_template('survey.html', courses=courses, 
-                questions=questions, description="", 
-                selected_questions=[], selected_course=courses[0])
+    return render_template('survey.html', courses=courses, 
+            questions=questions, description="", 
+            selected_questions=[], selected_course=courses[0])
+
+@main.route('/survey/<int:id>', methods=['GET', 'POST'])
+@login_required
+def modify_survey(id):
+    """
+    this function is view function for modify a survey
+    @id = survey id  
+    """
+    survey = Survey.get_by_id(id)
+
+    if current_user.id != survey.owner_id and not current_user.is_administrator():
+        return redirect(url_for('.index'))
+
+    questions = Question.get_all()
+
+    if request.method == 'POST':
+        title = request.form['title']
+        course = request.form['course']
+        survey.description = title
+        survey.course = course
+        survey.remove_all_questions()
+        selected = request.form.getlist('to[]')
+        survey.set_questions(selected)
+        flash("You successfully modified the survey")
+        return redirect(url_for('.index'))
+
+    courses = FileOperation.read_course()
+    return render_template('survey.html', questions=questions,
+            survey=survey, courses=courses, description=survey.description,
+            selected_questions = survey.questions.all(),
+            selected_course = survey.course)
 
 
 @main.route('/create_question', methods=['GET', 'POST'])
