@@ -18,9 +18,9 @@ def get_answer_data(survey_id, question_id):
     vsa = {'label': 'Very Strongly Agree', 'value': 0}
     sa = {'label': 'Strongly Agree', 'value': 0}
     a = {'label': 'Agree', 'value': 0}
-    d = {'label': 'Disagre', 'value': 0}
+    d = {'label': 'Disagree', 'value': 0}
     sd = {'label': 'Strongly Disagree', 'value': 0}
-    vsd = {'label': 'Very Strongly Disgree', 'value': 0}
+    vsd = {'label': 'Very Strongly Disagree', 'value': 0}
 
     rtn = [vsa, sa, a, d, sd, vsd]
     rst = []
@@ -30,6 +30,7 @@ def get_answer_data(survey_id, question_id):
                 rst.append(answer.content)
 
     counter = dict(collections.Counter(rst))
+    print(counter)
     for key, value in counter.items():
         for i in rtn:
             if i['label'] == key:
