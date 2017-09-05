@@ -40,14 +40,14 @@ def create_survey():
     if request.method == 'POST':
         title = request.form['title']
         course = request.form['course']
-        try:
-            survey = Survey.create(description=title, owner_id=current_user.id,
-                                   course=course, active=True)
-        except sqlalchemy.exc.IntegrityError:
-            db.session.rollback()
-            flash("Create survey failed!\n\
-                  The survey title is already in use.")
-            return redirect(url_for('.create_question'))
+        # try:
+        survey = Survey.create(description=title, owner_id=current_user.id,
+                               course=course, active=True)
+        # except sqlalchemy.exc.IntegrityError:
+        # db.session.rollback()
+        # flash("Create survey failed!\n\
+        # The survey title is already in use.")
+        # return redirect(url_for('.create_question'))
         selected_questions = request.form.getlist('to[]')
         survey.set_questions(selected_questions)
         flash("You successfully created the survey")
