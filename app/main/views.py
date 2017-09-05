@@ -97,9 +97,10 @@ def modify_survey(id):
 def create_question():
     if request.method == 'POST':
         question_description = request.form['title']
+        q_type = int(request.form['q_type'])
         try:
             Question.create(description=question_description,
-                            owner_id=current_user.id)
+                            owner_id=current_user.id, q_type=q_type)
         except sqlalchemy.exc.IntegrityError:
             db.session.rollback()
             flash("Create question failed!\n\

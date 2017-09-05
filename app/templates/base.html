@@ -44,35 +44,40 @@
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Account <b class="caret"></b></a>
           <ul class="dropdown-menu">
-            <li><a href="{{ url_for('auth.change_password') }}">Change Password</a></li>
+            <li>
+              <a href="{{ url_for('auth.change_password') }}">Change Password</a>
+            </li>
           </ul>
         </li>
         <li class="log-out">
           <div class="log-button">
-            <a type="button" class="btn btn-info" href="{{ url_for('auth.logout') }}">Log Out</a> {% else %}
+            <a type="button" class="btn btn-info" href="{{ url_for('auth.logout') }}">Log Out</a>
+            {% else %}
+        </li>
         <li class="sign-in">
           <div class="log-button">
-            <a type="button" class="btn btn-info" href="{{ url_for('auth.login') }}">Sign In</a> {% endif %}
+            <a type="button" class="btn btn-info" href="{{ url_for('auth.login') }}">Sign In</a>
           </div>
+          {% endif %}
         </li>
+          </div>
       </div>
     </div>
   </div>
-</div>
 
-{% block content %}
-<div class="container">
-  {% for message in get_flashed_messages() %}
-  <div class="alert alert-warning">
-    <button type="button" class="close" data-dismiss="alert">&times;</button>
-    {{ message }}
-  </div>
-  {% endfor %}
+  {% block content %}
+  <div class="container">
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-warning">
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+      {{ message }}
+    </div>
+    {% endfor %}
 
-  <div class="col-md-8 col-md-offset-2">
-    {% block page_content %} {% endblock %}
+    <div class="col-md-8 col-md-offset-2">
+      {% block page_content %} {% endblock %}
+    </div>
   </div>
-</div>
-{% endblock %}
+  {% endblock %}
 
 </div>

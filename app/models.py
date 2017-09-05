@@ -187,7 +187,7 @@ class Question(db.Model, DatabaseUtil):
     q_type = db.Column(db.Integer, default=1)
 
     @classmethod
-    def create(cls, description, owner_id):
+    def create(cls, description, owner_id, q_type=1):
         new = cls(description=description, owner_id=owner_id)
         db.session.add(new)
         db.session.commit()
