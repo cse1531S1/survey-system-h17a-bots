@@ -8,6 +8,7 @@ from .. import db
 from . import main
 from .flatfile import FileOperation
 from config import basedir
+import sqlalchemy
 import builtins
 import os
 
@@ -39,11 +40,16 @@ def create_survey():
     if request.method == 'POST':
         title = request.form['title']
         course = request.form['course']
-        survey = Survey.create(description=title, owner_id=current_user.id,
-                               course=course, active=True)
-        survey.remove_all_questions()
-        selected = request.form.getlist('to[]')
-        survey.set_questions(selected)
+        try:
+            survey = Survey.create(description=title, owner_id=current_user.id,
+                                   course=course, active=True)
+        except sqlalchemy.exc.IntegrityError:
+            db.session.rollback()
+            flash("Create survey failed!\n\
+                  The survey title is already in use.")
+            return redirect(url_for('.create_question'))
+        selected_questions = request.form.getlist('to[]')
+        survey.set_questions(selected_questions)
         flash("You successfully created the survey")
         return redirect(url_for('.index'))
 
@@ -91,8 +97,14 @@ def modify_survey(id):
 def create_question():
     if request.method == 'POST':
         question_description = request.form['title']
-        Question.create(description=question_description,
-                        owner_id=current_user.id)
+        try:
+            Question.create(description=question_description,
+                            owner_id=current_user.id)
+        except sqlalchemy.exc.IntegrityError:
+            db.session.rollback()
+            flash("Create question failed!\n\
+                  The question title is already in use.")
+            return redirect(url_for('.create_question'))
         flash("The question is successfully created")
         return redirect(url_for('.question_pool'))
 
