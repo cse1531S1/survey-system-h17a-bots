@@ -1,22 +1,79 @@
-{% extends "base.html" %}
-{% block page_content %}
+{% extends "base.html" %} {% block page_content %}
 
-<h2 class="text-center">Survey result of: {{ survey.description }}</h2>
-
-{% for an_answer_of_survey in answer_survey_link %}
-<div class="result-body">
-    <h5 class="text-center">
-        Answer given by : {{ an_answer_of_survey.owner.username }}
-    </h5>
-    {% for question, answer in zip(survey.questions.all(), an_answer_of_survey.answers.all())%}
-    <p class="result-detail">
-    {{ question.description }} : {{ answer.content }}
-    </p>
+<script src="https://webcms3.cse.unsw.edu.au/static/js/Chart.min.js"></script>
+<div>
+    <h2 class="text-center">Survey result of: {{ survey.description }}</h2>
+    <!-- <canvas id="chart" width="400" height="400"> </canvas> -->
+    <br />
+    {% for question in survey.questions %}
+    <div class="row">
+        <h5 class="text-center"> Pie chart for question: {{ question.description }}</h5>
+        <hr />
+        <div id="chartLegend{{ question.id }}" class="col-sm-6">
+        </div>
+        <div class="text-center col-sm-6">
+            <canvas id="responseChart{{ question.id }}" width="440" height="440" style="width: 400px; height: 400px;"></canvas>
+        </div>
+    </div>
+    <br />
     {% endfor %}
-</div>
-{% endfor %}
 
-<div class="row text-center">
-    <a class="btn btn-info" href="{{ url_for('main.download_csv', filename=str(survey.id)+'.csv')}}">Download result</a>
+    {% for an_answer_of_survey in answer_survey_link %}
+    <div class="result-body">
+        <h5 class="text-center">
+            Answer given by : {{ an_answer_of_survey.owner.username }}
+        </h5>
+        {% for question, answer in zip(survey.questions.all(), an_answer_of_survey.answers.all())%}
+        <p class="result-detail">
+        {{ question.description }} : {{ answer.content }}
+        </p>
+        {% endfor %}
+    </div>
+    {% endfor %}
+
+    <div class="row text-center">
+        <a class="btn btn-info" href="{{ url_for('main.download_csv', filename=str(survey.id)+'.csv')}}">Download result</a>
+    </div>
 </div>
-{% endblock %}
+
+{% for question in survey.questions %}
+<script charset="utf-8">
+    var colors = ['#C5CAE9', '#9FA8DA', '#304FFE', '#283593', '#3949AB', '#1A237E', '#7986CB', '#5C6BC0', '#536DFE', '#8C9EFF', '#E8EAF6', '#303F9F', '#3F51B5', '#3D5AFE'];
+
+    $(function() {
+        $.getJSON("/api_1_0/get_answer_data/{{ survey.id }}/{{ question.id }}", function(data) {
+            var ctx = document.getElementById("responseChart{{ question.id }}").getContext("2d");
+            if (!data.success) {
+                ctx.font = "20px sans serif";
+                ctx.fillText("Error fetching poll data.", 20, 50);
+                return;
+            }
+            console.log(data)
+            var data2 = [];
+            for (var i = 0; i < data.result.length; i++) {
+                data2.push({
+                    value: data.result[i].value,
+                    label: data.result[i].label,
+                    color: colors[i % colors.length]
+                });
+            }
+            var config = {
+                animation: true,
+                animationEasing: "easeOutQuart",
+                showTooltips: true,
+                legendTemplate: '<div class="table-responsive"><table class="table table-bordered table-condensed" style="width: auto">' +
+                    '<% for (var i = 0; i < segments.length; i++) { %>' +
+                    '<tr>' +
+                    '<td style=\"background-color:<%=segments[i].fillColor%>; width:30px\"></td>' +
+                    '<td><%=segments[i].label%></td>' +
+                    '<td><%=segments[i].value%></td>' +
+                    '</tr>' +
+                    '<%}%>' +
+                    '</table></div>'
+            }
+            var pieChart = new Chart(ctx).Pie(data2, config);
+            $('#chartLegend{{ question.id }}').html(pieChart.generateLegend());
+        });
+    });
+</script>
+{% endfor %} {% endblock %}

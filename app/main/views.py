@@ -29,7 +29,7 @@ def user(id):
     return render_template('user.html', surveys=surveys)
 
 
-@main.route('/survey/', methods=['GET', 'POST'])
+@main.route('/survey', methods=['GET', 'POST'])
 @login_required
 def create_survey():
     """
