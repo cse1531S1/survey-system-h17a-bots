@@ -1,6 +1,6 @@
 {% extends "base.html" %} {% block page_content %}
 
-<script src="https://webcms3.cse.unsw.edu.au/static/js/Chart.min.js"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/Chart.min.js') }}"></script>
 <div>
     <h2 class="text-center">Survey result of: {{ survey.description }}</h2>
     <!-- <canvas id="chart" width="400" height="400"> </canvas> -->
