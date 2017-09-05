@@ -8,7 +8,7 @@ from ..models import db
 from ..models import User, Survey, AnswerSurveyLink, Answer, Question
 
 
-@api.route('/get_answer_data/<int:survey_id>/<int:question_id>', methods=['GET', 'POST'])
+@api.route('/get_answer_data/type1/<int:survey_id>/<int:question_id>', methods=['GET', 'POST'])
 def get_answer_data(survey_id, question_id):
     answer_survey_link = AnswerSurveyLink.query.filter_by(
         survey_id=survey_id).all()
@@ -19,8 +19,8 @@ def get_answer_data(survey_id, question_id):
     d = {'label': 'Disagre', 'value': 0}
     sd = {'label': 'Strongly Disagree', 'value': 0}
     vsd = {'label': 'Very Strongly Disgree', 'value': 0}
-    for an_link in answer_survey_link:
-        for answer in an_link.answers.all():
+    for link in answer_survey_link:
+        for answer in link.answers.all():
             if answer.question_id == question.id:
                 if answer.content == "Very Strongly Agree":
                     vsa['value'] += 1

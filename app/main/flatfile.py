@@ -18,7 +18,7 @@ class FileOperation(object):
     def read_course():
         with open('courses.csv', 'r') as file_in:
             result = map(str, csv.reader(file_in))
-            # match "ZZZZ9999 99z9" like string
+            # match '["ZZZZ9999 99z9"]' like string and get the alphanumeric part
             pattern = r'..([A-Z]{4}[0-9]{4}\s[0-9]{2}[a-z][0-9])..'
             result = [re.match(pattern, i).group(1)
                       for i in result if re.match(pattern, i)]
@@ -46,6 +46,5 @@ class FileOperation(object):
                         username = "Anonymous"
                     dic = {question.description: answer.content for question, answer in zip(
                         survey.questions.all(), link.answers.all())}
-                    print(dic)
                     writer.writerow(
                         [survey.description, username, dic])

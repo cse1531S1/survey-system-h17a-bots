@@ -1,6 +1,5 @@
 {% extends "base.html" %} {% block page_content %}
 
-<script type="text/javascript" src="{{ url_for('static', filename='js/Chart.min.js') }}"></script>
 <div>
     <h2 class="text-center">Survey result of: {{ survey.description }}</h2>
     <!-- <canvas id="chart" width="400" height="400"> </canvas> -->
@@ -36,13 +35,13 @@
     </div>
 </div>
 
+<script type="text/javascript" src="{{ url_for('static', filename='js/Chart.min.js') }}"></script>
 {% for question in survey.questions %}
 <script charset="utf-8">
     var colors = ['#C5CAE9', '#9FA8DA', '#304FFE', '#283593', '#3949AB', '#1A237E', '#7986CB', '#5C6BC0', '#536DFE', '#8C9EFF', '#E8EAF6', '#303F9F', '#3F51B5', '#3D5AFE'];
 
     $(function() {
-        $.getJSON("/api_1_0/get_answer_data/{{ survey.id }}/{{ question.id }}", function(data) {
-            var ctx = document.getElementById("responseChart{{ question.id }}").getContext("2d");
+        $.getJSON("/api_1_0/get_answer_data/type1/{{ survey.id }}/{{ question.id }}", function(data) {
             if (!data.success) {
                 ctx.font = "20px sans serif";
                 ctx.fillText("Error fetching poll data.", 20, 50);
@@ -70,6 +69,7 @@
                     '<%}%>' +
                     '</table></div>'
             }
+            var ctx = document.getElementById("responseChart{{ question.id }}").getContext("2d");
             var pieChart = new Chart(ctx).Pie(data2, config);
             $('#chartLegend{{ question.id }}').html(pieChart.generateLegend());
         });

@@ -1,28 +1,31 @@
-{% extends "base.html" %}
-{% block page_content %}
+{% extends "base.html" %} {% block page_content %}
 
 <script type="text/javascript">
-    $(document).ready(function() {
-        $(".select").select2();
-    });
+  $(document).ready(function() {
+    $(".select").select2();
+  });
 </script>
 
 <form action="" method="post" accept-charset="utf-8">
-    <div class="col-md-8 col-sm-offset-2">
-        <div class="text-center row">
-            <p>Choose a question type:</p>
-            <select name="q_type" id="q_type" class="select input-large">
-                <option value="1">Multiple Choices</option>
-            </select>
-        </div>
-        <br />
-        <div class="row">
-            <input class="form-control" type="text" name="title" id="title" value="" placeholder="Enter the title of question?" required/>
-        </div>
-        <br />
-        <div class='text-center'>
-            <button id="" type="submit" class='btn btn-default'> submit </button>
-        </div>
+  <div class="col-md-8 col-sm-offset-2">
+    <div class="text-center row">
+      <p>Choose a question type:</p>
+      <select name="q_type" id="q_type" class="select input-large">
+        <option value="1">Multiple Choices</option>
+        <option value="2" disabled="disabled">Checkboxes (disabled)</option>
+        <option value="3" disabled="disabled">Drop-down (disabled)</option>
+        <option value="4" disabled="disabled">Short answer (disabled)</option>
+        <option value="5" disabled="disabled">Paragraph (disabled)</option>
+      </select>
     </div>
+    <br />
+    <div class="row">
+      <input class="form-control" type="text" name="title" id="title" value="" placeholder="Enter the title of question?" required/>
+    </div>
+    <br />
+    <div class='text-center'>
+      <button id="" type="submit" class='btn btn-default'> submit </button>
+    </div>
+  </div>
 </form>
 {% endblock %}
