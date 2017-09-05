@@ -109,12 +109,12 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-Survey_Question = db.Table('survey_question',
-                           db.Column('survey_id', db.Integer,
-                                     db.ForeignKey('surveys.id')),
-                           db.Column('question_id', db.Integer,
-                                     db.ForeignKey('questions.id'))
-                           )
+SurveyQuestion = db.Table('survey_question',
+                          db.Column('survey_id', db.Integer,
+                                    db.ForeignKey('surveys.id')),
+                          db.Column('question_id', db.Integer,
+                                    db.ForeignKey('questions.id'))
+                          )
 
 
 class Survey(db.Model, DatabaseUtil):
@@ -128,7 +128,7 @@ class Survey(db.Model, DatabaseUtil):
     active = db.Column(db.Boolean())
     timestamp = db.Column(db.DateTime(), default=datetime.utcnow)
 
-    questions = db.relationship('Question', secondary=Survey_Question, backref=db.backref(
+    questions = db.relationship('Question', secondary=SurveyQuestion, backref=db.backref(
         'surveys', lazy='dynamic'), lazy='dynamic')
 
     @staticmethod

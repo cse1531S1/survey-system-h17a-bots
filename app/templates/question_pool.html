@@ -3,12 +3,15 @@
 
 <div class='page-header'>
     <h1>{{ current_user.username }}</h1>
+    <div align="center">
+        <a href="{{ url_for('main.create_question') }}" class="btn btn-primary">Add a question</a>
+    </div>
+    <br/>
     <div class='posts'>
         {% for question in questions%}
         <div class='post row'>
             <div class='col-md-10'>
                 <div class="post-content">
-
                     <div class="post-author">
                         <a href="{{ url_for('.user', id=question.owner_id) }}">{{ question.owner.username }}</a>
                         <p>
@@ -24,11 +27,6 @@
         </div>
         {% endfor %}
     </div>
-    <br/>
-    <div align="center">
-        <a href="{{ url_for('main.create_question') }}" class="btn btn-primary">Add a question</a>
-    </div>
-
 </div>
 
 {% endblock %}
