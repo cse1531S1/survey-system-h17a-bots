@@ -14,7 +14,11 @@ from .auth_util import verify_password
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
+        if User.query.filter_by(username=form.username.data).first():
+            user = User.query.filter_by(username=form.username.data).first()
+        else:
+            user = User.query.filter_by(email=form.username.data).first()
+
         if user is not None and verify_password(user, form.password.data):
             login_user(user, form.remember_me.data)
             return redirect(request.args.get('next') or url_for('main.index'))
@@ -26,7 +30,8 @@ def login():
 def register():
     form = RegistForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data, password=form.password.data)
+        user = User(username=form.username.data,
+                    email=form.email.data, password=form.password.data)
         db.session.add(user)
         flash('You can login in now!')
         db.session.commit()
@@ -47,6 +52,7 @@ def before_request():
     if current_user.is_authenticated:
         current_user.ping()
 
+
 @auth.route('/chage-password', methods=['GET', 'POST'])
 @login_required
 def change_password():
@@ -60,4 +66,3 @@ def change_password():
         else:
             flash('Invalid password.')
     return render_template("auth/change_password.html", form=form)
-        

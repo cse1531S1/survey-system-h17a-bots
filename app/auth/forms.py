@@ -9,7 +9,7 @@ from ..models import User
 
 
 class LoginForm(Form):
-    username = StringField('Username', validators=[
+    username = StringField('Username/Email', validators=[
         Required(), Length(1, 64)])
     password = PasswordField('Password', validators=[Required()])
     remember_me = BooleanField('Keep me logged in')
@@ -17,10 +17,9 @@ class LoginForm(Form):
 
 
 class RegistForm(Form):
-    # TODO change username to email
     username = StringField('Username', validators=[Required(), Length(1, 64)])
-    email = StringField('Email', validators=[Required(), Length(1,64),
-        Email("Please enter your email address.")])
+    email = StringField('Email', validators=[Required(), Length(1, 64),
+                                             Email("Please enter your email address.")])
     password = PasswordField('Password', validators=[Required(), EqualTo(
         'password_confirm', message='Password must match.')])
     password_confirm = PasswordField(
@@ -35,9 +34,11 @@ class RegistForm(Form):
         if User.query.filter_by(username=field.data).first():
             raise ValidationError('Username already registered.')
 
+
 class ChangePasswordForm(Form):
     old_password = PasswordField('Old password', validators=[Required()])
     new_password = PasswordField('New password', validators=[Required(), EqualTo(
         'password_confirm', message='Password must match.')])
-    password_confirm = PasswordField('Confirm new password', validators=[Required()])
+    password_confirm = PasswordField(
+        'Confirm new password', validators=[Required()])
     submit = SubmitField('Update Password')
