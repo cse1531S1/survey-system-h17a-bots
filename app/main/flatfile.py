@@ -34,18 +34,18 @@ class FileOperation(object):
     @staticmethod
     def write_flatfile(id, app):
         with app.app_context():
-            survey = Survey.query.filter_by(id=id).first_or_404()
-            answer_of_survey = AnswerSurveyLink.query.filter_by(
+            survey = Survey.get_by_id(id)
+            answer_survey_links = AnswerSurveyLink.query.filter_by(
                 survey_id=id).all()
             with open(str(survey.id) + '.csv', 'w') as csv_file:
                 writer = csv.writer(csv_file)
-                for an_answer_of_survey in answer_of_survey:
+                for link in answer_survey_links:
                     try:
-                        username = an_answer_of_survey.owner.username
+                        username = link.owner.username
                     except AttributeError:
                         username = "Anonymous"
-                    dic = {question.description: answer.content for question in survey.questions.all()
-                           for answer in an_answer_of_survey.answers.all()}
-                    # print(dic)
+                    dic = {question.description: answer.content for question, answer in zip(
+                        survey.questions.all(), link.answers.all())}
+                    print(dic)
                     writer.writerow(
                         [survey.description, username, dic])
