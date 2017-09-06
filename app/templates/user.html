@@ -40,8 +40,8 @@
             </div>
 
             <div class="col-md-4" id="button-delete">
-                <a type="button" class="btn btn-info" href="{{ url_for('main.survey_detail', id=survey.id) }}">Result</a>
-                <a type="button" class="btn btn-info" href="{{ url_for('main.modify_survey', id=survey.id) }}">Modify</a>
+                <a type="button" class="btn btn-primary" href="{{ url_for('main.survey_detail', id=survey.id) }}">Result</a>
+                <a type="button" class="btn btn-primary" href="{{ url_for('main.modify_survey', id=survey.id) }}">Modify</a>
                 <a type="button" class="btn btn-danger" href="{{ url_for('main.delete_survey', id=survey.id) }}">Delete</a>
             </div>
         </div>
