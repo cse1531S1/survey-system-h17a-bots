@@ -6,6 +6,16 @@ Home
 <body>
     <div align="center">
         {% if current_user.is_authenticated %}
+        <div class="info-box">
+          <!-- Apply any bg-* class to to the icon to color it -->
+          <span class="info-box-icon bg-red"><i class="fa fa-star-o"></i></span>
+          <div class="info-box-content">
+            <span class="info-box-text">Total amount of surveys</span>
+            <span class="info-box-number">{{survey_count}}</span>
+          </div>
+          <!-- /.info-box-content -->
+        </div>
+        <!-- /.info-box -->
         <a href="{{ url_for('main.create_survey') }}" class="btn btn-primary">Create your own survey</a>
         {% else %}
         <a href="{{ url_for('auth.login') }}" class="btn btn-primary">Create your own survey</a>
