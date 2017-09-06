@@ -1,0 +1,60 @@
+<head>
+  <meta charset="utf-8">
+  <title>Thank you!</title>
+
+  <!--Import Google Icon Font-->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <!-- Compiled and minified CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+  <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+  <!-- Compiled and minified JavaScript -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+  <style type="text/css">
+    body{
+      background: #00d4c0;
+    }
+
+    [type="radio"]:checked+label:after, [type="radio"].with-gap:checked+label:after {
+      background-color: #00bfa5;
+    }
+    [type="radio"]:checked+label:after, [type="radio"].with-gap:checked+label:before, [type="radio"].with-gap:checked+label:after {
+      border: 2px solid #00bfa5;
+    }
+    .question{
+      border-top: 1px solid #e0e0e0;
+      margin: 16px;
+      padding-bottom: 25px;
+    }
+    .card-panel {
+      -webkit-transition: -webkit-box-shadow .25s;
+      transition: -webkit-box-shadow .25s;
+      transition: box-shadow .25s;
+      transition: box-shadow .25s, -webkit-box-shadow .25s;
+      padding: 24px;
+      margin: 13.5rem -5rem 1rem -5rem;
+      border-radius: 3px;
+      background-color: #fff;
+    }
+  </style>
+</head>
+
+
+{% block content %}
+<body>
+  <div class="container main_container">
+    <div class="card-panel z-depth-5">
+      {% for message in get_flashed_messages() %}
+      <div class="alert alert-warning">
+        {{ message }}
+      </div>
+      {% endfor %}
+
+      <div>
+        {% block page_content %} {% endblock %}
+      </div>
+    </div>
+</body>
+  </div>
+  {% endblock %}
+
+  </div>
