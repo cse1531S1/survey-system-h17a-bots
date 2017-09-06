@@ -35,7 +35,6 @@ def get_answer_data(survey_id, question_id):
             if i['label'] == key:
                 i['value'] = value
 
-    print(rtn)
     rtn = {
         "result": rtn,
         "success": True
