@@ -11,7 +11,7 @@ import csv
 class FileOperation(object):
 
     """
-    this is the class for file operation
+        This is the class for file operations (CSV, JSON).
     """
 
     @staticmethod
