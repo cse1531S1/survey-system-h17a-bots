@@ -69,6 +69,7 @@
 
 .input-large {
   width: 210px;
+  height: 34px;
 }
 
 .input-xlarge {
@@ -157,7 +158,6 @@ ul {
 }
 
 .page-header {
-  /*border-bottom: 1px solid #ddd;        */
   margin: 20px 0 10px 0!important;
   position: relative;
   z-index: 1;
@@ -167,4 +167,13 @@ ul {
 .content {
   padding-left: 150px;
   padding-right: 150px;
+}
+
+.select-move {
+  margin-top: 3px;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: #444;
+    line-height: 23px;
 }
