@@ -33,7 +33,7 @@ def user(id):
 @login_required
 def create_survey():
     """
-    this function is view function for create a survey
+        This function is the view function for creating a survey.
     """
     questions = Question.get_all()
 
@@ -57,8 +57,8 @@ def create_survey():
 @login_required
 def modify_survey(id):
     """
-    this function is view function for modify a survey
-    @id = survey id
+        This function is the view function for modifying a survey.
+        @id represents the survey ID.
     """
     survey = Survey.get_by_id(id)
 
@@ -109,8 +109,8 @@ def create_question():
 @main.route('/answer/<hash_str>', methods=['GET', 'POST'])
 def answer(hash_str):
     """
-    this function is the view function for answering a survey
-    @id : the id for a survey
+        This function is the view function for answering a survey.
+        @id represents the survey ID.
     """
     survey = Survey.get_by_hash(hash_str)
 
@@ -140,8 +140,8 @@ def question_pool():
 @main.route('/delete_question/<int:id>', methods=['GET', 'POST'])
 def delete_question(id):
     """
-    the functio is the view function for deleting a question
-    @id : id for a question
+        This function is the view function for deleting a question.
+        @id represents the question ID.
     """
     question_to_delete = Question.query.filter_by(id=id).first_or_404()
 
@@ -164,8 +164,8 @@ def delete_question(id):
 @main.route('/delete_survey/<int:id>', methods=['GET', 'POST'])
 def delete_survey(id):
     """
-    the functio is the view function for deleting a survey
-    @id : id for a survey
+        This function is the view function for deleting a survey.
+        @id represents the survey ID.
     """
     survey_to_delete = Survey.get_by_id(id)
 
@@ -185,8 +185,8 @@ def delete_survey(id):
 @login_required
 def survey_detail(id):
     """
-    the function is the view function for survey detail page
-    @id : the id of a survey
+        This function is the view function for the survey details page.
+        @id represents the survey ID.
     """
 
     survey = Survey.get_by_id(id)
@@ -201,8 +201,8 @@ def survey_detail(id):
 @login_required
 def public_result(hash_str):
     """
-    the function is the view function for survey detail page
-    @id : the id of a survey
+        This function is the view function for survey details page.
+        @id represents the survey ID.
     """
 
     survey = Survey.get_by_hash(hash_str)
@@ -227,4 +227,7 @@ def download_csv(filename):
 
 @main.route('/thankyou')
 def thankyou():
+    """
+        This function is the view function for the thank you page the respondent will see after survey completion.
+    """
     return render_template('thank_you.html')

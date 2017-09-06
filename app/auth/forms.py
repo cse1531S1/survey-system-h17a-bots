@@ -7,6 +7,9 @@ from wtforms.validators import Required, Length, EqualTo, Email
 from wtforms import ValidationError
 from ..models import User
 
+"""
+    These forms are used in the account management panel and login/registration page.
+"""
 
 class LoginForm(Form):
     username = StringField('Username/Email', validators=[
@@ -21,24 +24,24 @@ class RegistForm(Form):
     email = StringField('Email', validators=[Required(), Length(1, 64),
                                              Email("Please enter your email address.")])
     password = PasswordField('Password', validators=[Required(), EqualTo(
-        'password_confirm', message='Password must match.')])
+        'password_confirm', message='The passwords must match.')])
     password_confirm = PasswordField(
-        'Confirm your password', validators=[Required()])
+        'Please confirm your password', validators=[Required()])
     submit = SubmitField('Register')
 
     def validate_email(self, field):
         if User.query.filter_by(email=field.data).first():
-            raise ValidationError('Email already registered.')
+            raise ValidationError('Email has already been registered.')
 
     def validate_username(self, field):
         if User.query.filter_by(username=field.data).first():
-            raise ValidationError('Username already registered.')
+            raise ValidationError('Username has already been registered.')
 
 
 class ChangePasswordForm(Form):
     old_password = PasswordField('Old password', validators=[Required()])
     new_password = PasswordField('New password', validators=[Required(), EqualTo(
-        'password_confirm', message='Password must match.')])
+        'password_confirm', message='The passwords must match.')])
     password_confirm = PasswordField(
-        'Confirm new password', validators=[Required()])
+        'New password confirmation', validators=[Required()])
     submit = SubmitField('Update Password')
