@@ -126,9 +126,7 @@ def answer(hash_str):
 
         db.session.commit()
         FileOperation.write_flatfile_async(survey.id)
-        flash('You have successfully submitted your response, thank you for completing this survey.')
-        flash('You will be sent a link to view the results once the survey has concluded.')
-        return render_template('thank_you.html')
+        return redirect(url_for('.thankyou'))
     return render_template('answer_survey.html', survey=survey)
 
 
@@ -212,3 +210,8 @@ def survey_save(id):
 def download_csv(filename):
     path = os.path.join(basedir)
     return send_from_directory(path, filename)
+
+
+@main.route('/thankyou')
+def thankyou():
+    return render_template('thank_you.html')

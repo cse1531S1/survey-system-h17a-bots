@@ -2,6 +2,7 @@
 
 <div>
     <h2 class="text-center">Survey result of: {{ survey.description }}</h2>
+    <h5 class="text-center">This survey is for {{ survey.course }}</h5>
     <!-- <canvas id="chart" width="400" height="400"> </canvas> -->
     <br /> {% for question in survey.questions %}
     <div class="row">
