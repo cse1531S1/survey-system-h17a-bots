@@ -45,9 +45,6 @@
 
         <!-- Logo -->
         <a class="logo" href="/">
-          <!-- mini logo for sidebar mini 50x50 pixels -->
-          <!-- <span class="logo-mini"><b>A</b>LT</span> -->
-          <!-- logo for regular state and mobile devices -->
           <span class="logo-lg"><b>Group</b>BOTS</span>
         </a>
 
@@ -90,14 +87,10 @@
                 </ul>
                 {% else %}
                 <div class="log-button">
-                  <a type="button" class="btn btn-info" href="{{ url_for('auth.login') }}">Sign In</a>
+                  <a type="button" class="btn btn-info" href="{{ url_for('auth.login') }}">Log in</a>
                 </div>
                 {% endif %}
               </li>
-              <!-- Control Sidebar Toggle Button -->
-              <!-- <li> -->
-              <!-- <a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a> -->
-              <!-- </li> -->
             </ul>
           </div>
         </nav>
@@ -107,29 +100,6 @@
 
         <!-- sidebar: style can be found in sidebar.less -->
         <section class="sidebar">
-
-          <!-- Sidebar user panel (optional) -->
-          <div class="user-panel">
-            <!-- <div class="pull-left image"> -->
-            <!-- </div> -->
-            <!-- <div class="pull-left info"> -->
-            <!-- <p>Alexander Pierce</p> -->
-            <!-- Status -->
-            <!-- <a href="#"><i class="fa fa-circle text-success"></i> Online</a> -->
-            <!-- </div> -->
-          </div>
-
-          <!-- search form (Optional) -->
-          <form action="#" method="get" class="sidebar-form">
-            <div class="input-group">
-              <input type="text" name="q" class="form-control" placeholder="Search...">
-              <span class="input-group-btn">
-                <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
-                </button>
-              </span>
-            </div>
-          </form>
-          <!-- /.search form -->
 
           <!-- Sidebar Menu -->
           <ul class="sidebar-menu">
@@ -174,7 +144,7 @@
         <!-- Content Header (Page header) -->
         <div class="content-header">
           {% for message in get_flashed_messages() %}
-          <div class="alert alert-success">
+          <div class="alert alert-success text-center">
             <button type="button" class="close" data-dismiss="alert">&times;</button>
             {{ message }}
           </div>
