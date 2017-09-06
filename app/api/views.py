@@ -30,7 +30,6 @@ def get_answer_data(survey_id, question_id):
                 rst.append(answer.content)
 
     counter = dict(collections.Counter(rst))
-    print(counter)
     for key, value in counter.items():
         for i in rtn:
             if i['label'] == key:
