@@ -15,6 +15,23 @@ Home
           </div>
           <!-- /.info-box-content -->
         </div>
+
+        <div class="info-box bg-red">
+          <span class="info-box-icon"><i class="fa fa-comments-o"></i></span>
+          <div class="info-box-content">
+            <span class="info-box-text">Survey responses</span>
+            <span class="info-box-number">{{response_count}}</span>
+            <!-- The progress section is optional -->
+            <div class="progress">
+              <div class="progress-bar" style="width: 20%"></div>
+            </div>
+            <span class="progress-description">
+              An increase of {{response_count}} responses over the last 30 days.
+            </span>
+          </div>
+          <!-- /.info-box-content -->
+        </div>
+
         <!-- /.info-box -->
         <a href="{{ url_for('main.create_survey') }}" class="btn btn-primary">Create your own survey</a>
         {% else %}
