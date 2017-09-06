@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block title %}
-View Surveys
+Survey list
 {% endblock %}
 {% block page_content %}
 
@@ -18,10 +18,10 @@ View Surveys
                         Survey: {{ survey.description }}
                         </p>
                         <p>
-                        Link to answer this survey: <a href="{{ url_for("main.answer", hash_str=survey.id_hash )}}">{{ url_for("main.answer", hash_str=survey.id_hash, _external=True) }}</a>
+                        Survey respondents' URL: <a href="{{ url_for("main.answer", hash_str=survey.id_hash )}}">{{ url_for("main.answer", hash_str=survey.id_hash, _external=True) }}</a>
                         </p>
                         <p>
-                        Link to the public view result of this survey: <a href="{{ url_for("main.public_result", hash_str=survey.id_hash )}}">{{ url_for("main.public_result", hash_str=survey.id_hash, _external=True) }}</a>
+                        Public survey result URL: <a href="{{ url_for("main.public_result", hash_str=survey.id_hash )}}">{{ url_for("main.public_result", hash_str=survey.id_hash, _external=True) }}</a>
                         </p>
                     </div>
 

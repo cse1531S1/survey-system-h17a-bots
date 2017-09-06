@@ -44,7 +44,7 @@ def create_survey():
                                course=course, active=True)
         selected_questions = request.form.getlist('to[]')
         survey.set_questions(selected_questions)
-        flash("You successfully created the survey")
+        flash("The survey has been successfully created.")
         return redirect(url_for('.index'))
 
     courses = FileOperation.read_course()
@@ -63,7 +63,7 @@ def modify_survey(id):
     survey = Survey.get_by_id(id)
 
     if current_user.id != survey.owner_id and not current_user.is_administrator():
-        flash("You don't have the permission to modify this survey.")
+        flash("You don't have sufficient permissions to modify this survey.")
         return redirect(url_for('.index'))
 
     questions = Question.get_all()
@@ -76,7 +76,7 @@ def modify_survey(id):
         survey.remove_all_questions()
         selected = request.form.getlist('to[]')
         survey.set_questions(selected)
-        flash("You successfully modified the survey")
+        flash("You have successfully modified the survey.")
         return redirect(url_for('.index'))
 
     courses = FileOperation.read_course()
@@ -97,10 +97,10 @@ def create_question():
                             owner_id=current_user.id, q_type=q_type)
         except sqlalchemy.exc.IntegrityError:
             db.session.rollback()
-            flash("Create question failed!\n\
+            flash("Failed to create the question!\n\
                   The question title is already in use.")
             return redirect(url_for('.create_question'))
-        flash("The question is successfully created")
+        flash("Successfully created the question.")
         return redirect(url_for('.create_question'))
 
     return render_template('create_question.html')
@@ -147,15 +147,15 @@ def delete_question(id):
 
     if request.method == 'POST':
         if current_user.id != question_to_delete.owner_id and current_user.is_admin is not True:
-            flash("You don't have the permission to delete this question")
+            flash("You don't have sufficient permissions to delete this question.")
             return redirect(url_for('.question_pool'))
 
         if question_to_delete.surveys.first() is not None:
-            flash("The question is already in use, can't delete")
+            flash("The question is already assigned to a survey, please unassign it first, then come back to delete it.")
             return redirect(url_for('.question_pool'))
 
         Question.delete_by_id(id)
-        flash("Delete the question successfully")
+        flash("The question has been successfully deleted.")
         return redirect(url_for('.question_pool'))
 
     return render_template('delete_question.html', question=question_to_delete)
@@ -171,11 +171,11 @@ def delete_survey(id):
 
     if request.method == 'POST':
         if survey_to_delete.check_permission(current_user.id) is not True:
-            flash("You don't have the permission to delete this survey")
+            flash("You don't have sufficient permissions to delete this survey.")
             return redirect(url_for('.question_pool'))
         AnswerSurveyLink.delete_by_survey_id(survey_to_delete.id)
         Survey.delete_by_id(id)
-        flash("Delete the survey successfully")
+        flash("The survey has been successfully deleted.")
         return redirect(url_for('.index'))
 
     return render_template('delete_survey.html', survey=survey_to_delete)
@@ -214,7 +214,7 @@ def public_result(hash_str):
 @login_required
 def survey_save(id):
     FileOperation.write_flatfile_async(id)
-    flash("Save the survey result to csv file successfully!")
+    flash("The survey results have been successfully written to a CSV file.")
     return redirect(url_for('.survey_detail', id=id))
 
 

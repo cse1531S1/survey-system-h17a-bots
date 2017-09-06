@@ -22,7 +22,7 @@ def login():
         if user is not None and verify_password(user, form.password.data):
             login_user(user, form.remember_me.data)
             return redirect(request.args.get('next') or url_for('main.index'))
-        flash('Invalid username or password.')
+        flash('Invalid username or password entered. Please try again.')
     return render_template('auth/login.html', form=form)
 
 
@@ -33,7 +33,7 @@ def register():
         user = User(username=form.username.data,
                     email=form.email.data, password=form.password.data)
         db.session.add(user)
-        flash('You can login in now!')
+        flash('You are able to login now.')
         db.session.commit()
         return redirect(url_for('.login'))
     return render_template('auth/register.html', form=form)
@@ -43,7 +43,7 @@ def register():
 @login_required
 def logout():
     logout_user()
-    flash('You have been logged out successfully!')
+    flash('You have been logged out successfully.')
     return redirect(url_for('main.index'))
 
 
@@ -53,7 +53,7 @@ def before_request():
         current_user.ping()
 
 
-@auth.route('/chage-password', methods=['GET', 'POST'])
+@auth.route('/change-password', methods=['GET', 'POST'])
 @login_required
 def change_password():
     form = ChangePasswordForm()
@@ -64,5 +64,5 @@ def change_password():
             flash('Your password has been updated.')
             return redirect(url_for('main.index'))
         else:
-            flash('Invalid password.')
+            flash('Invalid password entered.')
     return render_template("auth/change_password.html", form=form)

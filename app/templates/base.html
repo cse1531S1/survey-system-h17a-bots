@@ -77,21 +77,21 @@
                   <li class="user-header">
                     <p>
                     {{ current_user.username }}
-                    <small>Last login : {{current_user.last_login.strftime('%d %B %Y - %H:%M:%S')}}</small>
+                    <small>Last login timestamp: {{current_user.last_login.strftime('%d %B %Y - %H:%M:%S')}}</small>
                     </p>
                   </li>
                   <li class="user-footer">
                     <div class="pull-left">
-                      <a href="{{ url_for('auth.change_password') }}" class="btn btn-default btn-flat">Change Password</a>
+                      <a href="{{ url_for('auth.change_password') }}" class="btn btn-default btn-flat">Change password</a>
                     </div>
                     <div class="pull-right">
-                      <a href="{{ url_for('auth.logout') }}" class="btn btn-default btn-flat">Log out</a>
+                      <a href="{{ url_for('auth.logout') }}" class="btn btn-default btn-flat">Logout</a>
                     </div>
                   </li>
                 </ul>
                 {% else %}
                 <div class="log-button">
-                  <a type="button" class="btn btn-info" href="{{ url_for('auth.login') }}">Log in</a>
+                  <a type="button" class="btn btn-info" href="{{ url_for('auth.login') }}">Login</a>
                 </div>
                 {% endif %}
               </li>
@@ -107,32 +107,30 @@
 
           <!-- Sidebar Menu -->
           <ul class="sidebar-menu">
-            <li class="header">Survey Manage System</li>
+            <li class="header">Survey Management System</li>
             <!-- Optionally, you can add icons to the links -->
             {% if current_user.is_authenticated %}
-            <li>
-              <a href="{{ url_for('main.user', id=current_user.id) }}">
-                <i class="fa fa-link"></i>
-                <span>View Surveys</span>
-              </a>
-            </li>
-
-            <li>
-              <a href="{{ url_for('main.create_survey') }}">
-                <i class="fa fa-link"></i>
-                <span>Create a Survey</span>
-              </a>
-            </li>
-
             <li class="treeview">
-              <a href="#"><i class="fa fa-link"></i> <span>Question Pool</span>
+              <a href="#"><i class="fa fa-link"></i> <span>Surveys</span>
                 <span class="pull-right-container">
                   <i class="fa fa-angle-left pull-right"></i>
                 </span>
               </a>
               <ul class="treeview-menu">
-                <li><a href="{{ url_for('main.question_pool') }}">View Question Pool</a></li>
-                <li><a href="{{ url_for('main.create_question') }}">Add A New Question</a></li>
+                <li><a href="{{ url_for('main.user', id=current_user.id) }}">Survey list</a></li>
+                <li><a href="{{ url_for('main.create_survey') }}">Create a survey</a></li>
+              </ul>
+            </li>
+
+            <li class="treeview">
+              <a href="#"><i class="fa fa-link"></i> <span>Questions</span>
+                <span class="pull-right-container">
+                  <i class="fa fa-angle-left pull-right"></i>
+                </span>
+              </a>
+              <ul class="treeview-menu">
+                <li><a href="{{ url_for('main.question_pool') }}">Question pool</a></li>
+                <li><a href="{{ url_for('main.create_question') }}">Create a question</a></li>
               </ul>
             </li>
             {% endif %}
