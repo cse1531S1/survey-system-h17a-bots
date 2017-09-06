@@ -17,6 +17,9 @@
                         <p>
                         Link to answer this survey: <a href="{{ url_for("main.answer", hash_str=survey.id_hash )}}">{{ url_for("main.answer", hash_str=survey.id_hash, _external=True) }}</a>
                         </p>
+                        <p>
+                        Link to the public view result of this survey: <a href="{{ url_for("main.public_result", hash_str=survey.id_hash )}}">{{ url_for("main.public_result", hash_str=survey.id_hash, _external=True) }}</a>
+                        </p>
                     </div>
 
                     <div class="post-body">
