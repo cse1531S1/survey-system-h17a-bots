@@ -8,29 +8,33 @@ Survey Result
     <h2 class="text-center">Survey result of: {{ survey.description }}</h2>
     <h5 class="text-center">This survey is for {{ survey.course }}</h5>
     <!-- <canvas id="chart" width="400" height="400"> </canvas> -->
-    <br /> {% for question in survey.questions %}
-    <div class="row">
-        <hr />
-        <div class="text-center col-sm-12">
-            <canvas id="responseChart{{ question.id }}" width="440" height="440" style="width: 400px; height: 400px;"></canvas>
-        </div>
-    </div>
-    <br /> {% endfor %} {% for an_answer_of_survey in answer_survey_link %}
-    <div class="result-body">
-        <h5 class="text-center">
-            Answer given by : {{ an_answer_of_survey.owner.username }}
-        </h5>
-        {% for question, answer in zip(survey.questions.all(), an_answer_of_survey.answers.all())%}
-        <p class="result-detail">
-        {{ question.description }} : {{ answer.content }}
-        </p>
+    <br />
+    {% if answer_survey_link %}
+        {% for question in survey.questions %}
+            <div class="row">
+                <hr />
+                <div class="text-center col-sm-12">
+                    <canvas id="responseChart{{ question.id }}" width="440" height="440" style="width: 400px; height: 400px;"></canvas>
+                </div>
+            </div>
+            <br /> {% endfor %} {% for an_answer_of_survey in answer_survey_link %}
+            <div class="result-body">
+                <h5 class="text-center">
+                    Answer given by : {{ an_answer_of_survey.owner.username }}
+                </h5>
+                {% for question, answer in zip(survey.questions.all(), an_answer_of_survey.answers.all())%}
+                <p class="result-detail">
+                {{ question.description }} : {{ answer.content }}
+                </p>
+                {% endfor %}
+            </div>
         {% endfor %}
-    </div>
-    {% endfor %}
-
-    <div class="row text-center">
-        <a class="btn btn-info" href="{{ url_for('main.download_csv', filename=str(survey.id)+'.csv')}}">Download result</a>
-    </div>
+        <div class="row text-center">
+            <a class="btn btn-info" href="{{ url_for('main.download_csv', filename=str(survey.id)+'.csv')}}">Download result</a>
+        </div>
+    {% else %}
+        <h3>There doesn't seem to be any responses yet, come back later!</h3>
+    {% endif %}
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
