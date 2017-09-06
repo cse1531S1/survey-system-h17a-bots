@@ -126,8 +126,9 @@ def answer(hash_str):
 
         db.session.commit()
         FileOperation.write_flatfile_async(survey.id)
-        flash('You successfully submit your response')
-        return redirect(url_for('.index'))
+        flash('You have successfully submitted your response, thank you for completing this survey.')
+        flash('You will be sent a link to view the results once the survey has concluded.')
+        return render_template('thank_you.html')
     return render_template('answer_survey.html', survey=survey)
 
 
