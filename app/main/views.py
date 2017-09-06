@@ -197,6 +197,19 @@ def survey_detail(id):
                            answer_survey_link=answer_survey_link, zip=builtins.zip, str=builtins.str)
 
 
+@main.route('/public_result/<hash_str>', methods=['GET'])
+@login_required
+def public_result(hash_str):
+    """
+    the function is the view function for survey detail page
+    @id : the id of a survey
+    """
+
+    survey = Survey.get_by_hash(hash_str)
+
+    return render_template('public_survey_result.html', survey=survey)
+
+
 @main.route('/survey_save/<int:id>')
 @login_required
 def survey_save(id):
