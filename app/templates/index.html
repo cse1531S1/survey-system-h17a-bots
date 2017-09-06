@@ -8,7 +8,7 @@ Home
         {% if current_user.is_authenticated %}
         <div class="info-box">
           <!-- Apply any bg-* class to to the icon to color it -->
-          <span class="info-box-icon bg-red"><i class="fa fa-star-o"></i></span>
+          <span class="info-box-icon bg-teal"><i class="fa fa-star-o"></i></span>
           <div class="info-box-content">
             <span class="info-box-text">Total amount of surveys</span>
             <span class="info-box-number">{{survey_count}}</span>
@@ -16,18 +16,12 @@ Home
           <!-- /.info-box-content -->
         </div>
 
-        <div class="info-box bg-red">
-          <span class="info-box-icon"><i class="fa fa-comments-o"></i></span>
+        <div class="info-box">
+          <!-- Apply any bg-* class to to the icon to color it -->
+          <span class="info-box-icon bg-teal"><i class="fa fa-star-o"></i></span>
           <div class="info-box-content">
-            <span class="info-box-text">Survey responses</span>
+            <span class="info-box-text">Total amount of survey responses</span>
             <span class="info-box-number">{{response_count}}</span>
-            <!-- The progress section is optional -->
-            <div class="progress">
-              <div class="progress-bar" style="width: 20%"></div>
-            </div>
-            <span class="progress-description">
-              An increase of {{response_count}} responses over the last 30 days.
-            </span>
           </div>
           <!-- /.info-box-content -->
         </div>
