@@ -1,14 +1,15 @@
 {% extends "base.html" %}
 {% block title %}
-Delete Survey
+Delete a survey
 {% endblock %}
 {% block page_content %}
 
 <form action="" method="post" accept-charset="utf-8">
   <div class="text-center">
     <div>
-        Are you sure to delete the survey {{ survey.description }}
+        Are you sure you want to delete the survey? It can never be recovered!
     </div>
+    <br>
     <a type="button" id="" href={{ url_for("main.index") }} class='btn btn-default'> Cancel</a>
     <button id="" type="submit" class='btn btn-danger'> Confirm </button>
   </div>

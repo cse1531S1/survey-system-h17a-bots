@@ -11,24 +11,28 @@ Question Pool
     </div>
     <br/>
     <div class='posts'>
-        {% for question in questions%}
-        <div class='post row'>
-            <div class='col-md-11'>
-                <div class="post-content">
-                    <div class="post-author">
-                        <a href="{{ url_for('.user', id=question.owner_id) }}">{{ question.owner.username }}</a>
-                        <p>
-                        {{ question.description }}
-                        </p>
-                    </div>
+        {% if questions %}
+            {% for question in questions %}
+            <div class='post row'>
+                <div class='col-md-11'>
+                    <div class="post-content">
+                        <div class="post-author">
+                            <a href="{{ url_for('.user', id=question.owner_id) }}">{{ question.description }}</a>
+                            <p>
+                            Owner: {{ question.owner.username }}
+                            </p>
+                        </div>
 
+                    </div>
+                </div>
+                <div class="col-md-1" id="button-delete">
+                    <a type="button" class="btn btn-danger" href="{{ url_for('main.delete_question', id=question.id) }}">Delete</a>
                 </div>
             </div>
-            <div class="col-md-1" id="button-delete">
-                <a type="button" class="btn btn-danger" href="{{ url_for('main.delete_question', id=question.id) }}">Delete</a>
-            </div>
-        </div>
-        {% endfor %}
+            {% endfor %}
+        {% else %}
+            <h2>No question have been added to the pool yet!</h2>
+        {% endif %}
     </div>
 </div>
 

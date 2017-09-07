@@ -15,7 +15,9 @@ import os
 
 @main.route('/', methods=['GET'])
 def index():
-    return render_template('index.html')
+    survey_count = len(Survey.get_all())
+    response_count = len(Answer.get_all())
+    return render_template('index.html', survey_count=survey_count, response_count=response_count)
 
 
 @main.route('/user/<int:id>')
@@ -33,7 +35,7 @@ def user(id):
 @login_required
 def create_survey():
     """
-    this function is view function for create a survey
+        This function is the view function for creating a survey.
     """
     questions = Question.get_all()
 
@@ -44,7 +46,7 @@ def create_survey():
                                course=course, active=True)
         selected_questions = request.form.getlist('to[]')
         survey.set_questions(selected_questions)
-        flash("You successfully created the survey")
+        flash("The survey has been successfully created.")
         return redirect(url_for('.index'))
 
     courses = FileOperation.read_course()
@@ -57,13 +59,13 @@ def create_survey():
 @login_required
 def modify_survey(id):
     """
-    this function is view function for modify a survey
-    @id = survey id
+        This function is the view function for modifying a survey.
+        @id represents the survey ID.
     """
     survey = Survey.get_by_id(id)
 
     if current_user.id != survey.owner_id and not current_user.is_administrator():
-        flash("You don't have the permission to modify this survey.")
+        flash("You don't have sufficient permissions to modify this survey.")
         return redirect(url_for('.index'))
 
     questions = Question.get_all()
@@ -76,7 +78,7 @@ def modify_survey(id):
         survey.remove_all_questions()
         selected = request.form.getlist('to[]')
         survey.set_questions(selected)
-        flash("You successfully modified the survey")
+        flash("You have successfully modified the survey.")
         return redirect(url_for('.index'))
 
     courses = FileOperation.read_course()
@@ -97,10 +99,10 @@ def create_question():
                             owner_id=current_user.id, q_type=q_type)
         except sqlalchemy.exc.IntegrityError:
             db.session.rollback()
-            flash("Create question failed!\n\
+            flash("Failed to create the question!\n\
                   The question title is already in use.")
             return redirect(url_for('.create_question'))
-        flash("The question is successfully created")
+        flash("Successfully created the question.")
         return redirect(url_for('.create_question'))
 
     return render_template('create_question.html')
@@ -109,8 +111,8 @@ def create_question():
 @main.route('/answer/<hash_str>', methods=['GET', 'POST'])
 def answer(hash_str):
     """
-    this function is the view function for answering a survey
-    @id : the id for a survey
+        This function is the view function for answering a survey.
+        @id represents the survey ID.
     """
     survey = Survey.get_by_hash(hash_str)
 
@@ -140,22 +142,22 @@ def question_pool():
 @main.route('/delete_question/<int:id>', methods=['GET', 'POST'])
 def delete_question(id):
     """
-    the functio is the view function for deleting a question
-    @id : id for a question
+        This function is the view function for deleting a question.
+        @id represents the question ID.
     """
     question_to_delete = Question.query.filter_by(id=id).first_or_404()
 
     if request.method == 'POST':
         if current_user.id != question_to_delete.owner_id and current_user.is_admin is not True:
-            flash("You don't have the permission to delete this question")
+            flash("You don't have sufficient permissions to delete this question.")
             return redirect(url_for('.question_pool'))
 
         if question_to_delete.surveys.first() is not None:
-            flash("The question is already in use, can't delete")
+            flash("The question is already assigned to a survey, please unassign it first, then come back to delete it.")
             return redirect(url_for('.question_pool'))
 
         Question.delete_by_id(id)
-        flash("Delete the question successfully")
+        flash("The question has been successfully deleted.")
         return redirect(url_for('.question_pool'))
 
     return render_template('delete_question.html', question=question_to_delete)
@@ -164,18 +166,18 @@ def delete_question(id):
 @main.route('/delete_survey/<int:id>', methods=['GET', 'POST'])
 def delete_survey(id):
     """
-    the functio is the view function for deleting a survey
-    @id : id for a survey
+        This function is the view function for deleting a survey.
+        @id represents the survey ID.
     """
     survey_to_delete = Survey.get_by_id(id)
 
     if request.method == 'POST':
         if survey_to_delete.check_permission(current_user.id) is not True:
-            flash("You don't have the permission to delete this survey")
+            flash("You don't have sufficient permissions to delete this survey.")
             return redirect(url_for('.question_pool'))
         AnswerSurveyLink.delete_by_survey_id(survey_to_delete.id)
         Survey.delete_by_id(id)
-        flash("Delete the survey successfully")
+        flash("The survey has been successfully deleted.")
         return redirect(url_for('.index'))
 
     return render_template('delete_survey.html', survey=survey_to_delete)
@@ -185,8 +187,8 @@ def delete_survey(id):
 @login_required
 def survey_detail(id):
     """
-    the function is the view function for survey detail page
-    @id : the id of a survey
+        This function is the view function for the survey details page.
+        @id represents the survey ID.
     """
 
     survey = Survey.get_by_id(id)
@@ -201,8 +203,8 @@ def survey_detail(id):
 @login_required
 def public_result(hash_str):
     """
-    the function is the view function for survey detail page
-    @id : the id of a survey
+        This function is the view function for survey details page.
+        @id represents the survey ID.
     """
 
     survey = Survey.get_by_hash(hash_str)
@@ -214,7 +216,7 @@ def public_result(hash_str):
 @login_required
 def survey_save(id):
     FileOperation.write_flatfile_async(id)
-    flash("Save the survey result to csv file successfully!")
+    flash("The survey results have been successfully written to a CSV file.")
     return redirect(url_for('.survey_detail', id=id))
 
 
@@ -227,4 +229,7 @@ def download_csv(filename):
 
 @main.route('/thankyou')
 def thankyou():
+    """
+        This function is the view function for the thank you page the respondent will see after survey completion.
+    """
     return render_template('thank_you.html')
