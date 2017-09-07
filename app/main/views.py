@@ -44,13 +44,14 @@ def create_survey():
         course = request.form['course']
         survey = Survey.create(description=title, owner_id=current_user.id,
                                course=course, active=True)
-        selected_questions = request.form.getlist('to[]')
+        selected_questions = [int(i) for i in request.form['questions'].split(',')]
+        #  print(selected_questions)
         survey.set_questions(selected_questions)
         flash("The survey has been successfully created.")
         return redirect(url_for('.index'))
 
     courses = FileOperation.read_course()
-    return render_template('survey.html', courses=courses,
+    return render_template('create_survey.html', courses=courses,
                            questions=questions, description="",
                            selected_questions=[], selected_course=courses[0])
 
@@ -82,7 +83,7 @@ def modify_survey(id):
         return redirect(url_for('.index'))
 
     courses = FileOperation.read_course()
-    return render_template('survey.html', questions=questions,
+    return render_template('create_suevey', questions=questions,
                            survey=survey, courses=courses, description=survey.description,
                            selected_questions=survey.questions.all(),
                            selected_course=survey.course)
@@ -153,7 +154,8 @@ def delete_question(id):
             return redirect(url_for('.question_pool'))
 
         if question_to_delete.surveys.first() is not None:
-            flash("The question is already assigned to a survey, please unassign it first, then come back to delete it.")
+            flash("The question is already assigned to a survey, \
+                  please unassign it first, then come back to delete it.")
             return redirect(url_for('.question_pool'))
 
         Question.delete_by_id(id)
