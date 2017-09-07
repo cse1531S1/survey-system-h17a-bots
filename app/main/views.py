@@ -16,7 +16,7 @@ import os
 @main.route('/', methods=['GET'])
 def index():
     survey_count = len(Survey.get_all())
-    response_count = len(Answer.get_all())
+    response_count = len(AnswerSurveyLink.get_all())
     return render_template('index.html', survey_count=survey_count, response_count=response_count)
 
 

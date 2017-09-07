@@ -27,9 +27,9 @@ Home
         </div>
 
         <!-- /.info-box -->
-        <a href="{{ url_for('main.create_survey') }}" class="btn btn-primary">Create your own survey</a>
+        <a href="{{ url_for('main.create_survey') }}" class="btn btn-primary btn-index">Create your own survey</a>
         {% else %}
-        <a href="{{ url_for('auth.login') }}" class="btn btn-primary">Create your own survey</a>
+        <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-index">Create your own survey</a>
         {% endif %}
     </div>
 </body>
