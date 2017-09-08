@@ -3,7 +3,7 @@
 
 from flask import request, redirect, render_template, url_for, flash, send_from_directory
 from flask_login import login_required, current_user
-from ..models import Survey, Question, Answer, AnswerSurveyLink
+from ..models import Survey, Question, Answer, AnswerSurveyLink, Choice
 from .. import db
 from . import main
 from .flatfile import FileOperation
@@ -80,9 +80,7 @@ def modify_survey(id):
     if request.method == 'POST':
         title = request.form['title']
         course = request.form['course']
-        survey.description = title
-        survey.course = course
-        survey.remove_all_questions()
+        Survey.delete_by_id(id)
         timerange = request.form['choose_date'].split(' - ')
         times = [datetime.strptime(i, r'%d/%m/%Y %I:%M %p') for i in timerange]
         survey = Survey.create(description=title, owner_id=current_user.id,
@@ -115,14 +113,12 @@ def create_question():
     if request.method == 'POST':
         question_description = request.form['title']
         q_type = int(request.form['q_type'])
-        try:
-            Question.create(description=question_description,
-                            owner_id=current_user.id, q_type=q_type)
-        except sqlalchemy.exc.IntegrityError:
-            db.session.rollback()
-            flash("Failed to create the question!\n\
-                  The question title is already in use.")
-            return redirect(url_for('.create_question'))
+        question = Question.create(description=question_description,
+                                   owner_id=current_user.id, q_type=q_type)
+
+        choices = request.form.getlist('choice')
+        for choice in choices:
+            Choice.create(choice, question.id)
         flash("Successfully created the question.")
         return redirect(url_for('.create_question'))
 

@@ -187,12 +187,14 @@ class Question(db.Model, DatabaseUtil):
     # q_type : question type
     # 1 : multiple choices
     q_type = db.Column(db.Integer, default=1)
+    choices = db.relationship('Choice', backref='question', lazy='dynamic')
 
     @classmethod
     def create(cls, description, owner_id, q_type=1):
         new = cls(description=description, owner_id=owner_id)
         db.session.add(new)
         db.session.commit()
+        return new
 
     def __repr__(self):
         return '<Question {}>'.format(self.id)
@@ -256,3 +258,17 @@ class AnswerSurveyLink(db.Model, DatabaseUtil):
     def __repr__(self):
         return '<AnswerSurveyLink {} given by {} Survey {}>'.format(
             self.id, self.owner_id, self.survey_id)
+
+
+class Choice(db.Model, DatabaseUtil):
+    __tablename__ = 'choices'
+    id = db.Column(db.Integer, primary_key=True)
+    question_id = db.Column(db.Integer, db.ForeignKey('questions.id'))
+    content = db.Column(db.String(128))
+
+    @classmethod
+    def create(cls, content, question_id):
+        new = cls(question_id=question_id, content=content)
+        db.session.add(new)
+        db.session.commit()
+        return new

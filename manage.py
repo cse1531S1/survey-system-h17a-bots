@@ -3,7 +3,7 @@
 
 import os
 from app import create_app, db
-from app.models import User, Survey, Answer, Question, AnswerSurveyLink
+from app.models import User, Survey, Answer, Question, AnswerSurveyLink, Choice
 from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
 
@@ -14,7 +14,7 @@ migrate = Migrate(app, db)
 
 def make_shell_context():
     return dict(app=app, db=db, User=User, Survey=Survey, Answer=Answer,
-                Question=Question, AnswerSurveyLink=AnswerSurveyLink)
+                Question=Question, AnswerSurveyLink=AnswerSurveyLink, Choice=Choice)
 
 
 manager.add_command("shell", Shell(make_context=make_shell_context))

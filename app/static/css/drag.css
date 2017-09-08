@@ -197,6 +197,10 @@ ul {
   left: 25px;
 }
 
+#left{
+  left: 5px;
+}
+
 #sub{
   margin-left:20px;
 }
