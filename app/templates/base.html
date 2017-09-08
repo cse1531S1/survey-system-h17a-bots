@@ -40,8 +40,10 @@
     <!-- mystyle -->
     <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}" />
 
+    {% block head %}
+    {% endblock head %}
   </head>
-  <body class="hold-transition skin-blue sidebar-mini fixed">
+  <body class="hold-transition skin-blue sidebar-mini">
     <div class="wrapper">
 
       <!-- Main Header -->

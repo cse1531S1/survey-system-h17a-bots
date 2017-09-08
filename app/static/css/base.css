@@ -178,7 +178,22 @@ ul {
   line-height: 23px;
 }
 
-
 .btn-index {
   margin-left: 85px;
+}
+
+a{
+  word-wrap: break-word;
+}
+
+.input-box{
+  border-style: solid;
+  border-color: #ddd;
+  border-width: 1px;
+  border-radius: 4px;
+}
+
+.search-box{
+  width: 98%;
+  margin-bottom: 2px;
 }
