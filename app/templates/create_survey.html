@@ -50,7 +50,7 @@
             </div>
         </div>
 
-        <div class="row">
+        <div class="row refresh">
             <div class="row drag-wrapper gu-unselectable col-md-12">
                 <div class="col-md-6 drag-container drag-box" id='left'>
                     {% for question in questions %}
@@ -66,6 +66,11 @@
             </div>
 
         </div>
+
+        <!-- Large modal -->
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".add_question">Add a Question</button>
+
+
         <div class="row text-center col-md-12">
             <br />
             <button id="sub" type="submit" class="btn btn-primary" onclick="DoSubmit()">Submit</button>
@@ -74,8 +79,159 @@
     </form>
 </div>
 
+<div class="modal fade add_question" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <form id="create_question" action="" method="POST" accept-charset="utf-8">
+                <div class="row">
+                    <div class="text-center">
+                        <p>Choose a question type:</p>
+                        <select name="q_type" id="q_type" class="select input-large">
+                            <option value="1">Multiple choices</option>
+                            <option value="2" disabled="disabled">Checkboxes (disabled)</option>
+                            <option value="3" disabled="disabled">Drop-down menus (disabled)</option>
+                            <option value="4" disabled="disabled">Short answers (disabled)</option>
+                            <option value="5" disabled="disabled">Paragraphs (disabled)</option>
+                        </select>
+                    </div>
+
+                    <br></br>
+
+                    <div class="col-md-12">
+                        <input class="form-control" type="text" name="title" id="title" value="" placeholder="What is the title of your question?" required/>
+                    </div>
+
+                    <br></br>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h4 class="text-center">Choices</h4>
+                            <div id="1" class="group ">
+                                <div class="col-md-4">
+                                    <div class="box box-default">
+                                        <div class="box-header with-border">
+                                            <h3 class="box-title">Choice</h3>
+                                            <div class="box-tools pull-right">
+                                                <button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                                            </div>
+                                            <!-- /.box-tools -->
+                                        </div>
+                                        <!-- /.box-header -->
+                                        <div class="box-body">
+                                            <input type="text" name="choice" value="Very Strongly Agree" id="choice" class="form-control ">
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <!-- /.box -->
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="box box-default">
+                                        <div class="box-header with-border">
+                                            <h3 class="box-title">Choice</h3>
+                                            <div class="box-tools pull-right">
+                                                <button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                                            </div>
+                                            <!-- /.box-tools -->
+                                        </div>
+                                        <!-- /.box-header -->
+                                        <div class="box-body">
+                                            <input type="text" name="choice" value="Strongly Agree" id="choice" class="form-control ">
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <!-- /.box -->
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="box box-default">
+                                        <div class="box-header with-border">
+                                            <h3 class="box-title">Choice</h3>
+                                            <div class="box-tools pull-right">
+                                                <button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                                            </div>
+                                            <!-- /.box-tools -->
+                                        </div>
+                                        <!-- /.box-header -->
+                                        <div class="box-body">
+                                            <input type="text" name="choice" value="Agree" id="choice" class="form-control ">
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <!-- /.box -->
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="box box-default">
+                                        <div class="box-header with-border">
+                                            <h3 class="box-title">Choice</h3>
+                                            <div class="box-tools pull-right">
+                                                <button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                                            </div>
+                                            <!-- /.box-tools -->
+                                        </div>
+                                        <!-- /.box-header -->
+                                        <div class="box-body">
+                                            <input type="text" name="choice" value="Disagree" id="choice" class="form-control ">
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <!-- /.box -->
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="box box-default">
+                                        <div class="box-header with-border">
+                                            <h3 class="box-title">Choice</h3>
+                                            <div class="box-tools pull-right">
+                                                <button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                                            </div>
+                                            <!-- /.box-tools -->
+                                        </div>
+                                        <!-- /.box-header -->
+                                        <div class="box-body">
+                                            <input type="text" name="choice" value="Strongly Disagree" id="choice" class="form-control ">
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <!-- /.box -->
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="box box-default">
+                                        <div class="box-header with-border">
+                                            <h3 class="box-title">Choice</h3>
+                                            <div class="box-tools pull-right">
+                                                <button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                                            </div>
+                                            <!-- /.box-tools -->
+                                        </div>
+                                        <!-- /.box-header -->
+                                        <div class="box-body">
+                                            <input type="text" name="choice" value="Very Strongly Disagree" id="choice" class="form-control ">
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <!-- /.box -->
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+            <div class='text-center col-md-12'>
+                <button type="submit" id="submit_form" class='btn btn-primary' onclick="create_question()">Submit</button>
+                <br></br>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script charset="utf-8">
     dragula([$("#left").get(0), $("#right").get(0)]);
+    dragula([$(".group").get(0)]);
 </script>
 
 <script charset="utf-8">
@@ -105,6 +261,45 @@
         $(".select").select2();
     });
 </script>
+
+<script id="funcc" charset="utf-8">
+    function create_question() {
+        var postData = $('#create_question').serializeArray();
+        $.ajax({
+            url: '/api_1_0/create_question',
+            type: "POST",
+            data: postData,
+            success: function(data, textStatus, jqXHR) {
+                $(".modal").modal('toggle');
+                $("#left").load(location.href + " #selections", function() {
+                    remove_dup();
+                    dragula([$("#left").get(0), $("#right").get(0)]);
+                    $(".modal-lg").load(location.href + " .modal-content", function() {
+                        $("#funcc").load(location.href + " #funcc");
+                    });
+                });
+            },
+            error: function(jqXHR, status, error) {
+                console.log(status + ": " + error);
+            }
+        });
+        this.preventDefault();
+    };
+
+    function remove_dup() {
+        var left = $('#left').children();
+        var right = $('#right').children();
+        for (var i = 0; i < left.length; i++) {
+            for (var j = 0; j < right.length; j++) {
+                if (left[i].getAttribute('value') === right[j].getAttribute('value')) {
+                    left[i].remove();
+                    break;
+                }
+            }
+        }
+    }
+</script>
+
 
 <script charset="utf-8">
     if (!RegExp.escape) {

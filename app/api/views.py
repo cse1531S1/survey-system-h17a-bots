@@ -5,7 +5,7 @@ from flask import render_template, redirect, request, url_for, flash, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from . import api
 from ..models import db
-from ..models import User, Survey, AnswerSurveyLink, Answer, Question
+from ..models import User, Survey, AnswerSurveyLink, Answer, Question, Choice
 import collections
 
 
@@ -35,3 +35,18 @@ def get_answer_data(survey_id, question_id):
         "success": True
     }
     return jsonify(rtn)
+
+
+@api.route('/create_question', methods=['POST'])
+def create_question():
+    question_description = request.form['title']
+    q_type = int(request.form['q_type'])
+    question = Question.create(description=question_description,
+                               owner_id=current_user.id, q_type=q_type)
+
+    choices = request.form.getlist('choice')
+    for choice in choices:
+        Choice.create(choice, question.id)
+    return jsonify({
+        "success": True,
+    })
