@@ -1,39 +1,46 @@
-{% extends "base.html" %}
-{% block title %}
-Question Pool
-{% endblock %}
-{% block page_content %}
+{% extends "base.html" %} {% block title %} Question Pool {% endblock %} {% block page_content %}
 
 <div class='page-header'>
-    <h1>{{ current_user.username }}</h1>
-    <div align="center">
-        <a href="{{ url_for('main.create_question') }}" class="btn btn-primary">Add a question</a>
-    </div>
-    <br/>
-    <div class='posts'>
-        {% if questions %}
-            {% for question in questions %}
-            <div class='post row'>
-                <div class='col-md-11'>
-                    <div class="post-content">
-                        <div class="post-author">
-                            <a href="{{ url_for('.user', id=question.owner_id) }}">{{ question.description }}</a>
-                            <p>
-                            Owner: {{ question.owner.username }}
-                            </p>
-                        </div>
+  <h1>{{ current_user.username }}</h1>
+  <div align="center">
+    <a href="{{ url_for('main.create_question') }}" class="btn btn-primary">Add a question</a>
+  </div>
+  <br/>
+  <div class='posts'>
+    {% if questions %} {% for question in questions %}
+    <div class='post row'>
+      <div class='col-md-11'>
+        <div class="post-content">
+          <div class="post-author">
+            <a href="{{ url_for('.user', id=question.owner_id) }}">{{ question.description }}</a>
+            <p>
+              Owner: {{ question.owner.username }}
+            </p>
+          </div>
+          <div class="post-body">
+            <p>
+              Choices in the question:
+              <div class="col-md-9 col-md-offset-1">
+                {% for choice in question.choices %}
+                <p>
+                  {{ choice.content}}
+                </p>
+                {% endfor %}
+              </div>
+            </p>
+          </div>
 
-                    </div>
-                </div>
-                <div class="col-md-1" id="button-delete">
-                    <a type="button" class="btn btn-danger" href="{{ url_for('main.delete_question', id=question.id) }}">Delete</a>
-                </div>
-            </div>
-            {% endfor %}
-        {% else %}
-            <h2 class="text-center">No question have been added to the pool yet!</h2>
-        {% endif %}
+
+        </div>
+      </div>
+      <div class="col-md-1" id="button-delete">
+        <a type="button" class="btn btn-danger" href="{{ url_for('main.delete_question', id=question.id) }}">Delete</a>
+      </div>
     </div>
+    {% endfor %} {% else %}
+    <h2 class="text-center">No question have been added to the pool yet!</h2>
+    {% endif %}
+  </div>
 </div>
 
 {% endblock %}
