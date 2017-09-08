@@ -217,10 +217,9 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </form>
-            <div class='text-center col-md-12'>
+            <div class='row text-center col-md-12'>
                 <button type="submit" id="submit_form" class='btn btn-primary' onclick="create_question()">Submit</button>
                 <br></br>
             </div>
@@ -265,17 +264,21 @@
 <script id="funcc" charset="utf-8">
     function create_question() {
         var postData = $('#create_question').serializeArray();
+        var right = document.getElementById('right');
         $.ajax({
             url: '/api_1_0/create_question',
             type: "POST",
             data: postData,
             success: function(data, textStatus, jqXHR) {
                 $(".modal").modal('toggle');
-                $("#left").load(location.href + " #selections", function() {
-                    remove_dup();
-                    dragula([$("#left").get(0), $("#right").get(0)]);
+                $(".refresh").load(location.href + " .drag-wrapper", function() {
+                    copy_chlidren(right);
                     $(".modal-lg").load(location.href + " .modal-content", function() {
-                        $("#funcc").load(location.href + " #funcc");
+                        remove_dup();
+                        $("#funcc").load(location.href + " #funcc", function() {
+                            dragula([$("#left").get(0), $("#right").get(0)]);
+                            dragula([$(".group").get(0)]);
+                        });
                     });
                 });
             },
@@ -283,7 +286,6 @@
                 console.log(status + ": " + error);
             }
         });
-        this.preventDefault();
     };
 
     function remove_dup() {
@@ -296,6 +298,13 @@
                     break;
                 }
             }
+        }
+    }
+
+    function copy_chlidren(right) {
+        new_right = document.getElementById('right');
+        while (right.childNodes.length > 0) {
+            new_right.appendChild(right.childNodes[0]);
         }
     }
 </script>
