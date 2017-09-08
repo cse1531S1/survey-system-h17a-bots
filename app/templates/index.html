@@ -1,36 +1,31 @@
-{% extends "base.html" %}
-{% block title %}
-Home
-{% endblock %}
-{% block page_content %}
+{% extends "base.html" %} {% block title %} Home {% endblock %} {% block page_content %}
+
 <body>
     <div align="center">
         {% if current_user.is_authenticated %}
         <div class="info-box">
-          <!-- Apply any bg-* class to to the icon to color it -->
-          <span class="info-box-icon bg-teal"><i class="fa fa-star-o"></i></span>
-          <div class="info-box-content">
-            <span class="info-box-text">Total amount of surveys</span>
-            <span class="info-box-number">{{survey_count}}</span>
-          </div>
-          <!-- /.info-box-content -->
+            <!-- Apply any bg-* class to to the icon to color it -->
+            <span class="info-box-icon bg-teal"><i class="fa fa-star-o"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Total amount of surveys</span>
+                <span class="info-box-number">{{survey_count}}</span>
+            </div>
+            <!-- /.info-box-content -->
         </div>
 
         <div class="info-box">
-          <!-- Apply any bg-* class to to the icon to color it -->
-          <span class="info-box-icon bg-teal"><i class="fa fa-star-o"></i></span>
-          <div class="info-box-content">
-            <span class="info-box-text">Total amount of survey responses</span>
-            <span class="info-box-number">{{response_count}}</span>
-          </div>
-          <!-- /.info-box-content -->
+            <!-- Apply any bg-* class to to the icon to color it -->
+            <span class="info-box-icon bg-teal"><i class="fa fa-star-o"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Total amount of survey responses</span>
+                <span class="info-box-number">{{response_count}}</span>
+            </div>
+            <!-- /.info-box-content -->
         </div>
 
         <!-- /.info-box -->
-        <a href="{{ url_for('main.create_survey') }}" class="btn btn-primary btn-index">Create your own survey</a>
-        {% else %}
-        <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-index">Create your own survey</a>
-        {% endif %}
+        <a href="{{ url_for('main.create_survey') }}" class="btn btn-primary btn-index">Create your own survey</a> {% else %}
+        <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-index">Create your own survey</a> {% endif %}
     </div>
 </body>
 {% endblock %}
