@@ -44,8 +44,8 @@ def create_survey():
         course = request.form['course']
         survey = Survey.create(description=title, owner_id=current_user.id,
                                course=course, active=True)
-        selected_questions = [int(i) for i in request.form['questions'].split(',')]
-        #  print(selected_questions)
+        selected_questions = [int(i)
+                              for i in request.form['questions'].split(',')]
         survey.set_questions(selected_questions)
         flash("The survey has been successfully created.")
         return redirect(url_for('.index'))
@@ -77,15 +77,19 @@ def modify_survey(id):
         survey.description = title
         survey.course = course
         survey.remove_all_questions()
-        selected = request.form.getlist('to[]')
-        survey.set_questions(selected)
+        selected_questions = [int(i)
+                              for i in request.form['questions'].split(',')]
+        survey.set_questions(selected_questions)
         flash("You have successfully modified the survey.")
         return redirect(url_for('.index'))
 
     courses = FileOperation.read_course()
-    return render_template('create_suevey', questions=questions,
-                           survey=survey, courses=courses, description=survey.description,
-                           selected_questions=survey.questions.all(),
+    selected_questions = survey.questions.all()
+    not_selected_questions = [
+        x for x in questions if x not in selected_questions]
+
+    return render_template('create_survey.html', questions=not_selected_questions, survey=survey, courses=courses,
+                           description=survey.description, selected_questions=selected_questions,
                            selected_course=survey.course)
 
 

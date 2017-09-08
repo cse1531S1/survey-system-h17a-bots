@@ -1,15 +1,8 @@
 {% extends "base.html" %}
-{% block title %}
-Create a Survey
-{% endblock %}
-{% block page_content %}
-
-<script type="text/javascript">
-    $(document).ready(function() {
-        $(".select").select2();
-    });
-</script>
-
+{% block title %} Create a Survey {% endblock %} {% block head %}
+<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/drag.css') }}" />
+<script src='https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.js'></script>
+{% endblock head %} {% block page_content %}
 
 <div class="col-md-12 row">
     <form action="" method="post" accept-charset="utf-8">
@@ -29,53 +22,80 @@ Create a Survey
 
         <div class="row">
             <div class="col-md-12">
-                <input class="form-control" type="text" name="title" id="title" value="{{ description }}" placeholder="Enter the title of the survey" required/>
+                <input class="form-control input-box" type="text" name="title" id="title" value="{{ description }}" placeholder="Enter the title of the survey" required/>
             </div>
         </div>
 
         <br />
         <div class="row">
-            <div class="text-center">
+            <div class="text-center col-md-12">
                 <p>Select questions to add to the survey</p>
                 <br />
+            </div>
+
+            <div class="col-sm-6">
+                <input type="text" name="search" value="" id="search" class="search-box form-control input-box" placeholder="Search...">
             </div>
 
             <div class="row drag-wrapper gu-unselectable col-md-12">
                 <div class="col-sm-6 drag-container drag-box" id='left'>
                     {% for question in questions %}
-                    <div value="{{ question.id }}">{{ question.description }}</div>
+                    <div id="selections" value="{{ question.id }}">{{ question.description }}</div>
                     {% endfor %}
                 </div>
 
                 <div class="col-sm-6 drag-container drag-box" id='right'>
+                    {% for question in selected_questions %}
+                    <div id="selections" value="{{ question.id }}">{{ question.description }}</div>
+                    {% endfor %}
                 </div>
             </div>
 
-            <div class="row text-center">
-                <br />
-                <br />
-                <button id="sub" type="" class="btn btn-primary" onclick="DoSubmit()">Submit</button>
-            </div>
         </div>
-
+        <div class="row text-center col-md-12">
+            <br />
+            <button id="sub" type="submit" class="btn btn-primary" onclick="DoSubmit()">Submit</button>
+        </div>
         <input name="questions" id="questions" value=""></input>
-
-        <br />
     </form>
 </div>
 
-<script src='https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.js'></script>
 <script charset="utf-8">
     dragula([$("#left").get(0), $("#right").get(0)]);
 </script>
+
 <script charset="utf-8">
-    function DoSubmit(){
+    function DoSubmit() {
         var a = $('#right').children();
         var b = [];
-        for(var i = 0; i<a.length; i++){
+        for (var i = 0; i < a.length; i++) {
             b.push(a[i].getAttribute('value'));
         }
         $('#questions').attr('value', b);
     }
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $(".select").select2();
+    });
+</script>
+<script charset="utf-8">
+    if (!RegExp.escape) {
+        RegExp.escape = function(s) {
+            return s.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, "\\$&")
+        };
+    }
+
+    jQuery(function() {
+        var $rows = $('#left').children();
+        $('#search').keyup(function() {
+            var regex = new RegExp(RegExp.escape($.trim(this.value).replace(/\s+/g, ' ')), 'i')
+            $rows.hide().filter(function() {
+                var text = $(this).text().replace(/\s+/g, ' ');
+                return regex.test(text)
+            }).show();
+        });
+    });
 </script>
 {% endblock %}
