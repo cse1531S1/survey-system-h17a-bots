@@ -8,6 +8,7 @@ from .. import db
 from . import main
 from .flatfile import FileOperation
 from config import basedir
+from datetime import datetime
 import sqlalchemy
 import builtins
 import os
@@ -42,15 +43,21 @@ def create_survey():
     if request.method == 'POST':
         title = request.form['title']
         course = request.form['course']
+        timerange = request.form['choose_date'].split(' - ')
+        times = [datetime.strptime(i, r'%d/%m/%Y %I:%M %p') for i in timerange]
         survey = Survey.create(description=title, owner_id=current_user.id,
-                               course=course, active=True)
-        selected_questions = request.form.getlist('to[]')
+                               times=times, course=course, active=True)
+        question_data = request.form['questions']
+        if question_data:
+            selected_questions = [int(i) for i in question_data.split(',')]
+        else:
+            selected_questions = []
         survey.set_questions(selected_questions)
         flash("The survey has been successfully created.")
         return redirect(url_for('.index'))
 
     courses = FileOperation.read_course()
-    return render_template('survey.html', courses=courses,
+    return render_template('create_survey.html', courses=courses,
                            questions=questions, description="",
                            selected_questions=[], selected_course=courses[0])
 
@@ -76,15 +83,29 @@ def modify_survey(id):
         survey.description = title
         survey.course = course
         survey.remove_all_questions()
-        selected = request.form.getlist('to[]')
-        survey.set_questions(selected)
+        timerange = request.form['choose_date'].split(' - ')
+        times = [datetime.strptime(i, r'%d/%m/%Y %I:%M %p') for i in timerange]
+        survey = Survey.create(description=title, owner_id=current_user.id,
+                               times=times, course=course, active=True)
+        question_data = request.form['questions']
+        if question_data:
+            selected_questions = [int(i) for i in question_data.split(',')]
+        else:
+            selected_questions = []
+        survey.set_questions(selected_questions)
         flash("You have successfully modified the survey.")
         return redirect(url_for('.index'))
 
     courses = FileOperation.read_course()
-    return render_template('survey.html', questions=questions,
-                           survey=survey, courses=courses, description=survey.description,
-                           selected_questions=survey.questions.all(),
+    selected_questions = survey.questions.all()
+    not_selected_questions = [
+        x for x in questions if x not in selected_questions]
+    time1 = datetime.strftime(survey.start_date, r'%d/%m/%Y %I:%M %p')
+    time2 = datetime.strftime(survey.end_date, r'%d/%m/%Y %I:%M %p')
+    times = " - ".join([time1, time2])
+
+    return render_template('create_survey.html', questions=not_selected_questions, times=times,
+                           survey=survey, courses=courses, selected_questions=selected_questions,
                            selected_course=survey.course)
 
 
@@ -153,7 +174,8 @@ def delete_question(id):
             return redirect(url_for('.question_pool'))
 
         if question_to_delete.surveys.first() is not None:
-            flash("The question is already assigned to a survey, please unassign it first, then come back to delete it.")
+            flash("The question is already assigned to a survey, \
+                  please unassign it first, then come back to delete it.")
             return redirect(url_for('.question_pool'))
 
         Question.delete_by_id(id)
@@ -233,3 +255,13 @@ def thankyou():
         This function is the view function for the thank you page the respondent will see after survey completion.
     """
     return render_template('thank_you.html')
+
+
+@login_required
+@main.route('/dashboard')
+def dashboard():
+    """
+        This function is the view function for the thank you page the respondent will see after survey completion.
+    """
+    surveys = Survey.get_all()
+    return render_template('dashboard.html', surveys=surveys)

@@ -126,6 +126,8 @@ class Survey(db.Model, DatabaseUtil):
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     course = db.Column(db.String(32))
     active = db.Column(db.Boolean())
+    start_date = db.Column(db.DateTime())
+    end_date = db.Column(db.DateTime())
     timestamp = db.Column(db.DateTime(), default=datetime.utcnow)
 
     questions = db.relationship('Question', secondary=SurveyQuestion, backref=db.backref(
@@ -137,9 +139,9 @@ class Survey(db.Model, DatabaseUtil):
         return rtn
 
     @classmethod
-    def create(cls, description, owner_id, course, active):
-        new = cls(description=description, owner_id=owner_id,
-                  course=course, active=active)
+    def create(cls, description, owner_id, course, active, times):
+        new = cls(description=description, owner_id=owner_id, start_date=times[0],
+                  end_date=times[1], course=course, active=active)
         db.session.add(new)
         db.session.commit()
         new.id_hash = cls.generate_id_hash(new.id)

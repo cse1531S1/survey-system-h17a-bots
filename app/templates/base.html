@@ -40,8 +40,10 @@
     <!-- mystyle -->
     <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}" />
 
+    {% block head %}
+    {% endblock head %}
   </head>
-  <body class="hold-transition skin-blue sidebar-mini fixed">
+  <body class="hold-transition skin-blue sidebar-mini">
     <div class="wrapper">
 
       <!-- Main Header -->
@@ -132,6 +134,9 @@
                 <li><a href="{{ url_for('main.question_pool') }}">Question pool</a></li>
                 <li><a href="{{ url_for('main.create_question') }}">Create a question</a></li>
               </ul>
+            </li>
+            <li>
+              <a href="{{ url_for('main.dashboard') }}"><i class="fa fa-link"></i> <span>Dashboard</span></a>
             </li>
             {% endif %}
 
