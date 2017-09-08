@@ -192,8 +192,20 @@ a{
   border-width: 1px;
   border-radius: 4px;
 }
+.input-sm{
+  border-style: solid;
+  border-color: #ddd;
+  border-width: 1px;
+  border-radius: 4px;
+}
 
 .search-box{
   width: 98%;
   margin-bottom: 2px;
+  margin-left: 6px;
+}
+
+.box-header{
+    padding-bottom: 0px;
+    padding-top: 5px
 }
