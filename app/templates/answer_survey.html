@@ -1,9 +1,4 @@
-{% extends "answer_base.html" %}
-{% block title %}
-Answer a Survey
-{% endblock %}
-
-{% block page_content %}
+{% extends "answer_base.html" %} {% block title %} Answer a Survey {% endblock %} {% block page_content %}
 <div class="container">
     <div class='row'>
         <h3 class="center-align">
@@ -14,7 +9,7 @@ Answer a Survey
     </div>
 
 
-    <form  method="post">
+    <form method="post">
         <div>
             {% for question in survey.questions.all() %}
             <div class='row question'>
@@ -25,7 +20,8 @@ Answer a Survey
                 <div class="row center-align">
                     {% for choice in question.choices %}
                     <div class="col s2">
-                        <input class="validate" required="" name="{{ question.id }}" type="radio" id="{{ question.id }}{{ choice.id }}" value="{{ choice.content }}"/>
+                        <input class="validate" required="" name="{{ question.id }}" type="radio" id="{{ question.id }}{{ choice.id }}" value="{{ choice.content }}"
+                        />
                         <label for="{{ question.id }}{{ choice.id }}">{{ choice.content }}</label>
                     </div>
                     {% endfor %}
@@ -35,7 +31,7 @@ Answer a Survey
             {% endfor %}
 
             <div class="center-align row">
-                <button class="btn btn-default"id="sub" type="submit">Submit</button>
+                <button class="btn btn-default" id="sub" type="submit">Submit</button>
             </div>
         </div>
     </form>
