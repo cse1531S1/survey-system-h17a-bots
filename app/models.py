@@ -2,7 +2,9 @@
 # encoding: utf-8
 
 from werkzeug.security import generate_password_hash, check_password_hash
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask_login import UserMixin, AnonymousUserMixin
+from flask import current_app
 from . import db, login_manager
 from datetime import datetime
 import hashlib
@@ -87,6 +89,15 @@ class User(UserMixin, db.Model, DatabaseUtil):
     def ping(self):
         self.last_login = datetime.utcnow()
         db.session.add(self)
+
+    def generate_reset_token(self, expiration=1800):
+        s = Serializer(current_app.config['SECRET_KEY'], expiration)
+        return s.dumps({'reset': self.id})
+
+    def get_by_reset_token(token):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        return s.loads(token).get('reset')
+
 
 
 class AnoymousUser(AnonymousUserMixin):
