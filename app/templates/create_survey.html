@@ -303,6 +303,9 @@
 
     function copy_chlidren(right) {
         new_right = document.getElementById('right');
+        while(new_right.hasChildNodes()){
+            new_right.removeChild(new_right.lastChild);
+        }
         while (right.childNodes.length > 0) {
             new_right.appendChild(right.childNodes[0]);
         }
