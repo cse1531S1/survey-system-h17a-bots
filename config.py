@@ -12,10 +12,10 @@ class Config:
     MAIL_SERVER = 'smtp.googlemail.com'
     MAIL_PORT = 587
     MAIL_USE_TLS = True
-    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
-    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
-    FLASKY_MAIL_SUBJECT_PREFIX = 'A Survey System'
-    FLASKY_MAIL_SENDER = 'admin'
+    MAIL_USERNAME = 'h17a.bots@gmail.com'
+    MAIL_PASSWORD = '1531bots'
+    FLASKY_MAIL_SUBJECT_PREFIX = '[GroupBOTS]'
+    FLASKY_MAIL_SENDER = 'admin <h17a.bots@gmail.com>'
     FLASKY_ADMIN = os.environ.get('FLASKY_ADMIN')
 
     @staticmethod

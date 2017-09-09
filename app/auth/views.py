@@ -4,9 +4,9 @@
 from flask import render_template, redirect, request, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from . import auth
-from ..models import db
-from ..models import User
-from .forms import LoginForm, RegistForm, ChangePasswordForm
+from ..models import db, User
+from ..email import send_email
+from .forms import LoginForm, RegistForm, ChangePasswordForm, PasswordResetForm, PasswordResetRequestForm
 from .auth_util import verify_password
 
 
@@ -31,7 +31,7 @@ def register():
     form = RegistForm()
     if form.validate_on_submit():
         user = User(username=form.username.data,
-                    email=form.email.data, password=form.password.data)
+                email=form.email.data, password=form.password.data)
         db.session.add(user)
         flash('You are able to login now.')
         db.session.commit()
@@ -66,3 +66,41 @@ def change_password():
         else:
             flash('Invalid password entered.')
     return render_template("auth/change_password.html", form=form)
+
+
+@auth.route('/reset', methods=['GET', 'POST'])
+def password_reset_request():
+    if not current_user.is_anonymous:
+        return redirect(url_for('main.index'))
+    form = PasswordResetRequestForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user:
+            token = user.generate_reset_token()
+            send_email(user.email, 'Reset Your Password',
+                    'auth/email/reset_password',
+                    user=user, token=token,
+                    next=request.args.get('next'))
+            flash('An email with instructions to reset your password has been '
+                    'sent to you.')
+            return redirect(url_for('auth.login'))
+    return render_template('auth/reset_password.html', form=form)
+
+
+@auth.route('/reset/<token>', methods=['GET', 'POST'])
+def password_reset(token):
+    if not current_user.is_anonymous:
+        return redirect(url_for('main.index'))
+    form = PasswordResetForm()
+    if form.validate_on_submit():
+        user_id = User.get_by_reset_token(token)
+        try:
+            user = User.get_by_id(user_id)
+            user.password = form.password.data
+            db.session.add(user)
+            flash('Your password has been updated.')
+            return redirect(url_for('auth.login'))
+        except:
+            flash('Unable to reset password.')
+            return redirect(url_for('main.index'))
+    return render_template('auth/reset_password.html', form=form)

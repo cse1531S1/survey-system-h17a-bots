@@ -112,7 +112,12 @@
           <ul class="sidebar-menu">
             <li class="header">Survey Management System</li>
             <!-- Optionally, you can add icons to the links -->
+
             {% if current_user.is_authenticated %}
+            <li>
+              <a href="{{ url_for('main.dashboard') }}"><i class="fa fa-link"></i> <span>Dashboard</span></a>
+            </li>
+
             <li class="treeview">
               <a href="#"><i class="fa fa-link"></i> <span>Surveys</span>
                 <span class="pull-right-container">
@@ -135,9 +140,6 @@
                 <li><a href="{{ url_for('main.question_pool') }}">Question pool</a></li>
                 <li><a href="{{ url_for('main.create_question') }}">Create a question</a></li>
               </ul>
-            </li>
-            <li>
-              <a href="{{ url_for('main.dashboard') }}"><i class="fa fa-link"></i> <span>Dashboard</span></a>
             </li>
             {% endif %}
 
