@@ -112,11 +112,12 @@
           <ul class="sidebar-menu">
             <li class="header">Survey Management System</li>
             <!-- Optionally, you can add icons to the links -->
+
+            {% if current_user.is_authenticated %}
             <li>
               <a href="{{ url_for('main.dashboard') }}"><i class="fa fa-link"></i> <span>Dashboard</span></a>
             </li>
 
-            {% if current_user.is_authenticated %}
             <li class="treeview">
               <a href="#"><i class="fa fa-link"></i> <span>Surveys</span>
                 <span class="pull-right-container">
