@@ -126,6 +126,8 @@ class Survey(db.Model, DatabaseUtil):
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     course = db.Column(db.String(32))
     active = db.Column(db.Boolean())
+    start_date = db.Column(db.DateTime())
+    end_date = db.Column(db.DateTime())
     timestamp = db.Column(db.DateTime(), default=datetime.utcnow)
 
     questions = db.relationship('Question', secondary=SurveyQuestion, backref=db.backref(
@@ -137,9 +139,9 @@ class Survey(db.Model, DatabaseUtil):
         return rtn
 
     @classmethod
-    def create(cls, description, owner_id, course, active):
-        new = cls(description=description, owner_id=owner_id,
-                  course=course, active=active)
+    def create(cls, description, owner_id, course, active, times):
+        new = cls(description=description, owner_id=owner_id, start_date=times[0],
+                  end_date=times[1], course=course, active=active)
         db.session.add(new)
         db.session.commit()
         new.id_hash = cls.generate_id_hash(new.id)
@@ -185,12 +187,14 @@ class Question(db.Model, DatabaseUtil):
     # q_type : question type
     # 1 : multiple choices
     q_type = db.Column(db.Integer, default=1)
+    choices = db.relationship('Choice', backref='question', lazy='dynamic')
 
     @classmethod
     def create(cls, description, owner_id, q_type=1):
         new = cls(description=description, owner_id=owner_id)
         db.session.add(new)
         db.session.commit()
+        return new
 
     def __repr__(self):
         return '<Question {}>'.format(self.id)
@@ -254,3 +258,17 @@ class AnswerSurveyLink(db.Model, DatabaseUtil):
     def __repr__(self):
         return '<AnswerSurveyLink {} given by {} Survey {}>'.format(
             self.id, self.owner_id, self.survey_id)
+
+
+class Choice(db.Model, DatabaseUtil):
+    __tablename__ = 'choices'
+    id = db.Column(db.Integer, primary_key=True)
+    question_id = db.Column(db.Integer, db.ForeignKey('questions.id'))
+    content = db.Column(db.String(128))
+
+    @classmethod
+    def create(cls, content, question_id):
+        new = cls(question_id=question_id, content=content)
+        db.session.add(new)
+        db.session.commit()
+        return new

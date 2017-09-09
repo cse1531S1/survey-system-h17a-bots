@@ -31,7 +31,7 @@
     <script type="text/javascript" src="{{ url_for('static', filename='js/multiselect.min.js') }}"></script>
 
     <!-- AdminLTE App -->
-    <script type="text/javascript" src="{{ url_for('static', filename='js/app.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/app.js') }}"></script>
 
     <!-- select2 -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
@@ -51,6 +51,7 @@
 
         <!-- Logo -->
         <a class="logo" href="/">
+          <span class="logo-mini">BOTS</span>
           <span class="logo-lg"><b>Group</b>BOTS</span>
         </a>
 
@@ -134,6 +135,9 @@
                 <li><a href="{{ url_for('main.question_pool') }}">Question pool</a></li>
                 <li><a href="{{ url_for('main.create_question') }}">Create a question</a></li>
               </ul>
+            </li>
+            <li>
+              <a href="{{ url_for('main.dashboard') }}"><i class="fa fa-link"></i> <span>Dashboard</span></a>
             </li>
             {% endif %}
 

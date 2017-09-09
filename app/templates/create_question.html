@@ -1,35 +1,170 @@
-{% extends "base.html" %}
-{% block title %}
-Create Question
-{% endblock %}
-{% block page_content %}
+{% extends "base.html" %} {% block head %}
+<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/drag.css') }}" />
+<script src='https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.js'></script>
+{% endblock head %} {% block title %} Create Question {% endblock %} {% block page_content %}
+
+
+<div class="col-md-12 box box-primary">
+  <form action="" method="post" accept-charset="utf-8">
+    <div class="row">
+      <div class="text-center">
+        <p>Choose a question type:</p>
+        <select name="q_type" id="q_type" class="select input-large">
+          <option value="1">Multiple choices</option>
+          <option value="2" disabled="disabled">Checkboxes (disabled)</option>
+          <option value="3" disabled="disabled">Drop-down menus (disabled)</option>
+          <option value="4" disabled="disabled">Short answers (disabled)</option>
+          <option value="5" disabled="disabled">Paragraphs (disabled)</option>
+        </select>
+      </div>
+
+      <br></br>
+
+      <div class="col-md-12">
+        <input class="form-control" type="text" name="title" id="title" value="" placeholder="What is the title of your question?" required/>
+      </div>
+
+      <br></br>
+      <div class="row">
+        <div class="col-md-12">
+          <h4 class="text-center">Choices</h4>
+          <div id="1" class="group ">
+            <div class="col-md-4">
+              <div class="box box-default">
+                <div class="box-header with-border">
+                  <h3 class="box-title">Choice</h3>
+                  <div class="box-tools pull-right">
+                    <button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                  </div>
+                  <!-- /.box-tools -->
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                  <input type="text" name="choice" value="Very Strongly Agree" id="choice" class="form-control ">
+                </div>
+                <!-- /.box-body -->
+              </div>
+              <!-- /.box -->
+            </div>
+
+            <div class="col-md-4">
+              <div class="box box-default">
+                <div class="box-header with-border">
+                  <h3 class="box-title">Choice</h3>
+                  <div class="box-tools pull-right">
+                    <button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                  </div>
+                  <!-- /.box-tools -->
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                  <input type="text" name="choice" value="Strongly Agree" id="choice" class="form-control ">
+                </div>
+                <!-- /.box-body -->
+              </div>
+              <!-- /.box -->
+            </div>
+
+            <div class="col-md-4">
+              <div class="box box-default">
+                <div class="box-header with-border">
+                  <h3 class="box-title">Choice</h3>
+                  <div class="box-tools pull-right">
+                    <button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                  </div>
+                  <!-- /.box-tools -->
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                  <input type="text" name="choice" value="Agree" id="choice" class="form-control ">
+                </div>
+                <!-- /.box-body -->
+              </div>
+              <!-- /.box -->
+            </div>
+
+            <div class="col-md-4">
+              <div class="box box-default">
+                <div class="box-header with-border">
+                  <h3 class="box-title">Choice</h3>
+                  <div class="box-tools pull-right">
+                    <button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                  </div>
+                  <!-- /.box-tools -->
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                  <input type="text" name="choice" value="Disagree" id="choice" class="form-control ">
+                </div>
+                <!-- /.box-body -->
+              </div>
+              <!-- /.box -->
+            </div>
+
+            <div class="col-md-4">
+              <div class="box box-default">
+                <div class="box-header with-border">
+                  <h3 class="box-title">Choice</h3>
+                  <div class="box-tools pull-right">
+                    <button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                  </div>
+                  <!-- /.box-tools -->
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                  <input type="text" name="choice" value="Strongly Disagree" id="choice" class="form-control ">
+                </div>
+                <!-- /.box-body -->
+              </div>
+              <!-- /.box -->
+            </div>
+
+            <div class="col-md-4">
+              <div class="box box-default">
+                <div class="box-header with-border">
+                  <h3 class="box-title">Choice</h3>
+                  <div class="box-tools pull-right">
+                    <button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                  </div>
+                  <!-- /.box-tools -->
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                  <input type="text" name="choice" value="Very Strongly Disagree" id="choice" class="form-control ">
+                </div>
+                <!-- /.box-body -->
+              </div>
+              <!-- /.box -->
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class='text-center col-md-12'>
+        <button id="" type="submit" class='btn btn-primary'>Submit</button>
+        <br></br>
+      </div>
+    </div>
+  </form>
+</div>
 
 <script type="text/javascript">
   $(document).ready(function() {
     $(".select").select2();
   });
 </script>
-
-<form action="" method="post" accept-charset="utf-8">
-  <div class="">
-    <div class="text-center row">
-      <p>Choose a question type:</p>
-      <select name="q_type" id="q_type" class="select input-large">
-        <option value="1">Multiple choices</option>
-        <option value="2" disabled="disabled">Checkboxes (disabled)</option>
-        <option value="3" disabled="disabled">Drop-down menus (disabled)</option>
-        <option value="4" disabled="disabled">Short answers (disabled)</option>
-        <option value="5" disabled="disabled">Paragraphs (disabled)</option>
-      </select>
-    </div>
-    <br />
-    <div class="row">
-      <input class="form-control" type="text" name="title" id="title" value="" placeholder="What is the title of your question?" required/>
-    </div>
-    <br />
-    <div class='text-center'>
-      <button id="" type="submit" class='btn btn-primary'>Submit</button>
-    </div>
-  </div>
-</form>
+<script charset="utf-8">
+  $(document).ready(function() {
+    $('.group').hide();
+    $('#1').show();
+    $('#q_type').change(function() {
+      $('.group').hide();
+      $('#' + $(this).val()).show();
+    })
+  });
+</script>
+<script charset="utf-8">
+  dragula([$(".group").get(0)]);
+</script>
 {% endblock %}

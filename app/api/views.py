@@ -5,7 +5,7 @@ from flask import render_template, redirect, request, url_for, flash, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from . import api
 from ..models import db
-from ..models import User, Survey, AnswerSurveyLink, Answer, Question
+from ..models import User, Survey, AnswerSurveyLink, Answer, Question, Choice
 import collections
 
 
@@ -15,14 +15,13 @@ def get_answer_data(survey_id, question_id):
         survey_id=survey_id).all()
     question = Question.get_by_id(question_id)
 
-    vsa = {'label': 'Very Strongly Agree', 'value': 0}
-    sa = {'label': 'Strongly Agree', 'value': 0}
-    a = {'label': 'Agree', 'value': 0}
-    d = {'label': 'Disagree', 'value': 0}
-    sd = {'label': 'Strongly Disagree', 'value': 0}
-    vsd = {'label': 'Very Strongly Disagree', 'value': 0}
+    def make_counter(counter):
+        rtn = []
+        for key, value in counter.items():
+            rtn.append({'label': key, 'value': value})
 
-    rtn = [vsa, sa, a, d, sd, vsd]
+        return rtn
+
     rst = []
     for link in answer_survey_link:
         for answer in link.answers.all():
@@ -30,13 +29,24 @@ def get_answer_data(survey_id, question_id):
                 rst.append(answer.content)
 
     counter = dict(collections.Counter(rst))
-    for key, value in counter.items():
-        for i in rtn:
-            if i['label'] == key:
-                i['value'] = value
 
     rtn = {
-        "result": rtn,
+        "result": make_counter(counter),
         "success": True
     }
     return jsonify(rtn)
+
+
+@api.route('/create_question', methods=['POST'])
+def create_question():
+    question_description = request.form['title']
+    q_type = int(request.form['q_type'])
+    question = Question.create(description=question_description,
+                               owner_id=current_user.id, q_type=q_type)
+
+    choices = request.form.getlist('choice')
+    for choice in choices:
+        Choice.create(choice, question.id)
+    return jsonify({
+        "success": True,
+    })

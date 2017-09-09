@@ -3,11 +3,12 @@
 
 from flask import request, redirect, render_template, url_for, flash, send_from_directory
 from flask_login import login_required, current_user
-from ..models import Survey, Question, Answer, AnswerSurveyLink
+from ..models import Survey, Question, Answer, AnswerSurveyLink, Choice
 from .. import db
 from . import main
 from .flatfile import FileOperation
 from config import basedir
+from datetime import datetime
 import sqlalchemy
 import builtins
 import os
@@ -42,10 +43,15 @@ def create_survey():
     if request.method == 'POST':
         title = request.form['title']
         course = request.form['course']
+        timerange = request.form['choose_date'].split(' - ')
+        times = [datetime.strptime(i, r'%d/%m/%Y %I:%M %p') for i in timerange]
         survey = Survey.create(description=title, owner_id=current_user.id,
-                               course=course, active=True)
-        selected_questions = [int(i)
-                              for i in request.form['questions'].split(',')]
+                               times=times, course=course, active=True)
+        question_data = request.form['questions']
+        if question_data:
+            selected_questions = [int(i) for i in question_data.split(',')]
+        else:
+            selected_questions = []
         survey.set_questions(selected_questions)
         flash("The survey has been successfully created.")
         return redirect(url_for('.index'))
@@ -74,11 +80,16 @@ def modify_survey(id):
     if request.method == 'POST':
         title = request.form['title']
         course = request.form['course']
-        survey.description = title
-        survey.course = course
-        survey.remove_all_questions()
-        selected_questions = [int(i)
-                              for i in request.form['questions'].split(',')]
+        Survey.delete_by_id(id)
+        timerange = request.form['choose_date'].split(' - ')
+        times = [datetime.strptime(i, r'%d/%m/%Y %I:%M %p') for i in timerange]
+        survey = Survey.create(description=title, owner_id=current_user.id,
+                               times=times, course=course, active=True)
+        question_data = request.form['questions']
+        if question_data:
+            selected_questions = [int(i) for i in question_data.split(',')]
+        else:
+            selected_questions = []
         survey.set_questions(selected_questions)
         flash("You have successfully modified the survey.")
         return redirect(url_for('.index'))
@@ -87,9 +98,12 @@ def modify_survey(id):
     selected_questions = survey.questions.all()
     not_selected_questions = [
         x for x in questions if x not in selected_questions]
+    time1 = datetime.strftime(survey.start_date, r'%d/%m/%Y %I:%M %p')
+    time2 = datetime.strftime(survey.end_date, r'%d/%m/%Y %I:%M %p')
+    times = " - ".join([time1, time2])
 
-    return render_template('create_survey.html', questions=not_selected_questions, survey=survey, courses=courses,
-                           description=survey.description, selected_questions=selected_questions,
+    return render_template('create_survey.html', questions=not_selected_questions, times=times,
+                           survey=survey, courses=courses, selected_questions=selected_questions,
                            selected_course=survey.course)
 
 
@@ -99,14 +113,12 @@ def create_question():
     if request.method == 'POST':
         question_description = request.form['title']
         q_type = int(request.form['q_type'])
-        try:
-            Question.create(description=question_description,
-                            owner_id=current_user.id, q_type=q_type)
-        except sqlalchemy.exc.IntegrityError:
-            db.session.rollback()
-            flash("Failed to create the question!\n\
-                  The question title is already in use.")
-            return redirect(url_for('.create_question'))
+        question = Question.create(description=question_description,
+                                   owner_id=current_user.id, q_type=q_type)
+
+        choices = request.form.getlist('choice')
+        for choice in choices:
+            Choice.create(choice, question.id)
         flash("Successfully created the question.")
         return redirect(url_for('.create_question'))
 
@@ -239,3 +251,13 @@ def thankyou():
         This function is the view function for the thank you page the respondent will see after survey completion.
     """
     return render_template('thank_you.html')
+
+
+@login_required
+@main.route('/dashboard')
+def dashboard():
+    """
+        This function is the view function for the thank you page the respondent will see after survey completion.
+    """
+    surveys = Survey.get_all()
+    return render_template('dashboard.html', surveys=surveys)
