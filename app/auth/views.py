@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
-from flask import render_template, redirect, request, url_for, flash, current_app
+from flask import render_template, redirect, request, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from . import auth
-from ..models import db
-from ..models import User
+from ..models import db, User
 from ..email import send_email
 from .forms import LoginForm, RegistForm, ChangePasswordForm, PasswordResetForm, PasswordResetRequestForm
 from .auth_util import verify_password

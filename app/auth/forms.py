@@ -4,7 +4,6 @@
 from flask_wtf import FlaskForm as Form
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import Required, Length, EqualTo, Email
-from wtforms import ValidationError
 from ..models import User
 
 """
