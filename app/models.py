@@ -99,7 +99,6 @@ class User(UserMixin, db.Model, DatabaseUtil):
         return s.loads(token).get('reset')
 
 
-
 class AnoymousUser(AnonymousUserMixin):
     id = 0
     is_admin = False
