@@ -31,7 +31,7 @@ def register():
     form = RegistForm()
     if form.validate_on_submit():
         user = User(username=form.username.data,
-                email=form.email.data, password=form.password.data)
+                    email=form.email.data, password=form.password.data)
         db.session.add(user)
         flash('You are able to login now.')
         db.session.commit()
@@ -78,11 +78,11 @@ def password_reset_request():
         if user:
             token = user.generate_reset_token()
             send_email(user.email, 'Reset Your Password',
-                    'auth/email/reset_password',
-                    user=user, token=token,
-                    next=request.args.get('next'))
+                       'auth/email/reset_password',
+                       user=user, token=token,
+                       next=request.args.get('next'))
             flash('An email with instructions to reset your password has been '
-                    'sent to you.')
+                  'sent to you.')
             return redirect(url_for('auth.login'))
     return render_template('auth/reset_password.html', form=form)
 
