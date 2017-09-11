@@ -77,7 +77,6 @@ def password_reset_request():
         user = User.query.filter_by(email=form.email.data).first()
         if user:
             token = user.generate_reset_token()
-            print(token)
             send_email(user.email, 'Reset Your Password',
                     'auth/email/reset_password',
                     user=user, token=token,
