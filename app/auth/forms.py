@@ -21,12 +21,12 @@ class fa_map():
             }
 
 
-    class LoginForm(Form, fa_map):
-        username = StringField('', validators=[Required(), Length(1, 64)],
+class LoginForm(Form, fa_map):
+    username = StringField('', validators=[Required(), Length(1, 64)],
                 render_kw={"placeholder": "Username/ Email", })
-        password = PasswordField('', validators=[Required()],
+    password = PasswordField('', validators=[Required()],
                 render_kw={"placeholder": "Password", })
-        remember_me = BooleanField('Keep me logged in')
+    remember_me = BooleanField('Keep me logged in')
     submit = SubmitField('Log In')
 
 
