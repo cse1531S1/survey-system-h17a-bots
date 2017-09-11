@@ -3,7 +3,7 @@
 
 from flask_wtf import FlaskForm as Form
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
-from wtforms.validators import Required, Length, EqualTo, Email
+from wtforms.validators import Required, Length, EqualTo, Email, ValidationError
 from ..models import User
 
 """
@@ -12,35 +12,35 @@ from ..models import User
 
 class fa_map():
     fa_addon = {
-        'username' : 'fa-user',
-        'email' : 'fa-envelope-o',
-        'password' : 'fa-key',
-        'old_password' : 'fa-key',
-        'new_password' : 'fa-key',
-        'password_confirm' : 'fa-key',
-    }
+            'username' : 'fa-user',
+            'email' : 'fa-envelope-o',
+            'password' : 'fa-key',
+            'old_password' : 'fa-key',
+            'new_password' : 'fa-key',
+            'password_confirm' : 'fa-key',
+            }
 
 
-class LoginForm(Form, fa_map):
-    username = StringField('', validators=[Required(), Length(1, 64)],
-        render_kw={"placeholder" : "Username/ Email",})
-    password = PasswordField('', validators=[Required()],
-        render_kw={"placeholder" : "Password",})
-    remember_me = BooleanField('Keep me logged in')
+    class LoginForm(Form, fa_map):
+        username = StringField('', validators=[Required(), Length(1, 64)],
+                render_kw={"placeholder": "Username/ Email", })
+        password = PasswordField('', validators=[Required()],
+                render_kw={"placeholder": "Password", })
+        remember_me = BooleanField('Keep me logged in')
     submit = SubmitField('Log In')
 
 
 class RegistForm(Form, fa_map):
     username = StringField('', validators=[Required(), Length(1, 64)],
-        render_kw={"placeholder" : "Username",})
+            render_kw={"placeholder": "Username", })
     email = StringField('', validators=[Required(), Length(1, 64),
         Email("Please enter your email address.")],
-        render_kw={"placeholder" : "Email",})
+        render_kw={"placeholder": "Email", })
     password = PasswordField('', validators=[Required(), EqualTo(
         'password_confirm', message='The passwords must match.')],
-        render_kw={"placeholder" : "Password",})
+        render_kw={"placeholder": "Password", })
     password_confirm = PasswordField('', validators=[Required()],
-        render_kw={"placeholder" : "Confirm your password",})
+            render_kw={"placeholder": "Confirm your password", })
     submit = SubmitField('Register')
 
     def validate_email(self, field):
@@ -54,18 +54,18 @@ class RegistForm(Form, fa_map):
 
 class ChangePasswordForm(Form, fa_map):
     old_password = PasswordField('', validators=[Required()],
-        render_kw={"placeholder" : "Old password",})
+            render_kw={"placeholder": "Old password", })
     new_password = PasswordField('', validators=[Required(), EqualTo(
         'password_confirm', message='The passwords must match.')],
-        render_kw={"placeholder" : "New password",})
+        render_kw={"placeholder": "New password", })
     password_confirm = PasswordField('', validators=[Required()],
-        render_kw={"placeholder" : "Confirm your password",})
+            render_kw={"placeholder": "Confirm your password", })
     submit = SubmitField('Update Password')
 
 
 class PasswordResetRequestForm(Form, fa_map):
     email = StringField('', validators=[Required(), Length(1, 64),
-        Email()], render_kw={"placeholder" : "Email",})
+        Email()], render_kw={"placeholder": "Email", })
     submit = SubmitField('Reset Password')
 
 
@@ -74,7 +74,7 @@ class PasswordResetForm(Form, fa_map):
         EqualTo('password_confirm', message='Passwords must match')],
         render_kw={"placeholder" : "New password",})
     password_confirm = PasswordField('', validators=[Required()],
-        render_kw={"placeholder" : "Confirm your password",})
+            render_kw={"placeholder": "Confirm your password", })
     submit = SubmitField('Reset Password')
 
     def validate_email(self, field):

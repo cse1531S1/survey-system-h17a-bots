@@ -27,7 +27,8 @@
                 <div class="row text-center">
                     <p>Enter title</p>
                 </div>
-                <input class="form-control input-box" type="text" name="title" id="title" value="{% if survey %}{{ survey.description }}{% endif %}" placeholder="Enter the title of the survey" required/>
+                <input class="form-control input-box" type="text" name="title" id="title" value="{% if survey %}{{ survey.description }}{% endif %}"
+                    placeholder="Enter the title of the survey" required/>
             </div>
         </div>
         <div class="col-md-12">
@@ -35,7 +36,8 @@
                 <p>Select time</p>
             </div>
             <div class="row">
-                <input class="form-control text-center" type="text" name="choose_date" value="{% if times %}{{times}}{% endif %}" id="choose_date" placeholder="Choose the start date">
+                <input class="form-control text-center" type="text" name="choose_date" value="{% if times %}{{times}}{% endif %}" id="choose_date"
+                    placeholder="Choose the start date">
             </div>
         </div>
 
@@ -103,7 +105,8 @@
                         <br></br>
 
                         <div class="col-md-12">
-                            <input class="form-control" type="text" name="title" id="title" value="" placeholder="What is the title of your question?" required/>
+                            <input class="form-control" type="text" name="title" id="title" value="" placeholder="What is the title of your question?"
+                                required/>
                         </div>
 
                         <br></br>
@@ -262,7 +265,7 @@
 </script>
 
 <script type="text/javascript">
-    $(document).ready(function() {
+    $(document).ready(function () {
         $(".select").select2();
     });
 </script>
@@ -275,20 +278,20 @@
             url: '/api_1_0/create_question',
             type: "POST",
             data: postData,
-            success: function(data, textStatus, jqXHR) {
+            success: function (data, textStatus, jqXHR) {
                 $(".add_question").modal('toggle');
-                $(".refresh").load(location.href + " .drag-wrapper", function() {
+                $(".refresh").load(location.href + " .drag-wrapper", function () {
                     copy_chlidren(right);
-                    $(".modal-lg").load(location.href + " .modal-content", function() {
+                    $(".modal-lg").load(location.href + " .modal-content", function () {
                         remove_dup();
-                        $("#funcc").load(location.href + " #funcc", function() {
+                        $("#funcc").load(location.href + " #funcc", function () {
                             dragula([$("#left").get(0), $("#right").get(0)]);
                             dragula([$(".group").get(0)]);
                         });
                     });
                 });
             },
-            error: function(jqXHR, status, error) {
+            error: function (jqXHR, status, error) {
                 console.log(status + ": " + error);
             }
         });
@@ -321,16 +324,16 @@
 
 <script charset="utf-8">
     if (!RegExp.escape) {
-        RegExp.escape = function(s) {
+        RegExp.escape = function (s) {
             return s.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, "\\$&")
         };
     }
 
-    jQuery(function() {
+    jQuery(function () {
         var $rows = $('#left').children();
-        $('#search').keyup(function() {
+        $('#search').keyup(function () {
             var regex = new RegExp(RegExp.escape($.trim(this.value).replace(/\s+/g, ' ')), 'i')
-            $rows.hide().filter(function() {
+            $rows.hide().filter(function () {
                 var text = $(this).text().replace(/\s+/g, ' ');
                 return regex.test(text)
             }).show();
