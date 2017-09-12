@@ -40,6 +40,18 @@
         </template>
       </el-table-column>
 
+      <el-table-column width="110px" align="center" label="Start Time">
+        <template scope="scope">
+          <span>{{scope.row.start_time}}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column width="110px" align="center" label="End Time">
+        <template scope="scope">
+          <span>{{scope.row.end_time}}</span>
+        </template>
+      </el-table-column>
+
       <el-table-column width="110px" align="center" label="Owner">
         <template scope="scope">
           <span>{{scope.row.owner}}</span>
@@ -134,7 +146,7 @@
 </template>
 
 <script>
-import { fetchList, fetchPv, fetchQuestion, fetchCourse, modifySurvey } from '@/api/article'
+import { fetchList, fetchPv, fetchQuestion, fetchCourse, modifySurvey, createSurvey } from '@/api/article'
 import DndList from '@/components/twoDndList'
 import waves from '@/directive/waves.js'// 水波纹指令
 import { parseTime } from '@/utils'
@@ -183,7 +195,6 @@ export default {
       list2: [],
       dialogPvVisible: false,
       pvData: [],
-      showAuditor: false,
       tableKey: 0,
       to_post: {}
     }
@@ -203,8 +214,14 @@ export default {
   },
   created() {
     this.getList()
+    this.getCourse()
   },
   methods: {
+    getCourse() {
+      fetchCourse(this.listQuery).then(response => {
+        this.course = response.data.items
+      })
+    },
     getList() {
       this.listLoading = true
       fetchList(this.listQuery).then(response => {
@@ -252,11 +269,9 @@ export default {
       this.dialogFormVisible = true
     },
     handleUpdate(row) {
+      this.resetTemp()
       this.listLoading = true
       this.temp = Object.assign({}, row)
-      fetchCourse(this.listQuery).then(response => {
-        this.course = response.data.items
-      })
       this.list1 = row.questions
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
@@ -273,16 +288,35 @@ export default {
       this.list.splice(index, 1)
     },
     create() {
-      this.temp.id = parseInt(Math.random() * 100) + 1024
-      this.temp.timestamp = +new Date()
-      this.temp.author = ''
-      this.list.unshift(this.temp)
       this.dialogFormVisible = false
-      this.$notify({
-        title: 'Success',
-        message: 'You successfully created a survey!',
-        type: 'success',
-        duration: 2000
+      this.to_post = {
+        'title': this.temp.title,
+        'course': this.temp.course,
+        'questions': this.list1,
+        'start': this.temp.start_time,
+        'end': this.temp.end_time,
+        'status': this.temp.status,
+        'id': -1
+      }
+      createSurvey(this.to_post).then(response => {
+        if (response.data.success) {
+          this.$notify({
+            title: 'Success!',
+            message: 'You successfully created the survey!',
+            type: 'success',
+            duration: 2000
+          })
+        } else {
+          this.$notify({
+            title: 'Not Success!',
+            message: 'Some unknown error happened',
+            type: 'error',
+            duration: 2000
+          })
+        }
+      }).then(() => {
+        this.getList()
+        this.resetTemp()
       })
     },
     update() {
@@ -312,9 +346,10 @@ export default {
             duration: 2000
           })
         }
-      }).then(
+      }).then(() => {
         this.getList()
-      )
+        this.resetTemp()
+      })
     },
     resetTemp() {
       this.temp = {
@@ -322,8 +357,13 @@ export default {
         timestamp: 0,
         title: '',
         status: 'published',
-        questions: []
+        questions: [],
+        course: '',
+        end_time: null,
+        start_time: null
       }
+      this.list1 = []
+      this.to_post = {}
     },
     handleFetchPv(pv) {
       fetchPv(pv).then(response => {

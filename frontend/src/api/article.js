@@ -46,3 +46,11 @@ export function modifySurvey(to_post) {
     data: to_post
   })
 }
+
+export function createSurvey(to_post) {
+  return fetch({
+    url: 'http://127.0.0.1:5000/api_1_0/create_survey',
+    method: 'post',
+    data: to_post
+  })
+}

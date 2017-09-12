@@ -91,7 +91,7 @@ def all_survey(path=None):
         return {
             'id': survey.id,
             'title': survey.description,
-            'owner': survey.owner.username,
+            'owner': survey.owner.username if survey.owner else "AnoymousUser",
             'responses': len(AnswerSurveyLink.get_by_survey_id(survey.id)),
             'timestamp': datetime.strftime(survey.timestamp, r'%d-%m-%Y %H:%M'),
             'course': survey.course,
@@ -118,7 +118,6 @@ def fetch_course():
 
 
 @api.route('/modify_survey', methods=['GET', 'POST'])
-# @cross_origin(allow_headers=['application/json'])
 def modify_survey():
     data = request.get_json()
     survey_id = int(data['id'])
@@ -131,8 +130,11 @@ def modify_survey():
     if len(data['start']) == 24:
         timestart = datetime.strptime(
             data['start'][0: -5], r'%Y-%m-%dT%H:%M:%S')
-        timeend = datetime.strptime(data['end'][0: -5], r'%Y-%m-%dT%H:%M:%S')
         survey.start_date = timestart
+
+    if len(data['end']) == 24:
+        print("ha")
+        timeend = datetime.strptime(data['end'][0: -5], r'%Y-%m-%dT%H:%M:%S')
         survey.end_date = timeend
 
     survey.course = data['course']
@@ -153,3 +155,23 @@ def fetch_questions():
 
     result = [to_dict(question) for question in questions]
     return jsonify(result)
+
+
+@api.route('/create_survey', methods=['GET', 'POST'])
+def create_survey():
+    data = request.get_json()
+    timestart = datetime.strptime(
+        data['start'][0: -5], r'%Y-%m-%dT%H:%M:%S')
+    timeend = datetime.strptime(data['end'][0: -5], r'%Y-%m-%dT%H:%M:%S')
+    survey = Survey.create(description=data['title'], owner_id=0,
+                           times=[timestart, timeend], course=data['course'], active=True)
+
+    questions = data['questions']
+    questions_dump = [i['id'] for i in questions]
+    survey.set_questions(questions_dump)
+    survey.status = data['status']
+    db.session.add(survey)
+    db.session.commit()
+    return jsonify({
+        "success": True
+    })
