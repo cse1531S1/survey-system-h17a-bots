@@ -135,7 +135,7 @@ class Survey(db.Model, DatabaseUtil):
     description = db.Column(db.String(512))
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     course = db.Column(db.String(32))
-    active = db.Column(db.Boolean())
+    status = db.Column(db.String(32))
     start_date = db.Column(db.DateTime())
     end_date = db.Column(db.DateTime())
     timestamp = db.Column(db.DateTime(), default=datetime.utcnow)
@@ -151,7 +151,7 @@ class Survey(db.Model, DatabaseUtil):
     @classmethod
     def create(cls, description, owner_id, course, active, times):
         new = cls(description=description, owner_id=owner_id, start_date=times[0],
-                  end_date=times[1], course=course, active=active)
+                  end_date=times[1], course=course, status="published")
         db.session.add(new)
         db.session.commit()
         new.id_hash = cls.generate_id_hash(new.id)

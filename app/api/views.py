@@ -1,12 +1,30 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
-from flask import render_template, redirect, request, url_for, flash, jsonify
+from flask import render_template, redirect, request, url_for, flash, jsonify, Response
 from flask_login import login_user, logout_user, login_required, current_user
+from flask_cors import cross_origin
 from . import api
 from ..models import db
 from ..models import User, Survey, AnswerSurveyLink, Answer, Question, Choice
+from ..flatfile import FileOperation
+from datetime import datetime
 import collections
+
+from functools import wraps
+from flask import make_response
+
+
+def allow_cross_domain(fun):
+    @wraps(fun)
+    def wrapper_fun(*args, **kwargs):
+        rst = make_response(fun(*args, **kwargs))
+        rst.headers['Access-Control-Allow-Origin'] = 'http://localhost:9527'
+        rst.headers['Access-Control-Allow-Methods'] = 'OPTIONS,PUT,GET,POST,DELETE'
+        allow_headers = "Referer,Accept,Origin,User-Agent"
+        rst.headers['Access-Control-Allow-Headers'] = allow_headers
+        return rst
+    return wrapper_fun
 
 
 @api.route('/get_answer_data/type1/<int:survey_id>/<int:question_id>', methods=['GET', 'POST'])
@@ -50,3 +68,88 @@ def create_question():
     return jsonify({
         "success": True,
     })
+
+
+@api.route('/fetch_all_survey', methods=['GET'])
+def all_survey(path=None):
+    surveys = Survey.get_all()
+    order = request.args['sort']
+    if(order == '-id'):
+        surveys = surveys[::-1]
+    limit = int(request.args['limit'])
+    # surveys = Survey.get_all()
+    start = (int(request.args['page']) - 1)
+    surveys = surveys[start * limit:(start + 1) * limit]
+
+    try:
+        title = request.args['title']
+        surveys = list(filter(lambda x: title in x.description, surveys))
+    except:
+        pass
+
+    def to_dict(survey):
+        return {
+            'id': survey.id,
+            'title': survey.description,
+            'owner': survey.owner.username,
+            'responses': len(AnswerSurveyLink.get_by_survey_id(survey.id)),
+            'timestamp': datetime.strftime(survey.timestamp, r'%d-%m-%Y %H:%M'),
+            'course': survey.course,
+            'questions': [{"id": q.id, "description": q.description} for q in survey.questions.all()],
+            'start_time': datetime.strftime(survey.start_date, r'%d-%m-%Y %H:%M'),
+            'end_time': datetime.strftime(survey.end_date, r'%d-%m-%Y %H:%M'),
+            'status': survey.status
+        }
+
+    result = [to_dict(survey) for survey in surveys]
+
+    return jsonify({
+        'total': len(Survey.get_all()),
+        'items': result
+    })
+
+
+@api.route('/fetch_course', methods=['GET', 'OPTION'])
+def fetch_course():
+    li = FileOperation.read_course()
+    return jsonify({
+        'items': li
+    })
+
+
+@api.route('/modify_survey', methods=['GET', 'POST'])
+# @cross_origin(allow_headers=['application/json'])
+def modify_survey():
+    data = request.get_json()
+    survey_id = int(data['id'])
+    questions = data['questions']
+    questions_dump = [i['id'] for i in questions]
+    survey = Survey.get_by_id(survey_id)
+    survey.remove_all_questions()
+    survey.set_questions(questions_dump)
+    survey.description = data['title']
+    if len(data['start']) == 24:
+        timestart = datetime.strptime(
+            data['start'][0: -5], r'%Y-%m-%dT%H:%M:%S')
+        timeend = datetime.strptime(data['end'][0: -5], r'%Y-%m-%dT%H:%M:%S')
+        survey.start_date = timestart
+        survey.end_date = timeend
+
+    survey.course = data['course']
+    survey.status = data['status']
+    db.session.add(survey)
+    db.session.commit()
+    return jsonify({
+        "success": True
+    })
+
+
+@api.route('/fetch_question', methods=['GET', 'OPTION'])
+def fetch_questions():
+    questions = Question.get_all()
+
+    def to_dict(question):
+        return {"id": question.id, "description": question.description}
+
+    result = [to_dict(question) for question in questions]
+    return jsonify(result)

@@ -7,6 +7,7 @@ from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_mail import Mail
+from flask_cors import CORS
 from config import config
 
 
@@ -25,6 +26,7 @@ def create_app(config_name):
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
 
+    CORS(app)
     bootstrap.init_app(app)
     moment.init_app(app)
     db.init_app(app)
