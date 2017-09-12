@@ -136,8 +136,8 @@ class Survey(db.Model, DatabaseUtil):
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     course = db.Column(db.String(32))
     status = db.Column(db.String(32))
-    start_date = db.Column(db.DateTime())
-    end_date = db.Column(db.DateTime())
+    start_date = db.Column(db.String(64))
+    end_date = db.Column(db.String(64))
     timestamp = db.Column(db.DateTime(), default=datetime.utcnow)
 
     questions = db.relationship('Question', secondary=SurveyQuestion, backref=db.backref(

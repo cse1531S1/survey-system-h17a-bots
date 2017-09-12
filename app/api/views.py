@@ -96,8 +96,8 @@ def all_survey(path=None):
             'timestamp': datetime.strftime(survey.timestamp, r'%d-%m-%Y %H:%M'),
             'course': survey.course,
             'questions': [{"id": q.id, "description": q.description} for q in survey.questions.all()],
-            'start_time': datetime.strftime(survey.start_date, r'%d-%m-%Y %H:%M'),
-            'end_time': datetime.strftime(survey.end_date, r'%d-%m-%Y %H:%M'),
+            'start_time': survey.start_date,
+            'end_time': survey.end_date,
             'status': survey.status
         }
 
@@ -128,14 +128,16 @@ def modify_survey():
     survey.set_questions(questions_dump)
     survey.description = data['title']
     if len(data['start']) == 24:
-        timestart = datetime.strptime(
-            data['start'][0: -5], r'%Y-%m-%dT%H:%M:%S')
-        survey.start_date = timestart
+        # timestart = datetime.strptime( data['start'][0: -5], r'%Y-%m-%dT%H:%M:%S')
+        pass
+    timestart = data['start']
+    survey.start_date = timestart
 
     if len(data['end']) == 24:
-        print("ha")
-        timeend = datetime.strptime(data['end'][0: -5], r'%Y-%m-%dT%H:%M:%S')
-        survey.end_date = timeend
+        # timeend = datetime.strptime(data['end'][0: -5], r'%Y-%m-%dT%H:%M:%S')
+        pass
+    timeend = data['end']
+    survey.end_date = timeend
 
     survey.course = data['course']
     survey.status = data['status']
