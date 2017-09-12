@@ -34,21 +34,21 @@
         </template>
       </el-table-column>
 
-      <el-table-column width="110px" align="center" label="Course">
-        <template scope="scope">
-          <span>{{scope.row.course}}</span>
-        </template>
-      </el-table-column>
-
       <el-table-column width="110px" align="center" label="Start Time">
         <template scope="scope">
-          <span>{{scope.row.start_time}}</span>
+          <span>{{parseTime(scope.row.start_time)}}</span>
         </template>
       </el-table-column>
 
       <el-table-column width="110px" align="center" label="End Time">
         <template scope="scope">
-          <span>{{scope.row.end_time}}</span>
+          <span>{{parseTime(scope.row.end_time)}}</span>
+        </template>
+      </el-table-column>
+      
+      <el-table-column width="110px" align="center" label="Course">
+        <template scope="scope">
+          <span>{{scope.row.course}}</span>
         </template>
       </el-table-column>
 
@@ -58,7 +58,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Responses" width="120">
+      <el-table-column align="center" label="Responses" width="110">
         <template scope="scope">
           <span>{{scope.row.responses}}</span>
         </template>
@@ -217,6 +217,9 @@ export default {
     this.getCourse()
   },
   methods: {
+    parseTime(time) {
+      return parseTime(time)
+    },
     getCourse() {
       fetchCourse(this.listQuery).then(response => {
         this.course = response.data.items
