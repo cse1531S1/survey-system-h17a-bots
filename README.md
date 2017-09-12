@@ -65,4 +65,5 @@ $ cd frontend
 $ npm install
 $ npm run dev
 // then after a while, the frontend will be available on localhost:9527
+// and remember to run the backend together
 ```
