@@ -57,3 +57,12 @@ $ python manage.py shell
 // WOOHOO! a brand new database is initialised
 ```
 
+2. HOW DO I RUN THE FRONTEND??
+
+
+```shell
+$ cd frontend
+$ npm install
+$ npm run dev
+// then after a while, the frontend will be available on localhost:9527
+```
