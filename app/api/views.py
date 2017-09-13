@@ -55,21 +55,6 @@ def get_answer_data(survey_id, question_id):
     return jsonify(rtn)
 
 
-@api.route('/create_question', methods=['POST'])
-def create_question():
-    question_description = request.form['title']
-    q_type = int(request.form['q_type'])
-    question = Question.create(description=question_description,
-                               owner_id=current_user.id, q_type=q_type)
-
-    choices = request.form.getlist('choice')
-    for choice in choices:
-        Choice.create(choice, question.id)
-    return jsonify({
-        "success": True,
-    })
-
-
 @api.route('/fetch_all_survey', methods=['GET'])
 def all_survey(path=None):
     surveys = Survey.get_all()
@@ -177,3 +162,19 @@ def create_survey():
     return jsonify({
         "success": True
     })
+
+
+@api.route('/create_question', methods=['POST'])
+def create_question():
+    data = request.get_json()
+    print(data)
+    question = Question.create(description=data['title'],
+                               owner_id=current_user.id, q_type=data['qType'])
+    choices = data['choices']
+    for choice in choices:
+        Choice.create(choice, question.id)
+    return jsonify({
+        "success": True,
+    })
+
+

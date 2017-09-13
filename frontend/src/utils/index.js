@@ -6,7 +6,7 @@
    if (arguments.length === 0) {
      return null
    }
-   const format = cFormat || '{d}-{m}-{y} {h}:{i}:{s}'
+   const format = cFormat || '{d}-{m}-{y} {h}:{i}'
    let date
    if (typeof time === 'object') {
      date = time

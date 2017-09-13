@@ -40,26 +40,13 @@ export default new Router({
 
 export const asyncRouterMap = [
   {
-    path: '/components',
-    component: Layout,
-    redirect: '/components/index',
-    name: '组件',
-    icon: 'zujian',
-    children: [
-      { path: 'index', component: _import('components/index'), name: '介绍 ' },
-      { path: 'dndlist', component: _import('components/dndList'), name: '列表拖拽' },
-      { path: 'dropzone', component: _import('components/dropzone'), name: 'Dropzone' }
-    ]
-  },
-  {
     path: '/survey',
     component: Layout,
     redirect: '/survey/surveylist',
     name: 'Survey',
     icon: 'zujian',
     children: [
-      { path: 'surveylist', component: _import('survey/surveylist'), name: 'SurveyList' },
-      { path: 'createsurvey', component: _import('survey/createsurvey'), name: 'Create Survey' }
+      { path: 'surveylist', component: _import('survey/surveylist'), name: 'SurveyList' }
     ]
   },
   {
@@ -69,33 +56,7 @@ export const asyncRouterMap = [
     name: 'Question',
     icon: 'zujian',
     children: [
-      { path: 'questionpool', component: _import('question/questionpool'), name: 'Question Pool' },
-      { path: 'createquestion', component: _import('question/createquestion'), name: 'Create Question' }
-    ]
-  },
-  {
-    path: '/example',
-    component: Layout,
-    redirect: 'noredirect',
-    name: '综合实例',
-    icon: 'zonghe',
-    children: [
-      {
-        path: '/example/table',
-        component: _import('example/table/index'),
-        redirect: '/example/table/table',
-        name: 'Table',
-        icon: 'table',
-        children: [
-          { path: 'dynamictable', component: _import('example/table/dynamictable/index'), name: '动态table' },
-          { path: 'dragtable', component: _import('example/table/dragTable'), name: '拖拽table' },
-          { path: 'inline_edit_table', component: _import('example/table/inlineEditTable'), name: 'table内编辑' },
-          { path: 'table', component: _import('example/table/table'), name: '综合table' }
-        ]
-      },
-      { path: 'form/edit', icon: 'shouce', component: _import('example/form'), name: '编辑Form', meta: { isEdit: true }},
-      { path: 'form/create', icon: 'from', component: _import('example/form'), name: '创建Form' },
-      { path: 'tab/index', icon: 'tab', component: _import('example/tab/index'), name: 'Tab' }
+      { path: 'questionpool', component: _import('question/questionpool'), name: 'Question Pool' }
     ]
   },
 

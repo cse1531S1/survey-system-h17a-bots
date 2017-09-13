@@ -11,6 +11,7 @@
 
       <el-button class="filter-item" type="primary" v-waves icon="search" @click="handleFilter">Search</el-button>
       <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="edit">Add a Survey</el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" @click="handleCQuestion" type="primary" icon="edit">Add a question</el-button>
       <el-button class="filter-item" type="primary" icon="document" @click="handleDownload">Export</el-button>
     </div>
 
@@ -45,7 +46,7 @@
           <span>{{parseTime(scope.row.end_time)}}</span>
         </template>
       </el-table-column>
-      
+
       <el-table-column width="110px" align="center" label="Course">
         <template scope="scope">
           <span>{{scope.row.course}}</span>
@@ -89,7 +90,7 @@
     </div>
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form class="small-space" :model="temp" label-position="left" label-width="70px" style='width: 400px; margin-left:50px;'>
+      <el-form class="large-space" :model="temp" label-position="left" label-width="70px" style='width: 400px; margin-left:50px;'>
 
         <el-form-item label="Status">
           <el-select class="filter-item" v-model="temp.status" placeholder="Choose...">
@@ -132,21 +133,49 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="阅读数统计" :visible.sync="dialogPvVisible" size="small">
-      <el-table :data="pvData" border fit highlight-current-row style="width: 100%">
-        <el-table-column prop="key" label="渠道"> </el-table-column>
-        <el-table-column prop="pv" label="pv"> </el-table-column>
-      </el-table>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogPvVisible = false">确 定</el-button>
-      </span>
-    </el-dialog>
+    <el-dialog title="Create Question" :visible.sync="dialogQuestion" size="small">
+      <el-form class="large-space" :model="temp" label-position="left" label-width="70px" style='width: 400px; margin-left:50px;'>
+        <el-form-item label="Title">
+          <el-input v-model="newQuestion.title"></el-input>
+        </el-form-item>
 
+        <el-form-item label="Question Type">
+          <el-select class="filter-item" v-model="newQuestion.qType" placeholder="Choose...">
+            <el-option v-for="(item, index) in  qTypeAllowed" :key="index" :label="item" :value="index">
+            </el-option>
+          </el-select>
+          <div v-if="newQuestion.qType === '1'">
+            <el-button @click="addNewChoice">Add a Choice</el-button>
+            <draggable :list="newQuestion.choices" :options="{ handle: '.handler', draggable: '.list-complete-item'}">
+              <el-row class="list-complete-item " v-for="(element,index) in newQuestion.choices" :key='element'>
+                <el-col :span="2" class="handler">
+                  <icon-svg icon-class="tuozhuai"></icon-svg>
+                </el-col>
+                <el-col :span="2">
+                  <span style="" @click="deleteEle(element)">
+                    <i style="color:#ff4949" class="el-icon-delete"></i>
+                  </span>
+                </el-col>
+                <el-col :span="20">
+                  <el-input class="list-complete-item-handle" v-model.lazy="newQuestion.choices[index]"></el-input>
+                </el-col>
+              </el-row>
+            </draggable>
+          </div>
+        </el-form-item>
+
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogQuestion= false">Cancel</el-button>
+        <el-button type="primary" @click="createQuestion">Submit</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { fetchList, fetchPv, fetchQuestion, fetchCourse, modifySurvey, createSurvey } from '@/api/article'
+import { fetchList, fetchPv, fetchQuestion, fetchCourse, modifySurvey, createSurvey, createQuestion } from '@/api/article'
+import draggable from 'vuedraggable'
 import DndList from '@/components/twoDndList'
 import waves from '@/directive/waves.js'// 水波纹指令
 import { parseTime } from '@/utils'
@@ -157,6 +186,7 @@ export default {
     waves
   },
   components: {
+    draggable,
     DndList
   },
   data() {
@@ -165,6 +195,10 @@ export default {
       total: null,
       listLoading: true,
       course: [],
+      options: {
+        handle: '.drag-handler',
+        animation: 150
+      },
       listQuery: {
         page: 1,
         limit: 20,
@@ -196,6 +230,15 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       tableKey: 0,
+      newQuestion: {
+        title: '',
+        qType: '',
+        choices: ['Very Strongly Agree', 'Strongly Agree', 'Agree', 'Disagree', 'Strongly Disagree', 'Very Strongly Disagree']
+      },
+      qTypeAllowed: {
+        1: 'Multiple Choices'
+      },
+      dialogQuestion: false,
       to_post: {}
     }
   },
@@ -217,6 +260,18 @@ export default {
     this.getCourse()
   },
   methods: {
+    addNewChoice() {
+      this.newQuestion.choices.push('')
+    },
+    deleteEle(ele) {
+      for (const item of this.newQuestion.choices) {
+        if (item === ele) {
+          const index = this.newQuestion.choices.indexOf(item)
+          this.newQuestion.choices.splice(index, 1)
+          break
+        }
+      }
+    },
     parseTime(time) {
       return parseTime(time)
     },
@@ -258,10 +313,6 @@ export default {
       this.listQuery.end = parseInt((+time[1] + 3600 * 1000 * 24) / 1000)
     },
     handleModifyStatus(row, status) {
-      // this.$message({
-      //   message: 'Success',
-      //   type: 'success'
-      // })
       row.status = status
       this.temp = Object.assign({}, row)
       this.update()
@@ -280,6 +331,12 @@ export default {
       this.dialogFormVisible = true
       this.listLoading = false
     },
+    handleCQuestion(row) {
+      this.listLoading = true
+      this.resetTemp()
+      this.dialogQuestion = true
+      this.listLoading = false
+    },
     handleDelete(row) {
       this.$notify({
         title: '成功',
@@ -289,6 +346,34 @@ export default {
       })
       const index = this.list.indexOf(row)
       this.list.splice(index, 1)
+    },
+    createQuestion() {
+      var detail = {
+        title: this.newQuestion.title,
+        qType: this.newQuestion.qType,
+        choices: this.newQuestion.choices
+      }
+      createQuestion(detail).then(response => {
+        if (response.data.success) {
+          this.$notify({
+            title: 'Success!',
+            message: 'You successfully created a question!',
+            type: 'success',
+            duration: 2000
+          })
+        } else {
+          this.$notify({
+            title: 'Not Success!',
+            message: 'Some unknown error happened',
+            type: 'error',
+            duration: 2000
+          })
+        }
+      }).then(() => {
+        this.getList()
+        this.resetTemp()
+        this.dialogQuestion = false
+      })
     },
     create() {
       this.dialogFormVisible = false
@@ -355,6 +440,11 @@ export default {
       })
     },
     resetTemp() {
+      this.newQuestion = {
+        title: '',
+        qType: '',
+        choices: ['Very Strongly Agree', 'Strongly Agree', 'Agree', 'Disagree', 'Strongly Disagree', 'Very Strongly Disagree']
+      }
       this.temp = {
         id: undefined,
         timestamp: 0,
@@ -395,3 +485,24 @@ export default {
   }
 }
 </script>
+
+
+<style scoped>
+.list-complete-item {
+  cursor: pointer;
+  position: relative;
+  font-size: 14px;
+  padding: 5px 12px;
+  margin-top: 4px;
+  border: 1px solid #bfcbd9;
+  transition: all 1s;
+}
+
+.list-complete-item.sortable-chosen {
+  background: #4AB7BD;
+}
+
+.list-complete-item.sortable-ghost {
+  background: #30B08F;
+}
+</style>
