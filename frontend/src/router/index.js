@@ -16,10 +16,10 @@ import Layout from '../views/layout/Layout'
 * meta : { role: ['admin'] }  will control the page role
 **/
 export const constantRouterMap = [
-    { path: '/login', component: _import('login/index'), hidden: true },
-    { path: '/authredirect', component: _import('login/authredirect'), hidden: true },
-    { path: '/404', component: _import('errorPage/404'), hidden: true },
-    { path: '/401', component: _import('errorPage/401'), hidden: true },
+  { path: '/login', component: _import('login/index'), hidden: true },
+  { path: '/authredirect', component: _import('login/authredirect'), hidden: true },
+  { path: '/404', component: _import('errorPage/404'), hidden: true },
+  { path: '/401', component: _import('errorPage/401'), hidden: true },
   {
     path: '/',
     component: Layout,
@@ -44,19 +44,31 @@ export const asyncRouterMap = [
     component: Layout,
     redirect: '/survey/surveylist',
     name: 'Survey',
+    meta: { role: ['admin'] },
     icon: 'zujian',
     children: [
-      { path: 'surveylist', component: _import('survey/surveylist'), name: 'SurveyList' }
+      {
+        path: 'surveylist',
+        component: _import('survey/surveylist'),
+        name: 'SurveyList',
+        meta: { role: ['admin'] }
+      }
     ]
   },
   {
     path: '/question',
     component: Layout,
     redirect: '/question/questionpool',
+    meta: { role: ['admin'] },
     name: 'Question',
     icon: 'zujian',
     children: [
-      { path: 'questionpool', component: _import('question/questionpool'), name: 'Question Pool' }
+      {
+        meta: { role: ['admin'] },
+        path: 'questionpool',
+        component: _import('question/questionpool'),
+        name: 'Question Pool'
+      }
     ]
   },
 

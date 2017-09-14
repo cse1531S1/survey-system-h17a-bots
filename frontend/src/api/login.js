@@ -6,22 +6,22 @@ export function loginByUsername(username, password) {
     password
   }
   return fetch({
-    url: '/login/login',
+    url: 'http://127.0.0.1:5000/api/v1.0/get_token',
     method: 'post',
-    data
+    data: data
   })
 }
 
 export function logout() {
   return fetch({
-    url: '/login/logout',
+    url: 'http://127.0.0.1:5000/api/v1.0/logoff',
     method: 'post'
   })
 }
 
 export function getUserInfo(token) {
   return fetch({
-    url: '/user/info',
+    url: 'http://127.0.0.1:5000/api/v1.0/get_info',
     method: 'get',
     params: { token }
   })

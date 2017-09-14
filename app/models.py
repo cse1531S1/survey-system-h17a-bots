@@ -56,8 +56,12 @@ class User(UserMixin, db.Model, DatabaseUtil):
     answers = db.relationship(
         'AnswerSurveyLink', backref='owner', lazy='dynamic')
 
-    # TODO User_role class
     is_admin = db.Column(db.Boolean, default=False)
+    user_role = db.Column(db.String(32))
+
+    def generate_auth_token(self, expiration=None):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        return s.dumps({'id': self.id}).decode('ascii')
 
     @property
     def password(self):
@@ -69,6 +73,19 @@ class User(UserMixin, db.Model, DatabaseUtil):
 
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    @classmethod
+    def get_by_name(cls, name):
+        return cls.query.filter_by(username=name).first()
+
+    @staticmethod
+    def verify_auth_token(token):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token)
+        except:
+            return None
+        return User.get_by_id(data['id'])
 
     def __repr__(self):
         return '<User %r>' % self.username

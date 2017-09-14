@@ -120,6 +120,7 @@
           <el-input v-model="temp.title"></el-input>
         </el-form-item>
 
+        <el-button class="filter-item" style="margin-left: 10px;" @click="handleCQuestion" type="primary" icon="edit">Add a question</el-button>
         <div class="editor-container">
           <dnd-list :list1="list1" :list2="list2" list1Title="Chosen" list2Title="Question Pool"></dnd-list>
         </div>
@@ -147,7 +148,7 @@
           <div v-if="newQuestion.qType === '1'">
             <el-button @click="addNewChoice">Add a Choice</el-button>
             <draggable :list="newQuestion.choices" :options="{ handle: '.handler', draggable: '.list-complete-item'}">
-              <el-row class="list-complete-item " v-for="(element,index) in newQuestion.choices" :key='element'>
+              <el-row class="list-complete-item " v-for="(element,index) in newQuestion.choices" :key='index'>
                 <el-col :span="2" class="handler">
                   <icon-svg icon-class="tuozhuai"></icon-svg>
                 </el-col>
@@ -172,6 +173,8 @@
     </el-dialog>
   </div>
 </template>
+
+
 
 <script>
 import { fetchList, fetchPv, fetchQuestion, fetchCourse, modifySurvey, createSurvey, createQuestion } from '@/api/article'
@@ -332,10 +335,8 @@ export default {
       this.listLoading = false
     },
     handleCQuestion(row) {
-      this.listLoading = true
-      this.resetTemp()
+      this.resetQuestionTemp()
       this.dialogQuestion = true
-      this.listLoading = false
     },
     handleDelete(row) {
       this.$notify({
@@ -371,7 +372,7 @@ export default {
         }
       }).then(() => {
         this.getList()
-        this.resetTemp()
+        this.resetQuestionTemp()
         this.dialogQuestion = false
       })
     },
@@ -440,11 +441,6 @@ export default {
       })
     },
     resetTemp() {
-      this.newQuestion = {
-        title: '',
-        qType: '',
-        choices: ['Very Strongly Agree', 'Strongly Agree', 'Agree', 'Disagree', 'Strongly Disagree', 'Very Strongly Disagree']
-      }
       this.temp = {
         id: undefined,
         timestamp: 0,
@@ -457,6 +453,13 @@ export default {
       }
       this.list1 = []
       this.to_post = {}
+    },
+    resetQuestionTemp() {
+      this.newQuestion = {
+        title: '',
+        qType: '',
+        choices: ['Very Strongly Agree', 'Strongly Agree', 'Agree', 'Disagree', 'Strongly Disagree', 'Very Strongly Disagree']
+      }
     },
     handleFetchPv(pv) {
       fetchPv(pv).then(response => {

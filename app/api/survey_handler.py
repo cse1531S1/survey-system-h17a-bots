@@ -1,30 +1,14 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
-from flask import render_template, redirect, request, url_for, flash, jsonify, Response
-from flask_login import login_user, logout_user, login_required, current_user
-from flask_cors import cross_origin
+from flask import request, jsonify, g
 from . import api
 from ..models import db
-from ..models import User, Survey, AnswerSurveyLink, Answer, Question, Choice
+from ..models import User, Survey, AnswerSurveyLink, Question, Choice
 from ..flatfile import FileOperation
 from datetime import datetime
+from .authentication import auth
 import collections
-
-from functools import wraps
-from flask import make_response
-
-
-def allow_cross_domain(fun):
-    @wraps(fun)
-    def wrapper_fun(*args, **kwargs):
-        rst = make_response(fun(*args, **kwargs))
-        rst.headers['Access-Control-Allow-Origin'] = 'http://localhost:9527'
-        rst.headers['Access-Control-Allow-Methods'] = 'OPTIONS,PUT,GET,POST,DELETE'
-        allow_headers = "Referer,Accept,Origin,User-Agent"
-        rst.headers['Access-Control-Allow-Headers'] = allow_headers
-        return rst
-    return wrapper_fun
 
 
 @api.route('/get_answer_data/type1/<int:survey_id>/<int:question_id>', methods=['GET', 'POST'])
@@ -55,16 +39,23 @@ def get_answer_data(survey_id, question_id):
     return jsonify(rtn)
 
 
+@auth.login_required
 @api.route('/fetch_all_survey', methods=['GET'])
-def all_survey(path=None):
+def all_survey():
     surveys = Survey.get_all()
-    order = request.args['sort']
-    if(order == '-id'):
-        surveys = surveys[::-1]
-    limit = int(request.args['limit'])
-    # surveys = Survey.get_all()
-    start = (int(request.args['page']) - 1)
-    surveys = surveys[start * limit:(start + 1) * limit]
+    try:
+        order = request.args['sort']
+        if(order == '-id'):
+            surveys = surveys[::-1]
+    except:
+        pass
+
+    try:
+        limit = int(request.args['limit'])
+        start = (int(request.args['page']) - 1)
+        surveys = surveys[start * limit:(start + 1) * limit]
+    except:
+        pass
 
     try:
         title = request.args['title']
@@ -94,6 +85,7 @@ def all_survey(path=None):
     })
 
 
+@auth.login_required
 @api.route('/fetch_course', methods=['GET', 'OPTION'])
 def fetch_course():
     li = FileOperation.read_course()
@@ -102,6 +94,7 @@ def fetch_course():
     })
 
 
+@auth.login_required
 @api.route('/modify_survey', methods=['GET', 'POST'])
 def modify_survey():
     data = request.get_json()
@@ -112,15 +105,9 @@ def modify_survey():
     survey.remove_all_questions()
     survey.set_questions(questions_dump)
     survey.description = data['title']
-    if len(data['start']) == 24:
-        # timestart = datetime.strptime( data['start'][0: -5], r'%Y-%m-%dT%H:%M:%S')
-        pass
+
     timestart = data['start']
     survey.start_date = timestart
-
-    if len(data['end']) == 24:
-        # timeend = datetime.strptime(data['end'][0: -5], r'%Y-%m-%dT%H:%M:%S')
-        pass
     timeend = data['end']
     survey.end_date = timeend
 
@@ -133,24 +120,84 @@ def modify_survey():
     })
 
 
+@auth.login_required
 @api.route('/fetch_question', methods=['GET', 'OPTION'])
 def fetch_questions():
     questions = Question.get_all()
 
     def to_dict(question):
-        return {"id": question.id, "description": question.description}
+        qt = question.q_type
+        qtype = ""
+        if qt == 1:
+            qtype = "Multiple Choices"
+        return {
+            "Type": qtype,
+            "id": question.id,
+            "choices": [i.content for i in question.choices.all()],
+            "description": question.description
+        }
 
     result = [to_dict(question) for question in questions]
     return jsonify(result)
 
 
+@api.route('/question_pool', methods=['GET', 'OPTION'])
+def question_pool():
+    questions = Question.get_all()
+
+    try:
+        order = request.args['sort']
+        if(order == '-id'):
+            questions = questions[::-1]
+    except:
+        pass
+    try:
+        limit = int(request.args['limit'])
+        start = (int(request.args['page']) - 1)
+        questions = questions[start * limit:(start + 1) * limit]
+    except:
+        pass
+
+    try:
+        title = request.args['title']
+        questions = list(filter(lambda x: title in x.description, questions))
+    except:
+        pass
+
+    def to_dict(question):
+        qt = question.q_type
+        qtype = ""
+        if qt == 1:
+            qtype = "Multiple Choices"
+        return {
+            "type": qtype,
+            "id": question.id,
+            "choices": [i.content for i in question.choices.all()],
+            "title": question.description
+        }
+
+    result = [to_dict(question) for question in questions]
+
+    return jsonify({
+        'total': len(Survey.get_all()),
+        'items': result
+    })
+
+
+@auth.login_required
 @api.route('/create_survey', methods=['GET', 'POST'])
 def create_survey():
+    token = request.headers['X-Token']
+    user = User.verify_auth_token(token)
+    if not user:
+        return jsonify({
+            "error": "wrong token"
+        })
     data = request.get_json()
     timestart = datetime.strptime(
         data['start'][0: -5], r'%Y-%m-%dT%H:%M:%S')
     timeend = datetime.strptime(data['end'][0: -5], r'%Y-%m-%dT%H:%M:%S')
-    survey = Survey.create(description=data['title'], owner_id=0,
+    survey = Survey.create(description=data['title'], owner_id=user.id,
                            times=[timestart, timeend], course=data['course'], active=True)
 
     questions = data['questions']
@@ -164,17 +211,22 @@ def create_survey():
     })
 
 
+@auth.login_required
 @api.route('/create_question', methods=['POST'])
 def create_question():
+    token = request.headers['X-Token']
+    user = User.verify_auth_token(token)
+    if not user:
+        return jsonify({
+            "error": "wrong token"
+        })
     data = request.get_json()
     print(data)
     question = Question.create(description=data['title'],
-                               owner_id=current_user.id, q_type=data['qType'])
+                               owner_id=user.id, q_type=int(data['qType']))
     choices = data['choices']
     for choice in choices:
         Choice.create(choice, question.id)
     return jsonify({
         "success": True,
     })
-
-
