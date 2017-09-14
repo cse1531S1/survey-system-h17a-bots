@@ -11,7 +11,7 @@
 
       <el-button class="filter-item" type="primary" v-waves icon="search" @click="handleFilter">Search</el-button>
       <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="edit">Add a Survey</el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" @click="handleCQuestion" type="primary" icon="edit">Add a question</el-button>
+      <!-- <el-button class="filter-item" style="margin-left: 10px;" @click="handleCQuestion" type="primary" icon="edit">Add a question</el-button> -->
       <el-button class="filter-item" type="primary" icon="document" @click="handleDownload">Export</el-button>
     </div>
 
@@ -73,11 +73,11 @@
 
       <el-table-column align="center" label="Operation" width="180">
         <template scope="scope">
-          <el-button v-if="scope.row.status!='published'" size="small" type="success" @click="handleModifyStatus(scope.row,'published')">Publish
+          <el-button v-if="scope.row.status!='open'" size="small" type="success" @click="handleModifyStatus(scope.row,'open')">Open
           </el-button>
           <el-button v-if="scope.row.status!='draft'" size="small" @click="handleModifyStatus(scope.row,'draft')">Draft
           </el-button>
-          <el-button v-if="scope.row.status!='deleted'" size="small" type="danger" @click="handleModifyStatus(scope.row,'deleted')">Delete
+          <el-button v-if="scope.row.status!='closed'" size="small" type="danger" @click="handleModifyStatus(scope.row,'closed')">Close
           </el-button>
         </template>
       </el-table-column>
@@ -214,13 +214,13 @@ export default {
         start_time: 0,
         end_time: 0,
         title: '',
-        status: 'published',
+        status: 'draft',
         course: '',
         questions: []
       },
       importanceOptions: [1, 2, 3],
       sortOptions: [{ label: 'Ascending by id', key: '+id' }, { label: 'Descending by id', key: '-id' }],
-      statusOptions: ['published', 'draft', 'deleted'],
+      statusOptions: ['open', 'draft', 'closed'],
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
@@ -248,9 +248,9 @@ export default {
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: 'success',
+        open: 'success',
         draft: 'gray',
-        deleted: 'danger'
+        closed: 'danger'
       }
       return statusMap[status]
     },

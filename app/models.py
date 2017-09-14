@@ -214,6 +214,7 @@ class Question(db.Model, DatabaseUtil):
     # q_type : question type
     # 1 : multiple choices
     q_type = db.Column(db.Integer, default=1)
+
     choices = db.relationship('Choice', backref='question', lazy='dynamic')
 
     @classmethod
