@@ -26,7 +26,7 @@
 			<el-col :span="6">
 				<el-card class="box-card">
 					<div slot="header" class="box-card-header">
-						<pan-thumb class="panThumb" :image="avatar"> 你的权限:
+						<pan-thumb class="panThumb" :name="name"> You Are:
 							<span class="pan-info-roles" :key='item' v-for="item in roles">{{item}}</span>
 						</pan-thumb>
 					</div>

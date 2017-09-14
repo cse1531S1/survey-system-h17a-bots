@@ -11,7 +11,14 @@ auth = HTTPBasicAuth()
 
 @auth.verify_password
 def verify_password(name_or_token, password):
+    try:
+        token = request.headers['X-Token']
+        g.current_user = User.verify_auth_token(token)
+        return g.current_user is not None
+    except:
+        pass
     if name_or_token == '':
+        g.current_user = None
         return False
     if password == '':
         g.current_user = User.verify_auth_token(name_or_token)
@@ -39,38 +46,25 @@ def log_off():
 
 
 @api.route('/get_info')
+@auth.login_required
 def get_info():
-    # print(request.headers['X-Token'])
-    try:
-        token = request.args['token']
-    except:
-        return unauthorized('Invalid credentials')
-
-    user = User.verify_auth_token(token)
+    user = g.current_user
     if not user:
-        print('blah')
         return unauthorized('Invalid credentials')
     return jsonify({
-        'role': ['admin'],
-        'name': 'admin',
-        'avatar': 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
+        'role': [user.user_role],
+        'name': user.username,
+        'avatar': '',
         'token': user.generate_auth_token(),
-        'introduction': 'super admin'
+        'introduction': ''
     })
     pass
 
 
 @api.route('/get_token', methods=['POST', 'GET'])
+@auth.login_required
 def get_token():
-    # print(request.headers)
-    data = request.get_json()
-    user = User.get_by_name(data['username'])
-    if verify_password(data['username'], data['password']):
-        g.current_user = user
-        return jsonify({
-            'success': True,
-            'token': user.generate_auth_token()
-        })
-    return jsonify({
-        'error': 'Invalid credentials!'
-    })
+    if g.current_user.is_anonymous:
+        return unauthorized('Invalid credentials')
+    return jsonify({'token': g.current_user.generate_auth_token(
+        expiration=3600), 'expiration': 3600, 'success': True})

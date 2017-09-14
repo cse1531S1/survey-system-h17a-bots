@@ -30,7 +30,7 @@ def login():
 def register():
     form = RegistForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data,
+        user = User(username=form.username.data, user_role='admin',
                     email=form.email.data, password=form.password.data)
         db.session.add(user)
         flash('You are able to login now.')

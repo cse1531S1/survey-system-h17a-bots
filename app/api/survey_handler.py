@@ -59,7 +59,7 @@ def all_survey():
 
     try:
         title = request.args['title']
-        surveys = list(filter(lambda x: title in x.description, surveys))
+        surveys = list(filter(lambda x: title.lower() in x.description.lower(), surveys))
     except:
         pass
 
@@ -123,6 +123,12 @@ def modify_survey():
 @auth.login_required
 @api.route('/fetch_question', methods=['GET', 'OPTION'])
 def fetch_questions():
+    token = request.headers['X-Token']
+    user = User.verify_auth_token(token)
+    if not user:
+        return jsonify({
+            "error": "wrong token"
+        })
     questions = Question.get_all()
 
     def to_dict(question):
@@ -160,7 +166,7 @@ def question_pool():
 
     try:
         title = request.args['title']
-        questions = list(filter(lambda x: title in x.description, questions))
+        questions = list(filter(lambda x: title.lower() in x.description.lower(), questions))
     except:
         pass
 

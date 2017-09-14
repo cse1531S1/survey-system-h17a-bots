@@ -445,7 +445,7 @@ export default {
         id: undefined,
         timestamp: 0,
         title: '',
-        status: 'published',
+        status: 'open',
         questions: [],
         course: '',
         end_time: null,

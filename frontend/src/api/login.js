@@ -8,7 +8,11 @@ export function loginByUsername(username, password) {
   return fetch({
     url: 'http://127.0.0.1:5000/api/v1.0/get_token',
     method: 'post',
-    data: data
+    data: data,
+    auth: {
+      username: username,
+      password: password
+    }
   })
 }
 
@@ -22,8 +26,8 @@ export function logout() {
 export function getUserInfo(token) {
   return fetch({
     url: 'http://127.0.0.1:5000/api/v1.0/get_info',
-    method: 'get',
-    params: { token }
+    method: 'get'
+    // params: { token }
   })
 }
 

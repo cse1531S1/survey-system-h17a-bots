@@ -22,9 +22,6 @@
 
       <el-button type="primary" style="width:100%;margin-bottom:30px;" :loading="loading" @click.native.prevent="handleLogin">Login</el-button>
 
-      <!-- <div class='tips'>账号:admin 密码随便填</div> -->
-      <!-- <div class='tips'>账号:editor  密码随便填</div> -->
-
     </el-form>
   </div>
 </template>
