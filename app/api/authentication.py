@@ -24,6 +24,7 @@ def verify_password(name_or_token, password):
         g.current_user = User.verify_auth_token(name_or_token)
         g.token_used = True
         return g.current_user is not None
+
     user = User.query.filter_by(username=name_or_token).first()
     if not user:
         return False
@@ -58,7 +59,6 @@ def get_info():
         'token': user.generate_auth_token(),
         'introduction': ''
     })
-    pass
 
 
 @api.route('/get_token', methods=['POST', 'GET'])

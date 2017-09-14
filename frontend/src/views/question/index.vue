@@ -42,7 +42,7 @@
 
       <el-table-column align="center" label="Operation" width="180">
         <template scope="scope">
-          <el-button size="small" type="danger" @click="handleDelete">Delete
+          <el-button size="small" type="danger" @click="handleDelete(scope.row)">Delete
           </el-button>
           </el-button>
         </template>
@@ -56,7 +56,7 @@
     </div>
 
     <el-dialog title="Create Question" :visible.sync="dialogQuestion" size="small">
-      <el-form class="large-space" :model="temp" label-position="left" label-width="70px" style='width: 400px; margin-left:50px;'>
+      <el-form class="large-space" :model="newQuestion" label-position="left" label-width="70px" style='width: 400px; margin-left:50px;'>
         <el-form-item label="Title">
           <el-input v-model="newQuestion.title"></el-input>
         </el-form-item>
@@ -92,11 +92,16 @@
         <el-button type="primary" @click="createQuestion">Submit</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog title="Are you sure to delete this question?" :visible.sync="showWarning" size="small">
+      <el-button @click="showWarning = false">Cancel</el-button>
+      <el-button type="danger" @click="deleteQuestion">Delete</el-button>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { fetchPool, modifySurvey, createSurvey, createQuestion } from '@/api/article'
+import { fetchPool, modifySurvey, createSurvey, createQuestion, deleteQuestion } from '@/api/article'
 import draggable from 'vuedraggable'
 import waves from '@/directive/waves.js'// 水波纹指令
 import { parseTime } from '@/utils'
@@ -111,6 +116,7 @@ export default {
   },
   data() {
     return {
+      showWarning: false,
       list: null,
       total: null,
       listLoading: true,
@@ -125,16 +131,6 @@ export default {
         title: undefined,
         sort: '+id'
       },
-      temp: {
-        id: undefined,
-        timestamp: 0,
-        start_time: 0,
-        end_time: 0,
-        title: '',
-        status: 'published',
-        course: '',
-        questions: []
-      },
       importanceOptions: [1, 2, 3],
       sortOptions: [{ label: 'Ascending by id', key: '+id' }, { label: 'Descending by id', key: '-id' }],
       statusOptions: ['published', 'draft', 'deleted'],
@@ -145,8 +141,6 @@ export default {
         create: 'Create'
       },
       qIdMap: {},
-      list1: [],
-      list2: [],
       dialogPvVisible: false,
       pvData: [],
       tableKey: 0,
@@ -159,7 +153,8 @@ export default {
         1: 'Multiple Choices'
       },
       dialogQuestion: false,
-      to_post: {}
+      to_post: {},
+      to_delete: 0
     }
   },
   filters: {
@@ -212,14 +207,33 @@ export default {
       this.listLoading = false
     },
     handleDelete(row) {
-      this.$notify({
-        title: '成功',
-        message: '删除成功',
-        type: 'success',
-        duration: 2000
+      this.showWarning = true
+      this.to_delete = row.id
+    },
+    deleteQuestion() {
+      var id = this.to_delete
+      this.showWarning = false
+      deleteQuestion(id).then(response => {
+        if (response.data.success) {
+          this.$notify({
+            title: 'Success',
+            message: 'You successfully delete a question!',
+            type: 'success',
+            duration: 4000
+          })
+        } else {
+          this.$notify({
+            title: 'Error',
+            message: response.data.error,
+            type: 'error',
+            duration: 4000
+          })
+        }
+      }).then(() => {
+        this.getList()
+        this.to_delete = 0
+        this.showWarning = false
       })
-      const index = this.list.indexOf(row)
-      this.list.splice(index, 1)
     },
     createQuestion() {
       var detail = {
@@ -249,88 +263,12 @@ export default {
         this.dialogQuestion = false
       })
     },
-    create() {
-      this.dialogFormVisible = false
-      this.to_post = {
-        'title': this.temp.title,
-        'course': this.temp.course,
-        'questions': this.list1,
-        'start': this.temp.start_time,
-        'end': this.temp.end_time,
-        'status': this.temp.status,
-        'id': -1
-      }
-      createSurvey(this.to_post).then(response => {
-        if (response.data.success) {
-          this.$notify({
-            title: 'Success!',
-            message: 'You successfully created the survey!',
-            type: 'success',
-            duration: 2000
-          })
-        } else {
-          this.$notify({
-            title: 'Not Success!',
-            message: 'Some unknown error happened',
-            type: 'error',
-            duration: 2000
-          })
-        }
-      }).then(() => {
-        this.getList()
-        this.resetTemp()
-      })
-    },
-    update() {
-      this.dialogFormVisible = false
-      this.to_post = {
-        'title': this.temp.title,
-        'course': this.temp.course,
-        'questions': this.list1,
-        'start': this.temp.start_time,
-        'end': this.temp.end_time,
-        'status': this.temp.status,
-        'id': this.temp.id
-      }
-      modifySurvey(this.to_post).then(response => {
-        if (response.data.success) {
-          this.$notify({
-            title: 'Success!',
-            message: 'You successfully updated the survey!',
-            type: 'success',
-            duration: 2000
-          })
-        } else {
-          this.$notify({
-            title: 'Not Success!',
-            message: 'Some unknown error happened',
-            type: 'error',
-            duration: 2000
-          })
-        }
-      }).then(() => {
-        this.getList()
-        this.resetTemp()
-      })
-    },
     resetTemp() {
       this.newQuestion = {
         title: '',
         qType: '',
         choices: ['Very Strongly Agree', 'Strongly Agree', 'Agree', 'Disagree', 'Strongly Disagree', 'Very Strongly Disagree']
       }
-      this.temp = {
-        id: undefined,
-        timestamp: 0,
-        title: '',
-        status: 'published',
-        questions: [],
-        course: '',
-        end_time: null,
-        start_time: null
-      }
-      this.list1 = []
-      this.to_post = {}
     },
     handleDownload() {
       require.ensure([], () => {

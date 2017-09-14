@@ -42,15 +42,14 @@ export const asyncRouterMap = [
   {
     path: '/survey',
     component: Layout,
-    redirect: '/survey/surveylist',
-    name: 'Survey',
     meta: { role: ['admin'] },
-    icon: 'zujian',
+    icon: 'wujiaoxing',
+    noDropdown: true,
     children: [
       {
-        path: 'surveylist',
-        component: _import('survey/surveylist'),
-        name: 'SurveyList',
+        path: 'index',
+        component: _import('survey/index'),
+        name: 'Survey Panel',
         meta: { role: ['admin'] }
       }
     ]
@@ -58,15 +57,14 @@ export const asyncRouterMap = [
   {
     path: '/question',
     component: Layout,
-    redirect: '/question/questionpool',
     meta: { role: ['admin'] },
-    name: 'Question',
-    icon: 'zujian',
+    icon: 'wujiaoxing',
+    noDropdown: true,
     children: [
       {
         meta: { role: ['admin'] },
         path: 'questionpool',
-        component: _import('question/questionpool'),
+        component: _import('question/index'),
         name: 'Question Pool'
       }
     ]

@@ -70,3 +70,14 @@ export function createQuestion(to_post) {
     data: to_post
   })
 }
+
+export function deleteQuestion(id) {
+  var to_post = {
+    id: id
+  }
+  return fetch({
+    url: 'http://127.0.0.1:5000/api/v1.0/delete_question',
+    method: 'post',
+    data: to_post
+  })
+}

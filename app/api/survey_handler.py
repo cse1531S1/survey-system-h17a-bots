@@ -3,8 +3,7 @@
 
 from flask import request, jsonify, g
 from . import api
-from ..models import db
-from ..models import User, Survey, AnswerSurveyLink, Question, Choice
+from ..models import User, Survey, AnswerSurveyLink, Question, Choice, db
 from ..flatfile import FileOperation
 from datetime import datetime
 from .authentication import auth
@@ -39,8 +38,8 @@ def get_answer_data(survey_id, question_id):
     return jsonify(rtn)
 
 
-@auth.login_required
 @api.route('/fetch_all_survey', methods=['GET'])
+@auth.login_required
 def all_survey():
     surveys = Survey.get_all()
     try:
@@ -59,7 +58,8 @@ def all_survey():
 
     try:
         title = request.args['title']
-        surveys = list(filter(lambda x: title.lower() in x.description.lower(), surveys))
+        surveys = list(filter(lambda x: title.lower()
+                              in x.description.lower(), surveys))
     except:
         pass
 
@@ -85,8 +85,8 @@ def all_survey():
     })
 
 
-@auth.login_required
 @api.route('/fetch_course', methods=['GET', 'OPTION'])
+@auth.login_required
 def fetch_course():
     li = FileOperation.read_course()
     return jsonify({
@@ -94,8 +94,8 @@ def fetch_course():
     })
 
 
-@auth.login_required
 @api.route('/modify_survey', methods=['GET', 'POST'])
+@auth.login_required
 def modify_survey():
     data = request.get_json()
     survey_id = int(data['id'])
@@ -120,15 +120,10 @@ def modify_survey():
     })
 
 
-@auth.login_required
 @api.route('/fetch_question', methods=['GET', 'OPTION'])
+@auth.login_required
 def fetch_questions():
-    token = request.headers['X-Token']
-    user = User.verify_auth_token(token)
-    if not user:
-        return jsonify({
-            "error": "wrong token"
-        })
+    print(request.headers)
     questions = Question.get_all()
 
     def to_dict(question):
@@ -148,6 +143,7 @@ def fetch_questions():
 
 
 @api.route('/question_pool', methods=['GET', 'OPTION'])
+@auth.login_required
 def question_pool():
     questions = Question.get_all()
 
@@ -166,7 +162,8 @@ def question_pool():
 
     try:
         title = request.args['title']
-        questions = list(filter(lambda x: title.lower() in x.description.lower(), questions))
+        questions = list(filter(lambda x: title.lower()
+                                in x.description.lower(), questions))
     except:
         pass
 
@@ -190,15 +187,10 @@ def question_pool():
     })
 
 
-@auth.login_required
 @api.route('/create_survey', methods=['GET', 'POST'])
+@auth.login_required
 def create_survey():
-    token = request.headers['X-Token']
-    user = User.verify_auth_token(token)
-    if not user:
-        return jsonify({
-            "error": "wrong token"
-        })
+    user = g.current_user
     data = request.get_json()
     timestart = datetime.strptime(
         data['start'][0: -5], r'%Y-%m-%dT%H:%M:%S')
@@ -217,15 +209,10 @@ def create_survey():
     })
 
 
-@auth.login_required
 @api.route('/create_question', methods=['POST'])
+@auth.login_required
 def create_question():
-    token = request.headers['X-Token']
-    user = User.verify_auth_token(token)
-    if not user:
-        return jsonify({
-            "error": "wrong token"
-        })
+    user = g.current_user
     data = request.get_json()
     print(data)
     question = Question.create(description=data['title'],
@@ -233,6 +220,31 @@ def create_question():
     choices = data['choices']
     for choice in choices:
         Choice.create(choice, question.id)
+    return jsonify({
+        "success": True,
+    })
+
+
+@api.route('/delete_question', methods=['POST', 'GET'])
+@auth.login_required
+def delete_question():
+    data = request.get_json()
+    id = data['id']
+    current_user = g.current_user
+    question_to_delete = Question.get_by_id(id)
+
+    if current_user.id != question_to_delete.owner_id and current_user.is_admin is not True:
+        return jsonify({
+            'error': "You don't have sufficient permissions to delete this question."
+        })
+
+    if question_to_delete.surveys.first() is not None:
+        return jsonify({
+            'error': "The question is already assigned to a survey,\
+            please unassign it first, then come back to delete it."
+        })
+
+    Question.delete_by_id(id)
     return jsonify({
         "success": True,
     })

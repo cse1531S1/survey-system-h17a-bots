@@ -135,7 +135,7 @@
     </el-dialog>
 
     <el-dialog title="Create Question" :visible.sync="dialogQuestion" size="small">
-      <el-form class="large-space" :model="temp" label-position="left" label-width="70px" style='width: 400px; margin-left:50px;'>
+      <el-form class="large-space" :model="newQuestion" label-position="left" label-width="70px" style='width: 400px; margin-left:50px;'>
         <el-form-item label="Title">
           <el-input v-model="newQuestion.title"></el-input>
         </el-form-item>
