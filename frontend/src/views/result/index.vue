@@ -50,7 +50,6 @@
       <div v-for="i in nquestion" :key="i">
         <pie-chart :surveyId="surveyId" :questionId="i"></pie-chart>
       </div>
-      <el-button @click="pieDialog = false">Close</el-button>
     </el-dialog>
   </div>
 </template>
