@@ -103,7 +103,12 @@ def fetch_answers():
                 for answer in answerl.answers.all()]
         }
 
-    rtn = [to_dic(a) for a in answers]
+    rtn = []
+    try:
+        rtn = [to_dic(a) for a in answers]
+    except:
+        pass
+
     return jsonify({
         'items': rtn,
         'count': len(answers),
