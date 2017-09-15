@@ -256,8 +256,5 @@ def thankyou():
 @login_required
 @main.route('/dashboard')
 def dashboard():
-    """
-        This function is the view function for the thank you page the respondent will see after survey completion.
-    """
     surveys = Survey.get_all()
     return render_template('dashboard.html', surveys=surveys)

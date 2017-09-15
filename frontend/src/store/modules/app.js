@@ -36,6 +36,7 @@ const app = {
       commit('TOGGLE_SIDEBAR')
     },
     addVisitedViews({ commit }, view) {
+      if (view.name === 'Survey Result') return
       commit('ADD_VISITED_VIEWS', view)
     },
     delVisitedViews({ commit, state }, view) {

@@ -1,25 +1,25 @@
 <template>
   <div class="dashboard-editor-container">
     <!-- <el-row class="btn-group">
-          <el-col :span="4" class='text-center'>
-            <router-link class="pan-btn blue-btn" to="/components/index">Components</router-link>
-          </el-col>
-          <el-col :span="4" class='text-center'>
-            <router-link class="pan-btn light-blue-btn" to="/charts/index">Charts</router-link>
-          </el-col>
-          <el-col :span="4" class='text-center'>
-            <router-link class="pan-btn pink-btn" to="/excel/download">Excel</router-link>
-          </el-col>
-          <el-col :span="4" class='text-center'>
-            <router-link class="pan-btn green-btn" to="/example/table/table">Table</router-link>
-          </el-col>
-          <el-col :span="4" class='text-center'>
-            <router-link class="pan-btn tiffany-btn" to="/example/form/edit">Form</router-link>
-          </el-col>
-          <el-col :span="4" class='text-center'>
-            <router-link class="pan-btn yellow-btn" to="/theme/index">Theme</router-link>
-          </el-col>
-        </el-row> -->
+                <el-col :span="4" class='text-center'>
+                  <router-link class="pan-btn blue-btn" to="/components/index">Components</router-link>
+                </el-col>
+                <el-col :span="4" class='text-center'>
+                  <router-link class="pan-btn light-blue-btn" to="/charts/index">Charts</router-link>
+                </el-col>
+                <el-col :span="4" class='text-center'>
+                  <router-link class="pan-btn pink-btn" to="/excel/download">Excel</router-link>
+                </el-col>
+                <el-col :span="4" class='text-center'>
+                  <router-link class="pan-btn green-btn" to="/example/table/table">Table</router-link>
+                </el-col>
+                <el-col :span="4" class='text-center'>
+                  <router-link class="pan-btn tiffany-btn" to="/example/form/edit">Form</router-link>
+                </el-col>
+                <el-col :span="4" class='text-center'>
+                  <router-link class="pan-btn yellow-btn" to="/theme/index">Theme</router-link>
+                </el-col>
+              </el-row> -->
 
     <el-row>
       <el-col :span="6">
@@ -32,12 +32,12 @@
           <span class="display_name">{{name}}</span>
           <div class="row">
             <div class="info-item">
-              <count-to class="info-item-num" :startVal='0' :endVal='statisticsData.article_count' :duration='3400'></count-to>
+              <count-to class="info-item-num" :startVal='0' :endVal='statisticsData.survey_count' :duration='3400'></count-to>
               <span class="info-item-text">Surveys</span>
               <icon-svg icon-class="a" class="dashboard-editor-icon"></icon-svg>
             </div>
             <div class="info-item">
-              <count-to class="info-item-num" :startVal='0' :endVal='statisticsData.pageviews_count' :duration='3600'></count-to>
+              <count-to class="info-item-num" :startVal='0' :endVal='statisticsData.response_count' :duration='3600'></count-to>
               <span class="info-item-text">Response</span>
               <icon-svg icon-class="b" class="dashboard-editor-icon"></icon-svg>
             </div>
@@ -68,6 +68,7 @@ import panThumb from '@/components/PanThumb'
 import pieChart from './pieChart'
 import barChart from './barChart'
 import lineChart from './lineChart'
+import { fetchSRstatic } from '@/api/article'
 
 export default {
   name: 'dashboard-admin',
@@ -75,10 +76,13 @@ export default {
   data() {
     return {
       statisticsData: {
-        article_count: 1024,
-        pageviews_count: 1024
+        survey_count: 0,
+        response_count: 0
       }
     }
+  },
+  created() {
+    this.getData()
   },
   computed: {
     ...mapGetters([
@@ -86,6 +90,14 @@ export default {
       'avatar',
       'roles'
     ])
+  },
+  methods: {
+    getData() {
+      fetchSRstatic().then(response => {
+        this.statisticsData.survey_count = response.data.surveys
+        this.statisticsData.response_count = response.data.responses
+      })
+    }
   }
 }
 </script>

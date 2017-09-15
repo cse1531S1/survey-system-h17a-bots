@@ -73,11 +73,19 @@
 
       <el-table-column align="center" label="Operation" width="180">
         <template scope="scope">
-          <el-button v-if="scope.row.status!='open'" size="small" type="success" @click="handleModifyStatus(scope.row,'open')">Open
+          <el-button v-waves v-if="scope.row.status!='open'" size="small" type="success" @click="handleModifyStatus(scope.row,'open')">Open
           </el-button>
-          <el-button v-if="scope.row.status!='draft'" size="small" @click="handleModifyStatus(scope.row,'draft')">Draft
+          <el-button v-waves v-if="scope.row.status!='draft'" size="small" @click="handleModifyStatus(scope.row,'draft')">Draft
           </el-button>
-          <el-button v-if="scope.row.status!='closed'" size="small" type="danger" @click="handleModifyStatus(scope.row,'closed')">Close
+          <el-button v-waves v-if="scope.row.status!='closed'" size="small" type="danger" @click="handleModifyStatus(scope.row,'closed')">Close
+          </el-button>
+        </template>
+      </el-table-column>
+
+      <el-table-column width="110px" align="center" label="Links">
+        <template scope="scope">
+          <el-button size="small">
+            <router-link :to="'/result/'+scope.row.id">Result</router-link>
           </el-button>
         </template>
       </el-table-column>

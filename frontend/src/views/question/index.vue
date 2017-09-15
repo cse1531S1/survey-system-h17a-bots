@@ -56,40 +56,41 @@
     </div>
 
     <el-dialog title="Create Question" :visible.sync="dialogQuestion" size="small">
-      <el-form class="large-space" :model="newQuestion" label-position="left" label-width="70px" style='width: 400px; margin-left:50px;'>
-        <el-form-item label="Title">
+      <el-form class="large-space" :model="newQuestion" :rules="rules" ref="newQuestion" label-position="left" label-width="70px" style='width: 400px; margin-left:50px;'>
+        <el-form-item label="Title" prop="title">
           <el-input v-model="newQuestion.title"></el-input>
         </el-form-item>
 
-        <el-form-item label="Question Type">
+        <el-form-item label="Question Type" prop="qType">
           <el-select class="filter-item" v-model="newQuestion.qType" placeholder="Choose...">
             <el-option v-for="(item, index) in  qTypeAllowed" :key="index" :label="item" :value="index">
             </el-option>
           </el-select>
-          <div v-if="newQuestion.qType === '1'">
-            <el-button @click="addNewChoice">Add a Choice</el-button>
-            <draggable :list="newQuestion.choices" :options="{ handle: '.handler', draggable: '.list-complete-item'}">
-              <el-row class="list-complete-item " v-for="(element,index) in newQuestion.choices" :key='index'>
-                <el-col :span="2" class="handler">
-                  <icon-svg icon-class="tuozhuai"></icon-svg>
-                </el-col>
-                <el-col :span="2">
-                  <span style="" @click="deleteEle(element)">
-                    <i style="color:#ff4949" class="el-icon-delete"></i>
-                  </span>
-                </el-col>
-                <el-col :span="20">
-                  <el-input class="list-complete-item-handle" v-model.lazy="newQuestion.choices[index]"></el-input>
-                </el-col>
-              </el-row>
-            </draggable>
-          </div>
         </el-form-item>
+
+        <div v-if="newQuestion.qType === '1'">
+          <el-button @click="addNewChoice">Add a Choice</el-button>
+          <draggable :list="newQuestion.choices" :options="{ handle: '.handler', draggable: '.list-complete-item'}">
+            <el-row class="list-complete-item " v-for="(element,index) in newQuestion.choices" :key='index'>
+              <el-col :span="2" class="handler">
+                <icon-svg style="margin-top: 10px" icon-class="tuozhuai"></icon-svg>
+              </el-col>
+              <el-col :span="2">
+                <span style="" @click="deleteEle(element)">
+                  <i style="color:#ff4949;margin-top: 10px" class="el-icon-delete"></i>
+                </span>
+              </el-col>
+              <el-col :span="20">
+                <el-input class="list-complete-item-handle" v-model.lazy="newQuestion.choices[index]"></el-input>
+              </el-col>
+            </el-row>
+          </draggable>
+        </div>
 
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogQuestion= false">Cancel</el-button>
-        <el-button type="primary" @click="createQuestion">Submit</el-button>
+        <el-button @click="handleClean">Cancel</el-button>
+        <el-button type="primary" @click="createQuestion('newQuestion')">Submit</el-button>
       </div>
     </el-dialog>
 
@@ -101,7 +102,7 @@
 </template>
 
 <script>
-import { fetchPool, modifySurvey, createSurvey, createQuestion, deleteQuestion } from '@/api/article'
+import { fetchPool, createQuestion, deleteQuestion } from '@/api/article'
 import draggable from 'vuedraggable'
 import waves from '@/directive/waves.js'// 水波纹指令
 import { parseTime } from '@/utils'
@@ -154,7 +155,15 @@ export default {
       },
       dialogQuestion: false,
       to_post: {},
-      to_delete: 0
+      to_delete: 0,
+      rules: {
+        title: [
+          { required: true, message: 'Please enter a title for the question', trigger: 'blur' }
+        ],
+        qType: [
+          { required: true, message: 'Please Choose a type for the question', trigger: 'blur' }
+        ]
+      }
     }
   },
   filters: {
@@ -163,6 +172,10 @@ export default {
     this.getList()
   },
   methods: {
+    handleClean() {
+      this.$refs['newQuestion'].resetFields()
+      this.dialogQuestion = false
+    },
     addNewChoice() {
       this.newQuestion.choices.push('')
     },
@@ -236,31 +249,37 @@ export default {
       })
     },
     createQuestion() {
-      var detail = {
-        title: this.newQuestion.title,
-        qType: this.newQuestion.qType,
-        choices: this.newQuestion.choices
-      }
-      createQuestion(detail).then(response => {
-        if (response.data.success) {
-          this.$notify({
-            title: 'Success!',
-            message: 'You successfully created a question!',
-            type: 'success',
-            duration: 2000
+      this.$refs['newQuestion'].validate((valid) => {
+        if (valid) {
+          var detail = {
+            title: this.newQuestion.title,
+            qType: this.newQuestion.qType,
+            choices: this.newQuestion.choices
+          }
+          createQuestion(detail).then(response => {
+            if (response.data.success) {
+              this.$notify({
+                title: 'Success!',
+                message: 'You successfully created a question!',
+                type: 'success',
+                duration: 2000
+              })
+            } else {
+              this.$notify({
+                title: 'Not Success!',
+                message: 'Some unknown error happened',
+                type: 'error',
+                duration: 2000
+              })
+            }
+          }).then(() => {
+            this.getList()
+            this.resetTemp()
+            this.dialogQuestion = false
           })
         } else {
-          this.$notify({
-            title: 'Not Success!',
-            message: 'Some unknown error happened',
-            type: 'error',
-            duration: 2000
-          })
+          return false
         }
-      }).then(() => {
-        this.getList()
-        this.resetTemp()
-        this.dialogQuestion = false
       })
     },
     resetTemp() {

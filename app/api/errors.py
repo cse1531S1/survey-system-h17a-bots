@@ -16,13 +16,13 @@ def bad_request(message):
 
 
 def unauthorized(message):
-    response = jsonify({'error': 'unauthorized', 'message': message})
+    response = jsonify({'error': 'unauthorized', 'message': message, 'code': 50008})
     response.status_code = 401
     return response
 
 
 def forbidden(message):
-    response = jsonify({'error': 'forbidden', 'message': message})
+    response = jsonify({'error': 'forbidden', 'message': message, 'code': 50008})
     response.status_code = 403
     return response
 

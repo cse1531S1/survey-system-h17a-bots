@@ -98,11 +98,6 @@ export default {
     .avatar-wrapper {
       cursor: pointer; // margin-top: 5px;
       position: relative;
-      .user-avatar {
-        // width: 40px;
-        // height: 40px;
-        // border-radius: 10px;
-      }
       .el-icon-caret-bottom {
         position: absolute;
         right: -20px;

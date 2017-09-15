@@ -57,6 +57,7 @@ def get_info():
         'name': user.username,
         'avatar': '',
         'token': user.generate_auth_token(),
+        'success': True,
         'introduction': ''
     })
 
@@ -66,5 +67,9 @@ def get_info():
 def get_token():
     if g.current_user.is_anonymous:
         return unauthorized('Invalid credentials')
-    return jsonify({'token': g.current_user.generate_auth_token(
-        expiration=3600), 'expiration': 3600, 'success': True})
+    return jsonify({
+        'token': g.current_user.generate_auth_token(
+            expiration=360000),
+        'expiration': 360000,
+        'success': True
+    })

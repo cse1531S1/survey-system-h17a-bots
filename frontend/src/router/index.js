@@ -69,6 +69,19 @@ export const asyncRouterMap = [
       }
     ]
   },
-
+  {
+    path: '/result',
+    hidden: true,
+    component: Layout,
+    meta: { role: ['admin'] },
+    children: [
+      {
+        meta: { role: ['admin'] },
+        path: '/result/:id',
+        component: _import('result/index'),
+        name: 'Survey Result'
+      }
+    ]
+  },
   { path: '*', redirect: '/404', hidden: true }
 ]

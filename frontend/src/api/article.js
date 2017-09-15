@@ -16,6 +16,13 @@ export function fetchPool(query) {
   })
 }
 
+export function fetchSRstatic() {
+  return fetch({
+    url: 'http://127.0.0.1:5000/api/v1.0/srstatic',
+    method: 'get'
+  })
+}
+
 export function fetchCourse(query) {
   return fetch({
     url: 'http://127.0.0.1:5000/api/v1.0/fetch_course',
@@ -68,6 +75,29 @@ export function createQuestion(to_post) {
     url: 'http://127.0.0.1:5000/api/v1.0/create_question',
     method: 'post',
     data: to_post
+  })
+}
+
+export function fetchPie(surveyId, questionId) {
+  var to_post = {
+    survey: surveyId,
+    question: questionId
+  }
+  return fetch({
+    url: 'http://127.0.0.1:5000/api/v1.0/fetch_piechart',
+    method: 'post',
+    data: to_post
+  })
+}
+
+export function fetchAnswers(query, id) {
+  return fetch({
+    url: 'http://127.0.0.1:5000/api/v1.0/fetch_answer',
+    method: 'post',
+    data: {
+      id: id
+    },
+    params: query
   })
 }
 

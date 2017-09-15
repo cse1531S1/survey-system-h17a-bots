@@ -38,6 +38,68 @@ def get_answer_data(survey_id, question_id):
     return jsonify(rtn)
 
 
+@api.route('/fetch_piechart', methods=['GET', 'POST'])
+def fetchpiechart():
+    data = request.get_json()
+    survey_id = int(data['survey'])
+    question_id = int(data['question'])
+    answer_survey_link = AnswerSurveyLink.query.filter_by(
+        survey_id=survey_id).all()
+    question = Question.get_by_id(question_id)
+
+    def make_counter(counter):
+        rtn = []
+        for key, value in counter.items():
+            rtn.append({'name': key, 'value': value})
+
+        return rtn
+
+    rst = []
+    for link in answer_survey_link:
+        for answer in link.answers.all():
+            if answer.question_id == question.id:
+                rst.append(answer.content)
+
+    counter = dict(collections.Counter(rst))
+
+    rtn = {
+        "legend": rst,
+        "data": make_counter(counter),
+        "success": True,
+        "title": question.description
+    }
+    return jsonify(rtn)
+
+
+@api.route('/fetch_answer', methods=['POST'])
+@auth.login_required
+def fetch_answers():
+    data = request.get_json()
+    id = data['id']
+    answers = AnswerSurveyLink.get_by_survey_id(id)
+    nq = len(Survey.get_by_id(id).questions.all())
+
+    def to_dic(answerl):
+        return {
+            'id': answerl.id,
+            'name': 'Anonymous',
+            'time': answerl.timestamp,
+            'answers': [
+                {'question': Question.get_by_id(
+                    answer.question_id).description, 'answer': answer.content}
+                for answer in answerl.answers.all()]
+        }
+
+    rtn = [to_dic(a) for a in answers]
+    return jsonify({
+        'items': rtn,
+        'count': len(answers),
+        'nquestion': nq,
+        'success': True
+    })
+    pass
+
+
 @api.route('/fetch_all_survey', methods=['GET'])
 @auth.login_required
 def all_survey():
@@ -123,7 +185,6 @@ def modify_survey():
 @api.route('/fetch_question', methods=['GET', 'OPTION'])
 @auth.login_required
 def fetch_questions():
-    print(request.headers)
     questions = Question.get_all()
 
     def to_dict(question):
@@ -214,7 +275,6 @@ def create_survey():
 def create_question():
     user = g.current_user
     data = request.get_json()
-    print(data)
     question = Question.create(description=data['title'],
                                owner_id=user.id, q_type=int(data['qType']))
     choices = data['choices']
@@ -247,4 +307,16 @@ def delete_question():
     Question.delete_by_id(id)
     return jsonify({
         "success": True,
+    })
+
+
+@api.route('/srstatic', methods=['GET'])
+@auth.login_required
+def srstatic():
+    survey_count = len(Survey.get_all())
+    response_count = len(AnswerSurveyLink.get_all())
+    return jsonify({
+        "success": True,
+        'surveys': survey_count,
+        'responses': response_count
     })
