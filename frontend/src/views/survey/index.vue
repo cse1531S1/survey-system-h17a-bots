@@ -84,9 +84,7 @@
 
       <el-table-column width="110px" align="center" label="Links">
         <template scope="scope">
-          <el-button size="small">
-            <router-link :to="'/result/'+scope.row.id">Result</router-link>
-          </el-button>
+            <router-link v-waves class="el-button el-button--small" :to="'/result/'+scope.row.id">Result</router-link>
         </template>
       </el-table-column>
 

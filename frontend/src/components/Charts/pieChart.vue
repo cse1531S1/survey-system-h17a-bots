@@ -50,7 +50,6 @@ export default {
   methods: {
     fetchPie(surveyId, questionId) {
       fetchPie(surveyId, questionId).then(response => {
-        console.log(response)
         if (response.data.success) {
           this.legend = response.data.legend
           this.data = response.data.data

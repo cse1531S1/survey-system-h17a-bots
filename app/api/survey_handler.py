@@ -78,6 +78,19 @@ def fetch_answers():
     id = data['id']
     answers = AnswerSurveyLink.get_by_survey_id(id)
     nq = len(Survey.get_by_id(id).questions.all())
+    try:
+        order = request.args['sort']
+        if(order == '-id'):
+            answers = answers[::-1]
+    except:
+        pass
+
+    try:
+        limit = int(request.args['limit'])
+        start = (int(request.args['page']) - 1)
+        answers = answers[start * limit:(start + 1) * limit]
+    except:
+        pass
 
     def to_dic(answerl):
         return {

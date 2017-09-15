@@ -1,15 +1,6 @@
 <template>
   <div class="app-container calendar-list-container">
     <div class="filter-container">
-      <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="Title" v-model="listQuery.title">
-      </el-input>
-
-      <el-select @change='handleFilter' style="width: 120px" class="filter-item" v-model="listQuery.sort" placeholder="Sort">
-        <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key">
-        </el-option>
-      </el-select>
-
-      <el-button class="filter-item" type="primary" v-waves icon="search" @click="handleFilter">Search</el-button>
       <el-button class="filter-item" type="primary" v-waves icon="view" @click="handleShowPie">Statistic</el-button>
       <el-button class="filter-item" type="primary" v-waves icon="document" @click="handleDownload">Export</el-button>
     </div>
