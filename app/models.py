@@ -43,6 +43,22 @@ class DatabaseUtil:
         pass
 
 
+UserCourse = db.Table('user_course',
+                      db.Column('user_id', db.Integer,
+                                db.ForeignKey('users.id')),
+                      db.Column('course_id', db.Integer,
+                                db.ForeignKey('course.id'))
+                      )
+
+
+class Course(db.Model, DatabaseUtil):
+
+    """Docstring for Course. """
+    __tablename__ = 'courses'
+    id = db.Column(db.Integer, primary_key=True)
+    course_code = db.Column(db.String(32), unique=True, index=True)
+
+
 class User(UserMixin, db.Model, DatabaseUtil):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -57,7 +73,10 @@ class User(UserMixin, db.Model, DatabaseUtil):
         'AnswerSurveyLink', backref='owner', lazy='dynamic')
 
     is_admin = db.Column(db.Boolean, default=False)
+
     user_role = db.Column(db.String(32))
+    courses = db.relationship('Course', secondary=Course, backref=db.backref(
+        'users', lazy='dynamic'), lazy='dynamic')
 
     def generate_auth_token(self, expiration=None):
         s = Serializer(current_app.config['SECRET_KEY'])
