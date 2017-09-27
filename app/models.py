@@ -47,16 +47,8 @@ UserCourse = db.Table('user_course',
                       db.Column('user_id', db.Integer,
                                 db.ForeignKey('users.id')),
                       db.Column('course_id', db.Integer,
-                                db.ForeignKey('course.id'))
+                                db.ForeignKey('courses.id'))
                       )
-
-
-class Course(db.Model, DatabaseUtil):
-
-    """Docstring for Course. """
-    __tablename__ = 'courses'
-    id = db.Column(db.Integer, primary_key=True)
-    course_code = db.Column(db.String(32), unique=True, index=True)
 
 
 class User(UserMixin, db.Model, DatabaseUtil):
@@ -75,7 +67,8 @@ class User(UserMixin, db.Model, DatabaseUtil):
     is_admin = db.Column(db.Boolean, default=False)
 
     user_role = db.Column(db.String(32))
-    courses = db.relationship('Course', secondary=Course, backref=db.backref(
+
+    courses = db.relationship('Course', secondary=UserCourse, backref=db.backref(
         'users', lazy='dynamic'), lazy='dynamic')
 
     def generate_auth_token(self, expiration=None):
@@ -133,6 +126,14 @@ class User(UserMixin, db.Model, DatabaseUtil):
     def get_by_reset_token(token):
         s = Serializer(current_app.config['SECRET_KEY'])
         return s.loads(token).get('reset')
+
+
+class Course(db.Model, DatabaseUtil):
+
+    """Docstring for Course. """
+    __tablename__ = 'courses'
+    id = db.Column(db.Integer, primary_key=True)
+    course_code = db.Column(db.String(32), unique=True, index=True)
 
 
 class AnoymousUser(AnonymousUserMixin):

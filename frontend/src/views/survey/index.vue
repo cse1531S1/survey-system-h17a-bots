@@ -84,7 +84,7 @@
 
       <el-table-column width="110px" align="center" label="Links">
         <template scope="scope">
-            <router-link v-waves class="el-button el-button--small" :to="'/result/'+scope.row.id">Result</router-link>
+          <router-link v-waves class="el-button el-button--small" :to="'/result/'+scope.row.id">Result</router-link>
         </template>
       </el-table-column>
 
@@ -96,7 +96,7 @@
     </div>
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form class="large-space" :model="temp" label-position="left" label-width="70px" style='width: 400px; margin-left:50px;'>
+      <el-form :rules="rules" class="large-space" :model="temp" label-position="left" label-width="70px" style='width: 400px; margin-left:50px;' ref="newSurvey">
 
         <el-form-item label="Status">
           <el-select class="filter-item" v-model="temp.status" placeholder="Choose...">
@@ -105,24 +105,24 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="Courses">
-          <el-select class="filter-item" v-model="temp.course" placeholder="Choose...">
+        <el-form-item label="Courses" prop="course">
+          <el-select class="filter-item" v-model="temp.course" filterable placeholder="Choose...">
             <el-option v-for="item in  this.course" :key="item" :label="item" :value="item">
             </el-option>
           </el-select>
         </el-form-item>
 
-        <el-form-item label="Start Time">
+        <el-form-item label="Start Time" prop="start_time">
           <el-date-picker v-model="temp.start_time" type="datetime" placeholder="Choose Start Time" format="dd-MM-yyyy HH:mm">
           </el-date-picker>
         </el-form-item>
 
-        <el-form-item label="End Time">
+        <el-form-item label="End Time" prop="end_time">
           <el-date-picker v-model="temp.end_time" type="datetime" placeholder="Choose End Time" format="dd-MM-yyyy HH:mm">
           </el-date-picker>
         </el-form-item>
 
-        <el-form-item label="Title">
+        <el-form-item label="Title" prop="title">
           <el-input v-model="temp.title"></el-input>
         </el-form-item>
 
@@ -248,7 +248,21 @@ export default {
         1: 'Multiple Choices'
       },
       dialogQuestion: false,
-      to_post: {}
+      to_post: {},
+      rules: {
+        course: [
+          { required: true, message: 'Please choose a course', trigger: 'change' }
+        ],
+        start_time: [
+          { type: 'date', required: true, message: 'Please choose a start time', trigger: 'change' }
+        ],
+        end_time: [
+          { type: 'date', required: true, message: 'Please choose a end time', trigger: 'change' }
+        ],
+        title: [
+          { required: true, message: 'Please input a title', trigger: 'blur' }
+        ]
+      }
     }
   },
   filters: {
@@ -383,35 +397,41 @@ export default {
       })
     },
     create() {
-      this.dialogFormVisible = false
-      this.to_post = {
-        'title': this.temp.title,
-        'course': this.temp.course,
-        'questions': this.list1,
-        'start': this.temp.start_time,
-        'end': this.temp.end_time,
-        'status': this.temp.status,
-        'id': -1
-      }
-      createSurvey(this.to_post).then(response => {
-        if (response.data.success) {
-          this.$notify({
-            title: 'Success!',
-            message: 'You successfully created the survey!',
-            type: 'success',
-            duration: 2000
+      this.$refs['newSurvey'].validate((valid) => {
+        if (valid) {
+          this.to_post = {
+            'title': this.temp.title,
+            'course': this.temp.course,
+            'questions': this.list1,
+            'start': this.temp.start_time,
+            'end': this.temp.end_time,
+            'status': this.temp.status,
+            'id': -1
+          }
+          createSurvey(this.to_post).then(response => {
+            if (response.data.success) {
+              this.$notify({
+                title: 'Success!',
+                message: 'You successfully created the survey!',
+                type: 'success',
+                duration: 2000
+              })
+            } else {
+              this.$notify({
+                title: 'Not Success!',
+                message: 'Some unknown error happened',
+                type: 'error',
+                duration: 2000
+              })
+            }
+          }).then(() => {
+            this.getList()
+            this.resetTemp()
+            this.dialogFormVisible = false
           })
         } else {
-          this.$notify({
-            title: 'Not Success!',
-            message: 'Some unknown error happened',
-            type: 'error',
-            duration: 2000
-          })
+          return false
         }
-      }).then(() => {
-        this.getList()
-        this.resetTemp()
       })
     },
     update() {

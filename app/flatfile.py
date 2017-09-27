@@ -18,9 +18,14 @@ class FileOperation(object):
     def read_course():
         with open('courses.csv', 'r') as file_in:
             result = map(str, csv.reader(file_in))
-            # match '["ZZZZ9999 99z9"]' like string and get the alphanumeric part
-            pattern = r'..([A-Z]{4}[0-9]{4}\s[0-9]{2}[a-z][0-9])..'
-            result = [re.match(pattern, i).group(1)
+            # match '["ZZZZ9999 99z9"]' like string and get the alphanumeric
+            # part
+            # pattern = r'..([A-Z]{4}[0-9]{4}.\s[0-9]{2}[a-z][0-9])..'
+            ['COMP9844', '17s2']
+            pattern = r'..([A-Z]{4}[0-9]{4})..\s.([0-9]{2}[a-z][0-9])..'
+            # print([i for i in result])
+
+            result = [re.match(pattern, i).group(1) + " " + re.match(pattern, i).group(2)
                       for i in result if re.match(pattern, i)]
             return result
 

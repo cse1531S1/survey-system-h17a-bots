@@ -6,7 +6,7 @@ from flask_login import login_required, current_user
 from ..models import Survey, Question, Answer, AnswerSurveyLink, Choice
 from .. import db
 from . import main
-from .flatfile import FileOperation
+from ..flatfile import FileOperation
 from config import basedir
 from datetime import datetime
 import sqlalchemy
