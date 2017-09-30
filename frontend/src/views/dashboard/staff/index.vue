@@ -1,41 +1,20 @@
 <template>
   <div class="dashboard-editor-container">
-    <el-row>
+    <el-row type="flex" justify="center">
       <el-col :span="6">
         <el-card class="box-card">
           <div slot="header" class="box-card-header">
             <pan-thumb class="panThumb" :name="name"> You Are:
               <span class="pan-info-roles" :key='item' v-for="item in roles">{{item}}</span>
+              <br>
+              You currently enrolled in
+              <span class="pan-info-roles" :key='item' v-for="item in courses">{{item}}</span>
             </pan-thumb>
-          </div>
-          <span class="display_name">{{name}}</span>
 
-          <div class="row">
-            <div class="info-item">
-              <count-to class="info-item-num" :startVal='0' :endVal='statisticsData.survey_count' :duration='3400'></count-to>
-              <span class="info-item-text">Surveys</span>
-              <icon-svg icon-class="a" class="dashboard-editor-icon"></icon-svg>
-            </div>
-            <div class="info-item">
-              <count-to class="info-item-num" :startVal='0' :endVal='statisticsData.response_count' :duration='3600'></count-to>
-              <span class="info-item-text">Response</span>
-              <icon-svg icon-class="b" class="dashboard-editor-icon"></icon-svg>
-            </div>
           </div>
+          <span class="display_name">User id: {{name}}</span>
         </el-card>
       </el-col>
-
-      <el-col :span="8">
-        <pie-chart></pie-chart>
-      </el-col>
-
-      <el-col :span="10">
-        <bar-chart></bar-chart>
-      </el-col>
-    </el-row>
-
-    <el-row :gutter="20">
-      <line-chart></line-chart>
     </el-row>
 
   </div>
@@ -45,14 +24,11 @@
 import { mapGetters } from 'vuex'
 import countTo from 'vue-count-to'
 import panThumb from '@/components/PanThumb'
-import pieChart from './pieChart'
-import barChart from './barChart'
-import lineChart from './lineChart'
 import { fetchSRstatic } from '@/api/article'
 
 export default {
   name: 'dashboard-admin',
-  components: { countTo, panThumb, pieChart, lineChart, barChart },
+  components: { countTo, panThumb },
   data() {
     return {
       statisticsData: {
@@ -68,6 +44,7 @@ export default {
     ...mapGetters([
       'name',
       'avatar',
+      'courses',
       'roles'
     ])
   },

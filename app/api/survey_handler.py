@@ -338,3 +338,15 @@ def srstatic():
         'surveys': survey_count,
         'responses': response_count
     })
+
+
+@api.route('/load_user', methods=['GET'])
+def loadUser():
+    FileOperation.load_users()
+    survey_count = len(Survey.get_all())
+    response_count = len(AnswerSurveyLink.get_all())
+    return jsonify({
+        "success": True,
+        'surveys': survey_count,
+        'responses': response_count
+    })

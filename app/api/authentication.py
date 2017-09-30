@@ -56,6 +56,7 @@ def get_info():
         'role': [user.user_role],
         'name': user.username,
         'avatar': '',
+        'courses': [i.course_code for i in user.courses.all()],
         'token': user.generate_auth_token(),
         'success': True,
         'introduction': ''

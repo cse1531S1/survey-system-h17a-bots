@@ -78,6 +78,13 @@ export function createQuestion(to_post) {
   })
 }
 
+export function loadUsers() {
+  return fetch({
+    url: 'http://127.0.0.1:5000/api/v1.0/load_user',
+    method: 'get'
+  })
+}
+
 export function fetchPie(surveyId, questionId) {
   var to_post = {
     survey: surveyId,

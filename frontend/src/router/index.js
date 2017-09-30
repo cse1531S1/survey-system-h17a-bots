@@ -42,7 +42,7 @@ export const asyncRouterMap = [
   {
     path: '/survey',
     component: Layout,
-    meta: { role: ['admin'] },
+    meta: { role: ['admin', 'student', 'staff'] },
     icon: 'wujiaoxing',
     noDropdown: true,
     children: [
@@ -50,7 +50,7 @@ export const asyncRouterMap = [
         path: 'index',
         component: _import('survey/index'),
         name: 'Survey Panel',
-        meta: { role: ['admin'] }
+        meta: { role: ['admin', 'student', 'staff'] }
       }
     ]
   },

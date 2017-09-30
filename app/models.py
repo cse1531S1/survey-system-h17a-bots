@@ -127,6 +127,12 @@ class User(UserMixin, db.Model, DatabaseUtil):
         s = Serializer(current_app.config['SECRET_KEY'])
         return s.loads(token).get('reset')
 
+    def add_course(self, course_code):
+        course = Course.get_by_code(course_code)
+        self.courses.append(course)
+        db.session.add(self)
+        db.session.commit()
+
 
 class Course(db.Model, DatabaseUtil):
 
@@ -134,6 +140,10 @@ class Course(db.Model, DatabaseUtil):
     __tablename__ = 'courses'
     id = db.Column(db.Integer, primary_key=True)
     course_code = db.Column(db.String(32), unique=True, index=True)
+
+    @staticmethod
+    def get_by_code(code):
+        return Course.query.filter_by(course_code=code).first()
 
 
 class AnoymousUser(AnonymousUserMixin):

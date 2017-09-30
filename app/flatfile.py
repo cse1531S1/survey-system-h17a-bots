@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 from threading import Thread
-from .models import AnswerSurveyLink, Survey
+from .models import AnswerSurveyLink, Survey, User, db, Course
 from flask import current_app
 import re
 import csv
@@ -19,9 +19,6 @@ class FileOperation(object):
         with open('courses.csv', 'r') as file_in:
             result = map(str, csv.reader(file_in))
             # match '["ZZZZ9999 99z9"]' like string and get the alphanumeric
-            # part
-            # pattern = r'..([A-Z]{4}[0-9]{4}.\s[0-9]{2}[a-z][0-9])..'
-            ['COMP9844', '17s2']
             pattern = r'..([A-Z]{4}[0-9]{4})..\s.([0-9]{2}[a-z][0-9])..'
             # print([i for i in result])
 
@@ -53,3 +50,48 @@ class FileOperation(object):
                         survey.questions.all(), link.answers.all())}
                     writer.writerow(
                         [survey.description, username, dic])
+
+    @staticmethod
+    def load_users():
+        app = current_app._get_current_object()
+        thr = Thread(target=FileOperation.load_users_async, args=[app])
+        thr.start()
+        return thr
+
+    @staticmethod
+    def load_users_async(app):
+        with app.app_context():
+            with open('courses.csv', 'r') as file_in:
+                result = map(str, csv.reader(file_in))
+                # match '["ZZZZ9999 99z9"]' like string and get the
+                # alphanumeric
+                pattern = r'..([A-Z]{4}[0-9]{4})..\s.([0-9]{2}[a-z][0-9])..'
+                result = [re.match(pattern, i).group(1) + " " + re.match(pattern, i).group(2)
+                          for i in result if re.match(pattern, i)]
+
+                for course in result:
+                    try:
+                        c = Course(course_code=course)
+                        db.session.add(c)
+                        db.session.commit()
+                    except:
+                        db.session.rollback()
+
+            with open('passwords.csv', 'r') as file_in:
+                result = csv.reader(file_in)
+                for user in result:
+                    try:
+                        new_user = User(username=str(
+                            user[0]), user_role=user[2], password=user[1])
+                        db.session.add(new_user)
+                        db.session.commit()
+                    except:
+                        db.session.rollback()
+
+            with open('enrolments.csv', 'r') as file_in:
+                result = csv.reader(file_in)
+                for enrolment in result:
+                    user = User.get_by_name(enrolment[0])
+                    course = enrolment[1] + " " + enrolment[2]
+                    print(user.username, course)
+                    user.add_course(course)
