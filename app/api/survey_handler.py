@@ -78,6 +78,15 @@ def fetch_answers():
     id = data['id']
     answers = AnswerSurveyLink.get_by_survey_id(id)
     nq = len(Survey.get_by_id(id).questions.all())
+
+    if g.current_user.user_role != 'admin' and Survey.get_by_id(id).status != 'closed':
+        return jsonify({
+            'items': None,
+            'count': None,
+            'nquestion': None,
+            'success': True
+        })
+
     try:
         order = request.args['sort']
         if(order == '-id'):
@@ -121,7 +130,21 @@ def fetch_answers():
 @api.route('/fetch_all_survey', methods=['GET'])
 @auth.login_required
 def all_survey():
-    surveys = Survey.get_all()
+    user = g.current_user
+    role = user.user_role
+    if role == 'admin':
+        surveys = Survey.get_all()
+    else:
+        surveys = []
+        courses = user.courses.all()
+        for course in courses:
+            to_append = Survey.query.filter_by(
+                course=course.course_code).first()
+            if to_append is not None:
+                surveys.append(to_append)
+
+    total = len(surveys)
+
     try:
         order = request.args['sort']
         if(order == '-id'):
@@ -131,7 +154,7 @@ def all_survey():
 
     try:
         limit = int(request.args['limit'])
-        start = (int(request.args['page']) - 1)
+        start = int(request.args['page']) - 1
         surveys = surveys[start * limit:(start + 1) * limit]
     except:
         pass
@@ -154,13 +177,14 @@ def all_survey():
             'questions': [{"id": q.id, "description": q.description} for q in survey.questions.all()],
             'start_time': survey.start_date,
             'end_time': survey.end_date,
-            'status': survey.status
+            'status': survey.status,
+            'id_hash': survey.id_hash
         }
 
     result = [to_dict(survey) for survey in surveys]
 
     return jsonify({
-        'total': len(Survey.get_all()),
+        'total': total,
         'items': result
     })
 
@@ -182,10 +206,12 @@ def modify_survey():
     questions = data['questions']
     questions_dump = [i['id'] for i in questions]
     survey = Survey.get_by_id(survey_id)
-    survey.remove_all_questions()
-    survey.set_questions(questions_dump)
-    survey.description = data['title']
+    #  print(data['purpose'])
+    if data['purpose'] != 'update_status':
+        survey.remove_all_questions()
+        survey.set_questions(questions_dump)
 
+    survey.description = data['title']
     timestart = data['start']
     survey.start_date = timestart
     timeend = data['end']

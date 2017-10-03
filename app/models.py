@@ -292,6 +292,14 @@ class AnswerSurveyLink(db.Model, DatabaseUtil):
         return rtn
 
     @classmethod
+    def check_answered(cls, id, survey_id):
+        links = cls.get_by_survey_id(survey_id)
+        for link in links:
+            if link.owner_id == id:
+                return False
+        return True
+
+    @classmethod
     def delete_by_id(cls, id):
         answer_survey_link_to_delete = cls.get_by_id(id)
         for answer in answer_survey_link_to_delete.answers.all():

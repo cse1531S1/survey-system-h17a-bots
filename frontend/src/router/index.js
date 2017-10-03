@@ -73,10 +73,10 @@ export const asyncRouterMap = [
     path: '/result',
     hidden: true,
     component: Layout,
-    meta: { role: ['admin'] },
+    meta: { role: ['admin', 'student', 'staff'] },
     children: [
       {
-        meta: { role: ['admin'] },
+        meta: { role: ['admin', 'student', 'staff'] },
         path: '/result/:id',
         component: _import('result/index'),
         name: 'Survey Result'

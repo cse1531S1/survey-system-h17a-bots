@@ -9,7 +9,9 @@
             </pan-thumb>
 
           </div>
-          <span class="display_name">User id: {{name}}</span>
+          <el-row type="flex" justify="center" class="display_name">User id: {{name}}</el-row>
+          <el-row type="flex" justify="center">You currently involved in</el-row>
+          <el-row type="flex" justify="center" class="pan-info-roles" :key='item' v-for="item in courses">{{item}}</el-row>
         </el-card>
       </el-col>
     </el-row>
@@ -41,6 +43,7 @@ export default {
     ...mapGetters([
       'name',
       'avatar',
+      'courses',
       'roles'
     ])
   },

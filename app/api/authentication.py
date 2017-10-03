@@ -4,7 +4,7 @@
 from flask_httpauth import HTTPBasicAuth
 from ..models import User
 from flask import g, jsonify, request
-from .errors import unauthorized, forbidden
+from .errors import unauthorized
 from . import api
 auth = HTTPBasicAuth()
 
@@ -52,7 +52,7 @@ def get_info():
     user = g.current_user
     if not user:
         return unauthorized('Invalid credentials')
-    return jsonify({
+    rtn = jsonify({
         'role': [user.user_role],
         'name': user.username,
         'avatar': '',
@@ -61,6 +61,9 @@ def get_info():
         'success': True,
         'introduction': ''
     })
+    # print([i.course_code for i in user.courses.all()])
+
+    return rtn
 
 
 @api.route('/get_token', methods=['POST', 'GET'])

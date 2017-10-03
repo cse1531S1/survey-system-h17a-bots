@@ -70,8 +70,6 @@ export default {
         title: undefined,
         sort: '+id'
       },
-      sortOptions: [{ label: 'Ascending by id', key: '+id' }, { label: 'Descending by id', key: '-id' }],
-      statusOptions: ['published', 'draft', 'deleted'],
       pieDialog: false,
       nquestion: 0,
       tableKey: 0,

@@ -4,34 +4,14 @@
       <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="Title" v-model="listQuery.title">
       </el-input>
 
-      <el-select @change='handleFilter' style="width: 120px" class="filter-item" v-model="listQuery.sort" placeholder="Sort">
-        <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key">
-        </el-option>
-      </el-select>
-
       <el-button class="filter-item" type="primary" v-waves icon="search" @click="handleFilter">Search</el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="edit">Add a Survey</el-button>
-      <el-button class="filter-item" type="primary" icon="document" @click="loadUsers">Load Users</el-button>
-      <el-button class="filter-item" type="primary" icon="document" @click="handleDownload">Export</el-button>
     </div>
 
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="Loading!!!!" border fit highlight-current-row style="width: 100%">
 
-      <el-table-column align="center" label="ID" width="55" prop="id">
-        <template scope="scope">
-          <span>{{scope.row.id}}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column width="150px" align="center" label="Creation time">
-        <template scope="scope">
-          <span>{{scope.row.timestamp}}</span>
-        </template>
-      </el-table-column>
-
       <el-table-column min-width="250px" label="Title">
         <template scope="scope">
-          <span class="link-type" @click="handleUpdate(scope.row)">{{scope.row.title}}</span>
+          <span>{{scope.row.title}}</span>
         </template>
       </el-table-column>
 
@@ -53,38 +33,16 @@
         </template>
       </el-table-column>
 
-      <el-table-column width="110px" align="center" label="Owner">
-        <template scope="scope">
-          <span>{{scope.row.owner}}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column align="center" label="Responses" width="110">
-        <template scope="scope">
-          <span>{{scope.row.responses}}</span>
-        </template>
-      </el-table-column>
-
       <el-table-column class-name="status-col" label="Status" width="90">
         <template scope="scope">
           <el-tag :type="scope.row.status | statusFilter">{{scope.row.status}}</el-tag>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Operation" width="180">
-        <template scope="scope">
-          <el-button v-waves v-if="scope.row.status!='open'" size="small" type="success" @click="handleModifyStatus(scope.row,'open')">Open
-          </el-button>
-          <el-button v-waves v-if="scope.row.status!='draft'" size="small" @click="handleModifyStatus(scope.row,'draft')">Draft
-          </el-button>
-          <el-button v-waves v-if="scope.row.status!='closed'" size="small" type="danger" @click="handleModifyStatus(scope.row,'closed')">Close
-          </el-button>
-        </template>
-      </el-table-column>
-
       <el-table-column width="110px" align="center" label="Links">
         <template scope="scope">
-          <router-link v-waves class="el-button el-button--small" :to="'/result/'+scope.row.id">Result</router-link>
+          <router-link v-if="scope.row.status === 'closed'" v-waves class="el-button el-button--small" :to="'/result/'+scope.row.id">Result</router-link>
+          <a v-if="scope.row.status === 'open'" v-waves class="el-button el-button--small" :href="'http://127.0.0.1:5000/answer/'+scope.row.id_hash+'?token='+token" target="_blank">Answer it!</a>
         </template>
       </el-table-column>
 
@@ -95,88 +53,6 @@
       </el-pagination>
     </div>
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form :rules="rules" class="large-space" :model="temp" label-position="left" label-width="70px" style='width: 400px; margin-left:50px;' ref="newSurvey">
-
-        <el-form-item label="Status">
-          <el-select class="filter-item" v-model="temp.status" placeholder="Choose...">
-            <el-option v-for="item in  statusOptions" :key="item" :label="item" :value="item">
-            </el-option>
-          </el-select>
-        </el-form-item>
-
-        <el-form-item label="Courses" prop="course">
-          <el-select class="filter-item" v-model="temp.course" filterable placeholder="Choose...">
-            <el-option v-for="item in  this.course" :key="item" :label="item" :value="item">
-            </el-option>
-          </el-select>
-        </el-form-item>
-
-        <el-form-item label="Start Time" prop="start_time">
-          <el-date-picker v-model="temp.start_time" type="datetime" placeholder="Choose Start Time" format="dd-MM-yyyy HH:mm">
-          </el-date-picker>
-        </el-form-item>
-
-        <el-form-item label="End Time" prop="end_time">
-          <el-date-picker v-model="temp.end_time" type="datetime" placeholder="Choose End Time" format="dd-MM-yyyy HH:mm">
-          </el-date-picker>
-        </el-form-item>
-
-        <el-form-item label="Title" prop="title">
-          <el-input v-model="temp.title"></el-input>
-        </el-form-item>
-
-        <el-button class="filter-item" style="margin-left: 10px;" @click="handleCQuestion" type="primary" icon="edit">Add a question</el-button>
-        <div class="editor-container">
-          <dnd-list :list1="list1" :list2="list2" list1Title="Chosen" list2Title="Question Pool"></dnd-list>
-        </div>
-
-      </el-form>
-
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="handleClean">Cancel</el-button>
-        <el-button v-if="dialogStatus=='create'" type="primary" @click="create">Submit</el-button>
-        <el-button v-else type="primary" @click="update">Submit</el-button>
-      </div>
-    </el-dialog>
-
-    <el-dialog title="Create Question" :visible.sync="dialogQuestion" size="small">
-      <el-form class="large-space" :model="newQuestion" label-position="left" label-width="70px" style='width: 400px; margin-left:50px;'>
-        <el-form-item label="Title">
-          <el-input v-model="newQuestion.title"></el-input>
-        </el-form-item>
-
-        <el-form-item label="Question Type">
-          <el-select class="filter-item" v-model="newQuestion.qType" placeholder="Choose...">
-            <el-option v-for="(item, index) in  qTypeAllowed" :key="index" :label="item" :value="index">
-            </el-option>
-          </el-select>
-          <div v-if="newQuestion.qType === '1'">
-            <el-button @click="addNewChoice">Add a Choice</el-button>
-            <draggable :list="newQuestion.choices" :options="{ handle: '.handler', draggable: '.list-complete-item'}">
-              <el-row class="list-complete-item " v-for="(element,index) in newQuestion.choices" :key='index'>
-                <el-col :span="2" class="handler">
-                  <icon-svg icon-class="tuozhuai"></icon-svg>
-                </el-col>
-                <el-col :span="2">
-                  <span style="" @click="deleteEle(element)">
-                    <i style="color:#ff4949" class="el-icon-delete"></i>
-                  </span>
-                </el-col>
-                <el-col :span="20">
-                  <el-input class="list-complete-item-handle" v-model.lazy="newQuestion.choices[index]"></el-input>
-                </el-col>
-              </el-row>
-            </draggable>
-          </div>
-        </el-form-item>
-
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogQuestion= false">Cancel</el-button>
-        <el-button type="primary" @click="createQuestion">Submit</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
@@ -188,6 +64,7 @@ import draggable from 'vuedraggable'
 import DndList from '@/components/twoDndList'
 import waves from '@/directive/waves.js'// 水波纹指令
 import { parseTime } from '@/utils'
+import { getToken } from '@/utils/auth'
 
 export default {
   name: 'SurveyList',
@@ -214,6 +91,7 @@ export default {
         title: undefined,
         sort: '+id'
       },
+      token: '',
       temp: {
         id: undefined,
         timestamp: 0,
@@ -281,6 +159,7 @@ export default {
   created() {
     this.getList()
     this.getCourse()
+    this.token = getToken()
   },
   methods: {
     loadUsers() {

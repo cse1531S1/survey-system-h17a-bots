@@ -202,6 +202,7 @@ export default {
     return {
       list: null,
       total: null,
+      purpose: '',
       listLoading: true,
       course: [],
       options: {
@@ -363,16 +364,19 @@ export default {
     },
     handleModifyStatus(row, status) {
       row.status = status
+      this.purpose = 'update_status'
       this.temp = Object.assign({}, row)
       this.update()
     },
     handleCreate() {
       this.resetTemp()
+      this.purpose = 'create'
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
     },
     handleUpdate(row) {
       this.resetTemp()
+      this.purpose = 'update'
       this.listLoading = true
       this.temp = Object.assign({}, row)
       this.list1 = row.questions
@@ -469,6 +473,7 @@ export default {
         'start': this.temp.start_time,
         'end': this.temp.end_time,
         'status': this.temp.status,
+        'purpose': this.purpose,
         'id': this.temp.id
       }
       modifySurvey(this.to_post).then(response => {
@@ -505,7 +510,6 @@ export default {
       }
       this.list1 = []
       this.to_post = {}
-      // this.$refs['newSurvey'].resetFields()
     },
     resetQuestionTemp() {
       this.newQuestion = {

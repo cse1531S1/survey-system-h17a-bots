@@ -93,5 +93,5 @@ class FileOperation(object):
                 for enrolment in result:
                     user = User.get_by_name(enrolment[0])
                     course = enrolment[1] + " " + enrolment[2]
-                    print(user.username, course)
                     user.add_course(course)
+            print('done')

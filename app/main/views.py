@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
-from flask import request, redirect, render_template, url_for, flash, send_from_directory
+from flask import request, redirect, render_template, url_for, flash, send_from_directory, g
 from flask_login import login_required, current_user
-from ..models import Survey, Question, Answer, AnswerSurveyLink, Choice
+from ..models import Survey, Question, Answer, AnswerSurveyLink, Choice, User
 from .. import db
 from . import main
 from ..flatfile import FileOperation
 from config import basedir
 from datetime import datetime
-import sqlalchemy
 import builtins
 import os
 
@@ -131,12 +130,22 @@ def answer(hash_str):
         This function is the view function for answering a survey.
         @id represents the survey ID.
     """
+    token = request.args['token']
+    user = User.verify_auth_token(token)
+
+    print(user.user_role)
+    if not user or user.user_role == 'staff' or user.user_role == 'admin':
+        return redirect(url_for('.not_allowed'))
+
     survey = Survey.get_by_hash(hash_str)
+
+    if not AnswerSurveyLink.check_answered(user.id, survey.id):
+        return redirect(url_for('.answered'))
 
     if request.method == 'POST':
         questions = survey.questions.all()
         answer_survey_link = AnswerSurveyLink.create(
-            survey_id=survey.id, owner_id=current_user.id)
+            survey_id=survey.id, owner_id=user.id)
 
         for question in questions:
             answer_content = request.form[str(question.id)]
@@ -251,6 +260,16 @@ def thankyou():
         This function is the view function for the thank you page the respondent will see after survey completion.
     """
     return render_template('thank_you.html')
+
+
+@main.route('/answered')
+def answered():
+    return render_template('answered.html')
+
+
+@main.route('/not_allowed')
+def not_allowed():
+    return render_template('not_allowed.html')
 
 
 @login_required

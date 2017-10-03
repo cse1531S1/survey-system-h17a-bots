@@ -6,13 +6,12 @@
           <div slot="header" class="box-card-header">
             <pan-thumb class="panThumb" :name="name"> You Are:
               <span class="pan-info-roles" :key='item' v-for="item in roles">{{item}}</span>
-              <br>
-              You currently enrolled in
-              <span class="pan-info-roles" :key='item' v-for="item in courses">{{item}}</span>
             </pan-thumb>
 
           </div>
-          <span class="display_name">User id: {{name}}</span>
+          <el-row type="flex" justify="center" class="display_name">User id: {{name}}</el-row>
+          <el-row type="flex" justify="center">You currently involved in</el-row>
+          <el-row type="flex" justify="center" class="pan-info-roles" :key='item' v-for="item in courses">{{item}}</el-row>
         </el-card>
       </el-col>
     </el-row>
