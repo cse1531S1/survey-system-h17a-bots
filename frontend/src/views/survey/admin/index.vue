@@ -95,48 +95,63 @@
       </el-pagination>
     </div>
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form :rules="rules" class="large-space" :model="temp" label-position="left" label-width="70px" style='width: 400px; margin-left:50px;' ref="newSurvey">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :close-on-click-modal="false">
+      <el-row class="" type="flex" justify="center">
+        <el-form :rules="rules" class="large-space" :model="temp" label-position="left" label-width="70px" style='width: 800px; margin-left:50px;' ref="newSurvey">
+          <el-steps :active="active" finish-status="success">
+            <el-step title="General Info"></el-step>
+            <el-step title="Choose Generic Questions"></el-step>
+            <el-step title="Choose Optional Questions"></el-step>
+          </el-steps>
 
-        <el-form-item label="Status">
-          <el-select class="filter-item" v-model="temp.status" placeholder="Choose...">
-            <el-option v-for="item in  statusOptions" :key="item" :label="item" :value="item">
-            </el-option>
-          </el-select>
-        </el-form-item>
+          <template v-if="active == 0">
 
-        <el-form-item label="Courses" prop="course">
-          <el-select class="filter-item" v-model="temp.course" filterable placeholder="Choose...">
-            <el-option v-for="item in  this.course" :key="item" :label="item" :value="item">
-            </el-option>
-          </el-select>
-        </el-form-item>
+            <el-form-item label="Status">
+              <el-select class="filter-item" v-model="temp.status" placeholder="Choose...">
+                <el-option v-for="item in  statusOptions" :key="item" :label="item" :value="item">
+                </el-option>
+              </el-select>
+            </el-form-item>
 
-        <el-form-item label="Start Time" prop="start_time">
-          <el-date-picker v-model="temp.start_time" type="datetime" placeholder="Choose Start Time" format="dd-MM-yyyy HH:mm">
-          </el-date-picker>
-        </el-form-item>
+            <el-form-item label="Courses" prop="course">
+              <el-select class="filter-item" v-model="temp.course" filterable placeholder="Choose...">
+                <el-option v-for="item in  this.course" :key="item" :label="item" :value="item">
+                </el-option>
+              </el-select>
+            </el-form-item>
 
-        <el-form-item label="End Time" prop="end_time">
-          <el-date-picker v-model="temp.end_time" type="datetime" placeholder="Choose End Time" format="dd-MM-yyyy HH:mm">
-          </el-date-picker>
-        </el-form-item>
+            <el-form-item label="Start Time" prop="start_time">
+              <el-date-picker v-model="temp.start_time" type="datetime" placeholder="Choose Start Time" format="dd-MM-yyyy HH:mm">
+              </el-date-picker>
+            </el-form-item>
 
-        <el-form-item label="Title" prop="title">
-          <el-input v-model="temp.title"></el-input>
-        </el-form-item>
+            <el-form-item label="End Time" prop="end_time">
+              <el-date-picker v-model="temp.end_time" type="datetime" placeholder="Choose End Time" format="dd-MM-yyyy HH:mm">
+              </el-date-picker>
+            </el-form-item>
 
-        <el-button class="filter-item" style="margin-left: 10px;" @click="handleCQuestion" type="primary" icon="edit">Add a question</el-button>
-        <div class="editor-container">
-          <dnd-list :list1="list1" :list2="list2" list1Title="Chosen" list2Title="Question Pool"></dnd-list>
-        </div>
+            <el-form-item label="Title" prop="title">
+              <el-input v-model="temp.title"></el-input>
+            </el-form-item>
+          </template>
 
-      </el-form>
+          <template v-if="active == 1">
+            <el-button class="filter-item" style="margin-left: 10px;" @click="handleCQuestion" type="primary" icon="edit">Add a question</el-button>
 
+            <div class="editor-container">
+              <dnd-list :list1="list1" :list2="list2" list1Title="Chosen" list2Title="Question Pool"></dnd-list>
+            </div>
+          </template>
+
+        </el-form>
+      </el-row>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="handleClean">Cancel</el-button>
-        <el-button v-if="dialogStatus=='create'" type="primary" @click="create">Submit</el-button>
-        <el-button v-else type="primary" @click="update">Submit</el-button>
+        <el-button style="margin-top: 12px;" @click="prev" v-if="active != 0">Previous</el-button>
+        <el-button style="margin-top: 12px;" @click="next" v-if="active != 2 && active != 0">Next</el-button>
+        <el-button style="margin-top: 12px;" @click="checkformAndNext" v-if="active == 0">Next</el-button>
+        <!-- <el-button @click="handleClean" v-if="active == 2">Cancel</el-button> -->
+        <el-button v-if="dialogStatus=='create' && active == 2" type="primary" @click="create">Submit</el-button>
+        <el-button v-else-if="active == 2" type="primary" @click="update">Submit</el-button>
       </div>
     </el-dialog>
 
@@ -200,6 +215,7 @@ export default {
   },
   data() {
     return {
+      active: 0,
       list: null,
       total: null,
       purpose: '',
@@ -284,6 +300,21 @@ export default {
     this.getCourse()
   },
   methods: {
+    checkformAndNext() {
+      this.$refs['newSurvey'].validate((valid) => {
+        if (valid) {
+          this.active++
+        } else {
+          return false
+        }
+      })
+    },
+    next() {
+      if (this.active++ > 2) this.active = 0
+    },
+    prev() {
+      if (this.active-- < 0) this.active = 0
+    },
     loadUsers() {
       this.listLoading = true
       loadUsers().then(response => {

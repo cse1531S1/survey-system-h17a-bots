@@ -8,30 +8,20 @@
         <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key">
         </el-option>
       </el-select>
-
       <el-button class="filter-item" type="primary" v-waves icon="search" @click="handleFilter">Search</el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="edit">Add a Survey</el-button>
-      <el-button class="filter-item" type="primary" icon="document" @click="loadUsers">Load Users</el-button>
-      <el-button class="filter-item" type="primary" icon="document" @click="handleDownload">Export</el-button>
     </div>
 
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="Loading!!!!" border fit highlight-current-row style="width: 100%">
 
-      <el-table-column align="center" label="ID" width="55" prop="id">
+      <el-table-column min-width="250px" label="Title">
         <template scope="scope">
-          <span>{{scope.row.id}}</span>
+          <span class="link-type" @click="handleUpdate(scope.row)">{{scope.row.title}}</span>
         </template>
       </el-table-column>
 
       <el-table-column width="150px" align="center" label="Creation time">
         <template scope="scope">
           <span>{{scope.row.timestamp}}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column min-width="250px" label="Title">
-        <template scope="scope">
-          <span class="link-type" @click="handleUpdate(scope.row)">{{scope.row.title}}</span>
         </template>
       </el-table-column>
 
@@ -53,12 +43,6 @@
         </template>
       </el-table-column>
 
-      <el-table-column width="110px" align="center" label="Owner">
-        <template scope="scope">
-          <span>{{scope.row.owner}}</span>
-        </template>
-      </el-table-column>
-
       <el-table-column align="center" label="Responses" width="110">
         <template scope="scope">
           <span>{{scope.row.responses}}</span>
@@ -71,20 +55,10 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Operation" width="180">
-        <template scope="scope">
-          <el-button v-waves v-if="scope.row.status!='open'" size="small" type="success" @click="handleModifyStatus(scope.row,'open')">Open
-          </el-button>
-          <el-button v-waves v-if="scope.row.status!='draft'" size="small" @click="handleModifyStatus(scope.row,'draft')">Draft
-          </el-button>
-          <el-button v-waves v-if="scope.row.status!='closed'" size="small" type="danger" @click="handleModifyStatus(scope.row,'closed')">Close
-          </el-button>
-        </template>
-      </el-table-column>
-
       <el-table-column width="110px" align="center" label="Links">
         <template scope="scope">
-          <router-link v-waves class="el-button el-button--small" :to="'/result/'+scope.row.id">Result</router-link>
+          <router-link v-if="scope.row.status === 'closed'" v-waves class="el-button el-button--small" :to="'/result/'+scope.row.id">Result</router-link>
+          <el-button class="el-button--small" :v-if="scope.row.status === 'draft'" @click="handleReview">Review</el-button>
         </template>
       </el-table-column>
 
@@ -95,48 +69,18 @@
       </el-pagination>
     </div>
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form :rules="rules" class="large-space" :model="temp" label-position="left" label-width="70px" style='width: 400px; margin-left:50px;' ref="newSurvey">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :close-on-click-modal="false">
+      <el-row class="" type="flex" justify="center">
+        <el-form :rules="rules" class="large-space" :model="temp" label-position="left" label-width="70px" style='width: 800px; margin-left:50px;' ref="newSurvey">
+          <el-button class="filter-item" style="margin-left: 10px;" @click="handleCQuestion" type="primary" icon="edit">Add a question</el-button>
 
-        <el-form-item label="Status">
-          <el-select class="filter-item" v-model="temp.status" placeholder="Choose...">
-            <el-option v-for="item in  statusOptions" :key="item" :label="item" :value="item">
-            </el-option>
-          </el-select>
-        </el-form-item>
-
-        <el-form-item label="Courses" prop="course">
-          <el-select class="filter-item" v-model="temp.course" filterable placeholder="Choose...">
-            <el-option v-for="item in  this.course" :key="item" :label="item" :value="item">
-            </el-option>
-          </el-select>
-        </el-form-item>
-
-        <el-form-item label="Start Time" prop="start_time">
-          <el-date-picker v-model="temp.start_time" type="datetime" placeholder="Choose Start Time" format="dd-MM-yyyy HH:mm">
-          </el-date-picker>
-        </el-form-item>
-
-        <el-form-item label="End Time" prop="end_time">
-          <el-date-picker v-model="temp.end_time" type="datetime" placeholder="Choose End Time" format="dd-MM-yyyy HH:mm">
-          </el-date-picker>
-        </el-form-item>
-
-        <el-form-item label="Title" prop="title">
-          <el-input v-model="temp.title"></el-input>
-        </el-form-item>
-
-        <el-button class="filter-item" style="margin-left: 10px;" @click="handleCQuestion" type="primary" icon="edit">Add a question</el-button>
-        <div class="editor-container">
-          <dnd-list :list1="list1" :list2="list2" list1Title="Chosen" list2Title="Question Pool"></dnd-list>
-        </div>
-
-      </el-form>
-
+          <div class="editor-container">
+            <dnd-list :list1="list1" :list2="list2" list1Title="Chosen" list2Title="Question Pool"></dnd-list>
+          </div>
+        </el-form>
+      </el-row>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="handleClean">Cancel</el-button>
-        <el-button v-if="dialogStatus=='create'" type="primary" @click="create">Submit</el-button>
-        <el-button v-else type="primary" @click="update">Submit</el-button>
+        <el-button type="primary" @click="review">Submit</el-button>
       </div>
     </el-dialog>
 
@@ -172,6 +116,7 @@
         </el-form-item>
 
       </el-form>
+
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogQuestion= false">Cancel</el-button>
         <el-button type="primary" @click="createQuestion">Submit</el-button>
@@ -200,6 +145,7 @@ export default {
   },
   data() {
     return {
+      active: 0,
       list: null,
       total: null,
       listLoading: true,
@@ -283,6 +229,21 @@ export default {
     this.getCourse()
   },
   methods: {
+    checkformAndNext() {
+      this.$refs['newSurvey'].validate((valid) => {
+        if (valid) {
+          this.active++
+        } else {
+          return false
+        }
+      })
+    },
+    next() {
+      if (this.active++ > 2) this.active = 0
+    },
+    prev() {
+      if (this.active-- < 0) this.active = 0
+    },
     loadUsers() {
       this.listLoading = true
       loadUsers().then(response => {
@@ -367,11 +328,21 @@ export default {
       this.update()
     },
     handleCreate() {
+      if (this.$refs['newSurvey']) this.$refs['newSurvey'].resetFields()
       this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
     },
     handleUpdate(row) {
+      this.resetTemp()
+      this.listLoading = true
+      this.temp = Object.assign({}, row)
+      this.list1 = row.questions
+      this.dialogStatus = 'update'
+      this.dialogFormVisible = true
+      this.listLoading = false
+    },
+    handleReview(row) {
       this.resetTemp()
       this.listLoading = true
       this.temp = Object.assign({}, row)
@@ -460,6 +431,38 @@ export default {
         }
       })
     },
+    review() {
+      this.dialogFormVisible = false
+      this.to_post = {
+        'title': this.temp.title,
+        'course': this.temp.course,
+        'questions': this.list1,
+        'start': this.temp.start_time,
+        'end': this.temp.end_time,
+        'status': this.temp.status,
+        'id': this.temp.id
+      }
+      modifySurvey(this.to_post).then(response => {
+        if (response.data.success) {
+          this.$notify({
+            title: 'Success!',
+            message: 'You successfully updated the survey!',
+            type: 'success',
+            duration: 2000
+          })
+        } else {
+          this.$notify({
+            title: 'Not Success!',
+            message: 'Some unknown error happened',
+            type: 'error',
+            duration: 2000
+          })
+        }
+      }).then(() => {
+        this.getList()
+        this.resetTemp()
+      })
+    },
     update() {
       this.dialogFormVisible = false
       this.to_post = {
@@ -505,6 +508,7 @@ export default {
       }
       this.list1 = []
       this.to_post = {}
+      this.active = 0
       // this.$refs['newSurvey'].resetFields()
     },
     resetQuestionTemp() {
