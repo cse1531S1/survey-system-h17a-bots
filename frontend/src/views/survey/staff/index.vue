@@ -15,7 +15,7 @@
 
       <el-table-column min-width="250px" label="Title">
         <template scope="scope">
-          <span class="link-type" @click="handleUpdate(scope.row)">{{scope.row.title}}</span>
+          <span>{{scope.row.title}}</span>
         </template>
       </el-table-column>
 
@@ -58,7 +58,7 @@
       <el-table-column width="110px" align="center" label="Links">
         <template scope="scope">
           <router-link v-if="scope.row.status === 'closed'" v-waves class="el-button el-button--small" :to="'/result/'+scope.row.id">Result</router-link>
-          <el-button v-waves v-if="scope.row.status === 'review'" size="small" @click="handleReview">Review</el-button>
+          <el-button v-waves v-if="scope.row.status === 'review'" size="small" @click="handleReview(scope.row)">Review</el-button>
         </template>
       </el-table-column>
 
@@ -72,10 +72,10 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :close-on-click-modal="false">
       <el-row class="" type="flex" justify="center">
         <el-form :rules="rules" class="large-space" :model="temp" label-position="left" label-width="70px" style='width: 800px; margin-left:50px;' ref="newSurvey">
-          <el-button class="filter-item" style="margin-left: 10px;" @click="handleCQuestion" type="primary" icon="edit">Add a question</el-button>
+          <!-- <el-button class="filter-item" style="margin-left: 10px;" @click="handleCQuestion" type="primary" icon="edit">Add a question</el-button> -->
 
           <div class="editor-container">
-            <dnd-list :list1="list1" :list2="list2" list1Title="Chosen" list2Title="Question Pool"></dnd-list>
+            <dnd-list :list1="list1" :list2="list2" list1Title="Chosen" list2Title="Optional Question Pool"></dnd-list>
           </div>
         </el-form>
       </el-row>
@@ -128,7 +128,7 @@
 
 
 <script>
-import { fetchList, fetchQuestion, fetchCourse, modifySurvey, createSurvey, createQuestion, loadUsers } from '@/api/article'
+import { fetchList, fetchQuestion, fetchCourse, modifySurvey, createQuestion, loadUsers } from '@/api/article'
 import draggable from 'vuedraggable'
 import DndList from '@/components/twoDndList'
 import waves from '@/directive/waves.js'// 水波纹指令
@@ -182,6 +182,8 @@ export default {
       qIdMap: {},
       list1: [],
       list2: [],
+      list3: [],
+      list4: [],
       dialogPvVisible: false,
       pvData: [],
       tableKey: 0,
@@ -298,7 +300,7 @@ export default {
         this.listLoading = false
       })
       fetchQuestion().then(response => {
-        this.list2 = response.data
+        this.list2 = response.data.optional
       })
     },
     handleFilter() {
@@ -333,20 +335,12 @@ export default {
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
     },
-    handleUpdate(row) {
-      this.resetTemp()
-      this.listLoading = true
-      this.temp = Object.assign({}, row)
-      this.list1 = row.questions
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
-      this.listLoading = false
-    },
     handleReview(row) {
       this.resetTemp()
       this.listLoading = true
       this.temp = Object.assign({}, row)
-      this.list1 = row.questions
+      this.list1 = row.questions_opt
+      this.list3 = row.questions_man
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.listLoading = false
@@ -393,85 +387,17 @@ export default {
         this.dialogQuestion = false
       })
     },
-    create() {
-      this.$refs['newSurvey'].validate((valid) => {
-        if (valid) {
-          this.to_post = {
-            'title': this.temp.title,
-            'course': this.temp.course,
-            'questions': this.list1,
-            'start': this.temp.start_time,
-            'end': this.temp.end_time,
-            'status': this.temp.status,
-            'id': -1
-          }
-          createSurvey(this.to_post).then(response => {
-            if (response.data.success) {
-              this.$notify({
-                title: 'Success!',
-                message: 'You successfully created the survey!',
-                type: 'success',
-                duration: 2000
-              })
-            } else {
-              this.$notify({
-                title: 'Not Success!',
-                message: 'Some unknown error happened',
-                type: 'error',
-                duration: 2000
-              })
-            }
-          }).then(() => {
-            this.getList()
-            this.resetTemp()
-            this.dialogFormVisible = false
-          })
-        } else {
-          return false
-        }
-      })
-    },
     review() {
       this.dialogFormVisible = false
       this.to_post = {
         'title': this.temp.title,
+        'purpose': 'review',
         'course': this.temp.course,
-        'questions': this.list1,
+        'questions_opt': this.list1,
+        'questions_man': this.list3,
         'start': this.temp.start_time,
         'end': this.temp.end_time,
-        'status': this.temp.status,
-        'id': this.temp.id
-      }
-      modifySurvey(this.to_post).then(response => {
-        if (response.data.success) {
-          this.$notify({
-            title: 'Success!',
-            message: 'You successfully updated the survey!',
-            type: 'success',
-            duration: 2000
-          })
-        } else {
-          this.$notify({
-            title: 'Not Success!',
-            message: 'Some unknown error happened',
-            type: 'error',
-            duration: 2000
-          })
-        }
-      }).then(() => {
-        this.getList()
-        this.resetTemp()
-      })
-    },
-    update() {
-      this.dialogFormVisible = false
-      this.to_post = {
-        'title': this.temp.title,
-        'course': this.temp.course,
-        'questions': this.list1,
-        'start': this.temp.start_time,
-        'end': this.temp.end_time,
-        'status': this.temp.status,
+        'status': 'open',
         'id': this.temp.id
       }
       modifySurvey(this.to_post).then(response => {
@@ -507,6 +433,7 @@ export default {
         start_time: null
       }
       this.list1 = []
+      this.list3 = []
       this.to_post = {}
       this.active = 0
       // this.$refs['newSurvey'].resetFields()

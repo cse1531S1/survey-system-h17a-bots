@@ -16,9 +16,15 @@
 
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="Loading!!!!" border fit highlight-current-row style="width: 100%">
 
-      <el-table-column align="center" label="ID" width="55" prop="id">
+      <el-table-column align="center" label="ID" width="55">
         <template scope="scope">
           <span>{{scope.row.id}}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="Optional" width="75">
+        <template scope="scope">
+          <span>{{scope.row.optional}}</span>
         </template>
       </el-table-column>
 

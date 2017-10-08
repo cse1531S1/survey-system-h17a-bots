@@ -224,6 +224,13 @@ class Survey(db.Model, DatabaseUtil):
         db.session.add(self)
         db.session.commit()
 
+    def remove_optional_questions(self):
+        for question in self.questions.all():
+            if question.optional:
+                self.questions.remove(question)
+        db.session.add(self)
+        db.session.commit()
+
     def check_permission(self, id):
         current_user = User.get_by_id(id)
         if current_user.id != self.owner_id and current_user.is_admin is not True:
@@ -244,6 +251,7 @@ class Question(db.Model, DatabaseUtil):
     __tablename__ = 'questions'
     id = db.Column(db.Integer, primary_key=True)
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    optional = db.Column(db.Boolean)
     description = db.Column(db.String(512))
 
     # q_type : question type
@@ -253,8 +261,8 @@ class Question(db.Model, DatabaseUtil):
     choices = db.relationship('Choice', backref='question', lazy='dynamic')
 
     @classmethod
-    def create(cls, description, owner_id, q_type=1):
-        new = cls(description=description, owner_id=owner_id)
+    def create(cls, description, owner_id, optional, q_type=1):
+        new = cls(description=description, owner_id=owner_id, optional=optional)
         db.session.add(new)
         db.session.commit()
         return new
