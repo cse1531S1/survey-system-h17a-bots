@@ -227,6 +227,13 @@ export default {
     DndList
   },
   data() {
+    var validateDate = (rule, value, callback) => {
+      if (value === undefined || value === '') {
+        callback(new Error('Please Choose a Date'))
+      } else {
+        callback()
+      }
+    }
     return {
       active: 0,
       list: null,
@@ -288,10 +295,10 @@ export default {
           { required: true, message: 'Please choose a course', trigger: 'change' }
         ],
         start_time: [
-          { required: true, message: 'Please choose a start time', trigger: 'change' }
+          { required: true, validator: validateDate, trigger: 'blur' }
         ],
         end_time: [
-          { required: true, message: 'Please choose a end time', trigger: 'change' }
+          { required: true, validator: validateDate, trigger: 'blur' }
         ],
         title: [
           { required: true, message: 'Please input a title', trigger: 'blur' }
