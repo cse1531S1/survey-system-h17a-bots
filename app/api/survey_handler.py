@@ -3,7 +3,7 @@
 
 from flask import request, jsonify, g
 from . import api
-from ..models import User, Survey, AnswerSurveyLink, Question, Choice, db
+from ..models import User, Survey, AnswerSurveyLink, Question, Choice, db, Course
 from ..flatfile import FileOperation
 from datetime import datetime
 from .authentication import auth
@@ -124,7 +124,7 @@ def fetch_answers():
         'nquestion': nq,
         'success': True
     })
-    pass
+pass
 
 
 @api.route('/fetch_all_survey', methods=['GET'])
@@ -193,6 +193,15 @@ def all_survey():
 @auth.login_required
 def fetch_course():
     li = FileOperation.read_course()
+    def check(course_code):
+        course = Course.get_by_code(course_code)
+        if course.survey_id is None:
+            return True
+        else:
+            return False
+
+    li = list(filter(check, li))
+    print(li)
     return jsonify({
         'items': li
     })
@@ -306,7 +315,7 @@ def create_survey():
     questions = data['questions']
     questions_dump = [i['id'] for i in questions]
     survey.set_questions(questions_dump)
-    survey.status = data['status']
+    # survey.status = data['status']
     db.session.add(survey)
     db.session.commit()
     return jsonify({

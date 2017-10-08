@@ -75,7 +75,7 @@
         <template scope="scope">
           <el-button v-waves v-if="scope.row.status!='open'" size="small" type="success" @click="handleModifyStatus(scope.row,'open')">Open
           </el-button>
-          <el-button v-waves v-if="scope.row.status!='draft'" size="small" @click="handleModifyStatus(scope.row,'draft')">Draft
+          <el-button v-waves v-if="scope.row.status!='review'" size="small" @click="handleModifyStatus(scope.row,'review')">Review
           </el-button>
           <el-button v-waves v-if="scope.row.status!='closed'" size="small" type="danger" @click="handleModifyStatus(scope.row,'closed')">Close
           </el-button>
@@ -108,8 +108,9 @@
 
             <el-form-item label="Status">
               <el-select class="filter-item" v-model="temp.status" placeholder="Choose...">
-                <el-option v-for="item in  statusOptions" :key="item" :label="item" :value="item">
-                </el-option>
+                <!-- <el-option v-for="item in  statusOptions" :key="item" :label="item" :value="item"> -->
+                  <el-option class="" key="review" label="review"></el-option>
+                <!-- </el-option> -->
               </el-select>
             </el-form-item>
 
@@ -237,13 +238,13 @@ export default {
         start_time: 0,
         end_time: 0,
         title: '',
-        status: 'draft',
+        status: 'review',
         course: '',
         questions: []
       },
       importanceOptions: [1, 2, 3],
       sortOptions: [{ label: 'Ascending by id', key: '+id' }, { label: 'Descending by id', key: '-id' }],
-      statusOptions: ['open', 'draft', 'closed'],
+      statusOptions: ['open', 'review', 'closed'],
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
@@ -286,7 +287,7 @@ export default {
     statusFilter(status) {
       const statusMap = {
         open: 'success',
-        draft: 'gray',
+        review: 'gray',
         closed: 'danger'
       }
       return statusMap[status]
@@ -533,7 +534,7 @@ export default {
         id: undefined,
         timestamp: 0,
         title: '',
-        status: 'open',
+        status: 'review',
         questions: [],
         course: '',
         end_time: null,

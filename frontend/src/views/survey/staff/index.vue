@@ -58,7 +58,7 @@
       <el-table-column width="110px" align="center" label="Links">
         <template scope="scope">
           <router-link v-if="scope.row.status === 'closed'" v-waves class="el-button el-button--small" :to="'/result/'+scope.row.id">Result</router-link>
-          <el-button class="el-button--small" :v-if="scope.row.status === 'draft'" @click="handleReview">Review</el-button>
+          <el-button v-waves v-if="scope.row.status === 'review'" size="small" @click="handleReview">Review</el-button>
         </template>
       </el-table-column>
 
@@ -166,13 +166,13 @@ export default {
         start_time: 0,
         end_time: 0,
         title: '',
-        status: 'draft',
+        status: 'review',
         course: '',
         questions: []
       },
       importanceOptions: [1, 2, 3],
       sortOptions: [{ label: 'Ascending by id', key: '+id' }, { label: 'Descending by id', key: '-id' }],
-      statusOptions: ['open', 'draft', 'closed'],
+      statusOptions: ['open', 'review', 'closed'],
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
@@ -215,7 +215,7 @@ export default {
     statusFilter(status) {
       const statusMap = {
         open: 'success',
-        draft: 'gray',
+        review: 'gray',
         closed: 'danger'
       }
       return statusMap[status]
