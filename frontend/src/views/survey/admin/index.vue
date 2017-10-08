@@ -75,7 +75,7 @@
         <template scope="scope">
           <el-button v-waves v-if="scope.row.status!='open'" size="small" type="success" @click="handleModifyStatus(scope.row,'open')">Open
           </el-button>
-          <el-button v-waves v-if="scope.row.status!='draft'" size="small" @click="handleModifyStatus(scope.row,'draft')">Draft
+          <el-button v-waves v-if="scope.row.status!='review'" size="small" @click="handleModifyStatus(scope.row,'review')">Review
           </el-button>
           <el-button v-waves v-if="scope.row.status!='closed'" size="small" type="danger" @click="handleModifyStatus(scope.row,'closed')">Close
           </el-button>
@@ -108,8 +108,9 @@
 
             <el-form-item label="Status">
               <el-select class="filter-item" v-model="temp.status" placeholder="Choose...">
-                <el-option v-for="item in  statusOptions" :key="item" :label="item" :value="item">
-                </el-option>
+                <!-- <el-option v-for="item in  statusOptions" :key="item" :label="item" :value="item"> -->
+                <!-- </el-option> -->
+                <el-option class="" key="review" label="review" value="review"></el-option>
               </el-select>
             </el-form-item>
 
@@ -139,7 +140,15 @@
             <el-button class="filter-item" style="margin-left: 10px;" @click="handleCQuestion" type="primary" icon="edit">Add a question</el-button>
 
             <div class="editor-container">
-              <dnd-list :list1="list1" :list2="list2" list1Title="Chosen" list2Title="Question Pool"></dnd-list>
+              <dnd-list :list1="list1" :list2="list2" list1Title="Chosen" list2Title="Mandatory Question Pool"></dnd-list>
+            </div>
+          </template>
+
+          <template v-if="active == 2">
+            <el-button class="filter-item" style="margin-left: 10px;" @click="handleCQuestion" type="primary" icon="edit">Add a question</el-button>
+
+            <div class="editor-container">
+              <dnd-list :list1="list3" :list2="list4" list1Title="Chosen" list2Title="Mandatory Question Pool"></dnd-list>
             </div>
           </template>
 
@@ -159,6 +168,10 @@
       <el-form class="large-space" :model="newQuestion" label-position="left" label-width="70px" style='width: 400px; margin-left:50px;'>
         <el-form-item label="Title">
           <el-input v-model="newQuestion.title"></el-input>
+        </el-form-item>
+
+        <el-form-item label="Optional">
+          <el-switch v-model="newQuestion.qOptional" on-color="#13ce66" off-color="#ff4949"></el-switch>
         </el-form-item>
 
         <el-form-item label="Question Type">
@@ -237,13 +250,13 @@ export default {
         start_time: 0,
         end_time: 0,
         title: '',
-        status: 'draft',
+        status: 'review',
         course: '',
         questions: []
       },
       importanceOptions: [1, 2, 3],
       sortOptions: [{ label: 'Ascending by id', key: '+id' }, { label: 'Descending by id', key: '-id' }],
-      statusOptions: ['open', 'draft', 'closed'],
+      statusOptions: ['open', 'review', 'closed'],
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
@@ -253,16 +266,20 @@ export default {
       qIdMap: {},
       list1: [],
       list2: [],
+      list3: [],
+      list4: [],
       dialogPvVisible: false,
       pvData: [],
       tableKey: 0,
       newQuestion: {
         title: '',
         qType: '',
+        qOptional: false,
         choices: ['Very Strongly Agree', 'Strongly Agree', 'Agree', 'Disagree', 'Strongly Disagree', 'Very Strongly Disagree']
       },
       qTypeAllowed: {
-        1: 'Multiple Choices'
+        1: 'Multiple Choices',
+        2: 'Text Based Question'
       },
       dialogQuestion: false,
       to_post: {},
@@ -271,10 +288,10 @@ export default {
           { required: true, message: 'Please choose a course', trigger: 'change' }
         ],
         start_time: [
-          { type: 'date', required: true, message: 'Please choose a start time', trigger: 'change' }
+          { required: true, message: 'Please choose a start time', trigger: 'change' }
         ],
         end_time: [
-          { type: 'date', required: true, message: 'Please choose a end time', trigger: 'change' }
+          { required: true, message: 'Please choose a end time', trigger: 'change' }
         ],
         title: [
           { required: true, message: 'Please input a title', trigger: 'blur' }
@@ -286,7 +303,7 @@ export default {
     statusFilter(status) {
       const statusMap = {
         open: 'success',
-        draft: 'gray',
+        review: 'gray',
         closed: 'danger'
       }
       return statusMap[status]
@@ -369,7 +386,8 @@ export default {
         this.listLoading = false
       })
       fetchQuestion().then(response => {
-        this.list2 = response.data
+        this.list2 = response.data.mandatory
+        this.list4 = response.data.optional
       })
     },
     handleFilter() {
@@ -410,7 +428,8 @@ export default {
       this.purpose = 'update'
       this.listLoading = true
       this.temp = Object.assign({}, row)
-      this.list1 = row.questions
+      this.list1 = row.questions_man
+      this.list3 = row.questions_opt
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.listLoading = false
@@ -433,6 +452,7 @@ export default {
       var detail = {
         title: this.newQuestion.title,
         qType: this.newQuestion.qType,
+        optional: this.newQuestion.qOptional,
         choices: this.newQuestion.choices
       }
       createQuestion(detail).then(response => {
@@ -463,7 +483,8 @@ export default {
           this.to_post = {
             'title': this.temp.title,
             'course': this.temp.course,
-            'questions': this.list1,
+            'questions_man': this.list1,
+            'questions_opt': this.list3,
             'start': this.temp.start_time,
             'end': this.temp.end_time,
             'status': this.temp.status,
@@ -500,7 +521,8 @@ export default {
       this.to_post = {
         'title': this.temp.title,
         'course': this.temp.course,
-        'questions': this.list1,
+        'questions_man': this.list1,
+        'questions_opt': this.list3,
         'start': this.temp.start_time,
         'end': this.temp.end_time,
         'status': this.temp.status,
@@ -533,19 +555,22 @@ export default {
         id: undefined,
         timestamp: 0,
         title: '',
-        status: 'open',
+        status: 'review',
         questions: [],
         course: '',
         end_time: null,
         start_time: null
       }
+      this.active = 0
       this.list1 = []
+      this.list3 = []
       this.to_post = {}
     },
     resetQuestionTemp() {
       this.newQuestion = {
         title: '',
         qType: '',
+        qOptional: false,
         choices: ['Very Strongly Agree', 'Strongly Agree', 'Agree', 'Disagree', 'Strongly Disagree', 'Very Strongly Disagree']
       }
     },

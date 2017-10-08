@@ -3,7 +3,7 @@
 
 from flask import request, jsonify, g
 from . import api
-from ..models import User, Survey, AnswerSurveyLink, Question, Choice, db
+from ..models import User, Survey, AnswerSurveyLink, Question, Choice, db, Course
 from ..flatfile import FileOperation
 from datetime import datetime
 from .authentication import auth
@@ -124,7 +124,7 @@ def fetch_answers():
         'nquestion': nq,
         'success': True
     })
-    pass
+pass
 
 
 @api.route('/fetch_all_survey', methods=['GET'])
@@ -174,7 +174,8 @@ def all_survey():
             'responses': len(AnswerSurveyLink.get_by_survey_id(survey.id)),
             'timestamp': datetime.strftime(survey.timestamp, r'%d-%m-%Y %H:%M'),
             'course': survey.course,
-            'questions': [{"id": q.id, "description": q.description} for q in survey.questions.all()],
+            'questions_man': [{"id": q.id, "description": q.description} for q in survey.questions.all() if q.optional is False],
+            'questions_opt': [{"id": q.id, "description": q.description} for q in survey.questions.all() if q.optional is True],
             'start_time': survey.start_date,
             'end_time': survey.end_date,
             'status': survey.status,
@@ -193,6 +194,15 @@ def all_survey():
 @auth.login_required
 def fetch_course():
     li = FileOperation.read_course()
+    def check(course_code):
+        course = Course.get_by_code(course_code)
+        if course.survey_id is None:
+            return True
+        else:
+            return False
+
+    li = list(filter(check, li))
+    # print(li)
     return jsonify({
         'items': li
     })
@@ -203,13 +213,19 @@ def fetch_course():
 def modify_survey():
     data = request.get_json()
     survey_id = int(data['id'])
-    questions = data['questions']
+    questions = data['questions_opt'] + data['questions_man']
     questions_dump = [i['id'] for i in questions]
+    # print(questions_dump)
+
     survey = Survey.get_by_id(survey_id)
     #  print(data['purpose'])
     if data['purpose'] != 'update_status':
         survey.remove_all_questions()
         survey.set_questions(questions_dump)
+    elif data['purpose'] == 'review':
+        survey.remove_optional_questions()
+        survey.set_questions(questions_dump)
+
 
     survey.description = data['title']
     timestart = data['start']
@@ -239,12 +255,24 @@ def fetch_questions():
         return {
             "Type": qtype,
             "id": question.id,
+            "optional": question.optional,
             "choices": [i.content for i in question.choices.all()],
             "description": question.description
         }
 
     result = [to_dict(question) for question in questions]
-    return jsonify(result)
+    man = []
+    opt = []
+    for i in result:
+        if i['optional']:
+            opt.append(i)
+        else:
+            man.append(i)
+
+    return jsonify({
+        'mandatory': man,
+        'optional': opt
+    })
 
 
 @api.route('/question_pool', methods=['GET', 'OPTION'])
@@ -280,6 +308,7 @@ def question_pool():
         return {
             "type": qtype,
             "id": question.id,
+            "optional": question.optional,
             "choices": [i.content for i in question.choices.all()],
             "title": question.description
         }
@@ -303,10 +332,10 @@ def create_survey():
     survey = Survey.create(description=data['title'], owner_id=user.id,
                            times=[timestart, timeend], course=data['course'], active=True)
 
-    questions = data['questions']
+    questions = data['questions_opt'] + data['question_man']
     questions_dump = [i['id'] for i in questions]
     survey.set_questions(questions_dump)
-    survey.status = data['status']
+    # survey.status = data['status']
     db.session.add(survey)
     db.session.commit()
     return jsonify({
@@ -319,8 +348,8 @@ def create_survey():
 def create_question():
     user = g.current_user
     data = request.get_json()
-    question = Question.create(description=data['title'],
-                               owner_id=user.id, q_type=int(data['qType']))
+    question = Question.create(description=data['title'], owner_id=user.id,\
+                               q_type=int(data['qType']), optional=data['optional'])
     choices = data['choices']
     for choice in choices:
         Choice.create(choice, question.id)

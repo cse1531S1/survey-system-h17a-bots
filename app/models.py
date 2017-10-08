@@ -140,6 +140,7 @@ class Course(db.Model, DatabaseUtil):
     __tablename__ = 'courses'
     id = db.Column(db.Integer, primary_key=True)
     course_code = db.Column(db.String(32), unique=True, index=True)
+    survey_id = db.Column(db.Integer, db.ForeignKey('surveys.id'))
 
     @staticmethod
     def get_by_code(code):
@@ -182,6 +183,8 @@ class Survey(db.Model, DatabaseUtil):
     description = db.Column(db.String(512))
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     course = db.Column(db.String(32))
+    course_db = db.relationship('Course', backref='survey', lazy='dynamic')
+    # surveys = db.relationship('Survey', backref='owner', lazy='dynamic')
     status = db.Column(db.String(32))
     start_date = db.Column(db.String(64))
     end_date = db.Column(db.String(64))
@@ -197,12 +200,14 @@ class Survey(db.Model, DatabaseUtil):
 
     @classmethod
     def create(cls, description, owner_id, course, active, times):
+        course_in_db = Course.get_by_code(course)
         new = cls(description=description, owner_id=owner_id, start_date=times[0],
-                  end_date=times[1], course=course, status="published")
+                  end_date=times[1], course=course, status="review")
         db.session.add(new)
         db.session.commit()
+        course_in_db.survey_id = new.id
         new.id_hash = cls.generate_id_hash(new.id)
-        db.session.add(new)
+        db.session.add(new, course_in_db)
         db.session.commit()
         return new
 
@@ -216,6 +221,13 @@ class Survey(db.Model, DatabaseUtil):
     def remove_all_questions(self):
         for question in self.questions.all():
             self.questions.remove(question)
+        db.session.add(self)
+        db.session.commit()
+
+    def remove_optional_questions(self):
+        for question in self.questions.all():
+            if question.optional:
+                self.questions.remove(question)
         db.session.add(self)
         db.session.commit()
 
@@ -239,6 +251,7 @@ class Question(db.Model, DatabaseUtil):
     __tablename__ = 'questions'
     id = db.Column(db.Integer, primary_key=True)
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    optional = db.Column(db.Boolean)
     description = db.Column(db.String(512))
 
     # q_type : question type
@@ -248,8 +261,8 @@ class Question(db.Model, DatabaseUtil):
     choices = db.relationship('Choice', backref='question', lazy='dynamic')
 
     @classmethod
-    def create(cls, description, owner_id, q_type=1):
-        new = cls(description=description, owner_id=owner_id)
+    def create(cls, description, owner_id, optional, q_type=1):
+        new = cls(description=description, owner_id=owner_id, optional=optional)
         db.session.add(new)
         db.session.commit()
         return new
