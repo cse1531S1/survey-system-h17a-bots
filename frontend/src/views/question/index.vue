@@ -36,7 +36,9 @@
 
       <el-table-column width="250px" align="center" label="Choices">
         <template scope="scope">
-          <el-row v-for="choice in scope.row.choices" :key="choice">{{choice}}</el-row>
+          <template v-if="scope.row.type==='Multiple Choices'">
+            <el-row v-for="choice in scope.row.choices" :key="choice">{{choice}}</el-row>
+          </template>
         </template>
       </el-table-column>
 
@@ -65,6 +67,10 @@
       <el-form class="large-space" :model="newQuestion" :rules="rules" ref="newQuestion" label-position="left" label-width="70px" style='width: 400px; margin-left:50px;'>
         <el-form-item label="Title" prop="title">
           <el-input v-model="newQuestion.title"></el-input>
+        </el-form-item>
+
+        <el-form-item label="Optional">
+          <el-switch v-model="newQuestion.qOptional" on-color="#13ce66" off-color="#ff4949"></el-switch>
         </el-form-item>
 
         <el-form-item label="Question Type" prop="qType">
@@ -153,10 +159,12 @@ export default {
       newQuestion: {
         title: '',
         qType: '',
+        qOptional: false,
         choices: ['Very Strongly Agree', 'Strongly Agree', 'Agree', 'Disagree', 'Strongly Disagree', 'Very Strongly Disagree']
       },
       qTypeAllowed: {
-        1: 'Multiple Choices'
+        1: 'Multiple Choices',
+        2: 'Text Based Question'
       },
       dialogQuestion: false,
       to_post: {},
@@ -259,7 +267,8 @@ export default {
           var detail = {
             title: this.newQuestion.title,
             qType: this.newQuestion.qType,
-            choices: this.newQuestion.choices
+            choices: this.newQuestion.choices,
+            optional: this.newQuestion.qOptional
           }
           createQuestion(detail).then(response => {
             if (response.data.success) {
@@ -291,6 +300,7 @@ export default {
       this.newQuestion = {
         title: '',
         qType: '',
+        qOptional: false,
         choices: ['Very Strongly Agree', 'Strongly Agree', 'Agree', 'Disagree', 'Strongly Disagree', 'Very Strongly Disagree']
       }
     },

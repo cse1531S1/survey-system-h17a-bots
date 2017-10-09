@@ -262,7 +262,8 @@ class Question(db.Model, DatabaseUtil):
 
     @classmethod
     def create(cls, description, owner_id, optional, q_type=1):
-        new = cls(description=description, owner_id=owner_id, optional=optional)
+        new = cls(description=description, owner_id=owner_id, \
+                  optional=optional, q_type=q_type)
         db.session.add(new)
         db.session.commit()
         return new

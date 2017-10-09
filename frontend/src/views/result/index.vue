@@ -7,11 +7,11 @@
 
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="Loading!!!!" border fit highlight-current-row style="width: 100%">
 
-      <el-table-column align="center" label="ID" width="55px" prop="id">
+      <!-- <el-table-column align="center" label="ID" width="55px" prop="id">
         <template scope="scope">
           <span>{{scope.row.id}}</span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
 
       <el-table-column align="center" width="100px" label="User">
         <template scope="scope">
@@ -38,7 +38,7 @@
     </div>
 
     <el-dialog title="Statistical Report" :visible.sync="pieDialog" size="large">
-      <div v-for="i in nquestion" :key="i">
+      <div v-for="i in questions" :key="i">
         <pie-chart :surveyId="surveyId" :questionId="i"></pie-chart>
       </div>
     </el-dialog>
@@ -71,7 +71,7 @@ export default {
         sort: '+id'
       },
       pieDialog: false,
-      nquestion: 0,
+      questions: [],
       tableKey: 0,
       surveyId: 0
     }
@@ -91,7 +91,7 @@ export default {
       this.listLoading = true
       fetchAnswers(this.listQuery, this.$route.params.id).then(response => {
         this.list = response.data.items
-        this.nquestion = response.data.nquestion
+        this.questions = response.data.questions
         this.total = response.data.total
         this.listLoading = false
       })

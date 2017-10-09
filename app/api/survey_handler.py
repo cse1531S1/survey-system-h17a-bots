@@ -118,10 +118,15 @@ def fetch_answers():
     except:
         pass
 
+    survey = Survey.get_by_id(id)
+    qus = [i.id for i in survey.questions.all()]
+    print(qus)
+
     return jsonify({
         'items': rtn,
         'count': len(answers),
         'nquestion': nq,
+        'questions': qus,
         'success': True
     })
 pass
@@ -305,6 +310,11 @@ def question_pool():
         qtype = ""
         if qt == 1:
             qtype = "Multiple Choices"
+        elif qt == 2:
+            qtype = "Text Based Question"
+
+        print(qtype)
+        print(qt)
         return {
             "type": qtype,
             "id": question.id,
@@ -332,7 +342,7 @@ def create_survey():
     survey = Survey.create(description=data['title'], owner_id=user.id,
                            times=[timestart, timeend], course=data['course'], active=True)
 
-    questions = data['questions_opt'] + data['question_man']
+    questions = data['questions_opt'] + data['questions_man']
     questions_dump = [i['id'] for i in questions]
     survey.set_questions(questions_dump)
     # survey.status = data['status']
@@ -348,6 +358,7 @@ def create_survey():
 def create_question():
     user = g.current_user
     data = request.get_json()
+    print(data['qType'])
     question = Question.create(description=data['title'], owner_id=user.id,\
                                q_type=int(data['qType']), optional=data['optional'])
     choices = data['choices']

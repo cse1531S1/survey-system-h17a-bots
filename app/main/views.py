@@ -133,7 +133,7 @@ def answer(hash_str):
     token = request.args['token']
     user = User.verify_auth_token(token)
 
-    print(user.user_role)
+    # print(user.user_role)
     if not user or user.user_role == 'staff' or user.user_role == 'admin':
         return redirect(url_for('.not_allowed'))
 
@@ -155,7 +155,18 @@ def answer(hash_str):
         db.session.commit()
         FileOperation.write_flatfile_async(survey.id)
         return redirect(url_for('.thankyou'))
-    return render_template('answer_survey.html', survey=survey)
+    questions = survey.questions.all()
+    questions_man = []
+    questions_opt = []
+    for i in questions:
+        if i.optional:
+            questions_opt.append(i)
+        elif not i.optional:
+            questions_man.append(i)
+
+    #  print(questions_opt)
+    return render_template('answer_survey.html', survey=survey,\
+                           questions_opt=questions_opt, questions_man=questions_man)
 
 
 @main.route('/question_pool', methods=['GET', 'POST'])
