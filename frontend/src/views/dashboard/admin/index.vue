@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard-editor-container">
-    <el-row>
+    <el-row type="flex" justify="center">
       <el-col :span="6">
         <el-card class="box-card">
           <div slot="header" class="box-card-header">
@@ -25,18 +25,19 @@
         </el-card>
       </el-col>
 
-      <el-col :span="8">
+      <!-- <el-col :span="8">
         <pie-chart></pie-chart>
       </el-col>
 
       <el-col :span="10">
         <bar-chart></bar-chart>
-      </el-col>
+      </el-col> -->
+
     </el-row>
 
-    <el-row :gutter="20">
+    <!-- <el-row :gutter="20">
       <line-chart></line-chart>
-    </el-row>
+    </el-row> -->
 
   </div>
 </template>

@@ -252,17 +252,19 @@ class Question(db.Model, DatabaseUtil):
     id = db.Column(db.Integer, primary_key=True)
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     optional = db.Column(db.Boolean)
+    deleted = db.Column(db.Boolean, default=False)
     description = db.Column(db.String(512))
 
     # q_type : question type
     # 1 : multiple choices
+    # 2 : text based question
     q_type = db.Column(db.Integer, default=1)
 
     choices = db.relationship('Choice', backref='question', lazy='dynamic')
 
     @classmethod
     def create(cls, description, owner_id, optional, q_type=1):
-        new = cls(description=description, owner_id=owner_id, \
+        new = cls(description=description, owner_id=owner_id,
                   optional=optional, q_type=q_type)
         db.session.add(new)
         db.session.commit()

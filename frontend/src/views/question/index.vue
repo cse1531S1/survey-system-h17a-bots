@@ -4,33 +4,33 @@
       <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="Title" v-model="listQuery.title">
       </el-input>
 
-      <el-select @change='handleFilter' style="width: 120px" class="filter-item" v-model="listQuery.sort" placeholder="Sort">
+      <!-- <el-select @change='handleFilter' style="width: 120px" class="filter-item" v-model="listQuery.sort" placeholder="Sort">
         <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key">
         </el-option>
-      </el-select>
+      </el-select> -->
 
       <el-button class="filter-item" type="primary" v-waves icon="search" @click="handleFilter">Search</el-button>
       <el-button class="filter-item" v-waves style="margin-left: 10px;" @click="handleCQuestion" type="primary" icon="edit">Add a question</el-button>
-      <el-button class="filter-item" type="primary" icon="document" @click="handleDownload">Export</el-button>
+      <!-- <el-button class="filter-item" type="primary" icon="document" @click="handleDownload">Export</el-button> -->
     </div>
 
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="Loading!!!!" border fit highlight-current-row style="width: 100%">
 
-      <el-table-column align="center" label="ID" width="55">
+      <!-- <el-table-column align="center" label="ID" width="55">
         <template scope="scope">
           <span>{{scope.row.id}}</span>
+        </template>
+      </el-table-column> -->
+
+      <el-table-column min-width="250px" label="Title">
+        <template scope="scope">
+          <span class="link-type" @click="handleUpdate(scope.row)">{{scope.row.title}}</span>
         </template>
       </el-table-column>
 
       <el-table-column align="center" label="Optional" width="75">
         <template scope="scope">
           <span>{{scope.row.optional}}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column min-width="250px" label="Title">
-        <template scope="scope">
-          <span class="link-type" @click="handleUpdate(scope.row)">{{scope.row.title}}</span>
         </template>
       </el-table-column>
 

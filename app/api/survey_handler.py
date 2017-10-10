@@ -3,7 +3,7 @@
 
 from flask import request, jsonify, g
 from . import api
-from ..models import User, Survey, AnswerSurveyLink, Question, Choice, db, Course
+from ..models import Survey, AnswerSurveyLink, Question, Choice, db, Course
 from ..flatfile import FileOperation
 from datetime import datetime
 from .authentication import auth
@@ -120,7 +120,7 @@ def fetch_answers():
 
     survey = Survey.get_by_id(id)
     qus = [i.id for i in survey.questions.all()]
-    print(qus)
+    # print(qus)
 
     return jsonify({
         'items': rtn,
@@ -129,6 +129,8 @@ def fetch_answers():
         'questions': qus,
         'success': True
     })
+
+
 pass
 
 
@@ -179,8 +181,10 @@ def all_survey():
             'responses': len(AnswerSurveyLink.get_by_survey_id(survey.id)),
             'timestamp': datetime.strftime(survey.timestamp, r'%d-%m-%Y %H:%M'),
             'course': survey.course,
-            'questions_man': [{"id": q.id, "description": q.description} for q in survey.questions.all() if q.optional is False],
-            'questions_opt': [{"id": q.id, "description": q.description} for q in survey.questions.all() if q.optional is True],
+            'questions_man': [{"id": q.id, "description": q.description}
+                              for q in survey.questions.all() if q.optional is False],
+            'questions_opt': [{"id": q.id, "description": q.description}
+                              for q in survey.questions.all() if q.optional is True],
             'start_time': survey.start_date,
             'end_time': survey.end_date,
             'status': survey.status,
@@ -199,6 +203,7 @@ def all_survey():
 @auth.login_required
 def fetch_course():
     li = FileOperation.read_course()
+
     def check(course_code):
         course = Course.get_by_code(course_code)
         if course.survey_id is None:
@@ -231,7 +236,6 @@ def modify_survey():
         survey.remove_optional_questions()
         survey.set_questions(questions_dump)
 
-
     survey.description = data['title']
     timestart = data['start']
     survey.start_date = timestart
@@ -250,7 +254,7 @@ def modify_survey():
 @api.route('/fetch_question', methods=['GET', 'OPTION'])
 @auth.login_required
 def fetch_questions():
-    questions = Question.get_all()
+    questions = [i for i in Question.get_all() if i.deleted is not True]
 
     def to_dict(question):
         qt = question.q_type
@@ -283,7 +287,7 @@ def fetch_questions():
 @api.route('/question_pool', methods=['GET', 'OPTION'])
 @auth.login_required
 def question_pool():
-    questions = Question.get_all()
+    questions = [i for i in Question.get_all() if i.deleted is not True]
 
     try:
         order = request.args['sort']
@@ -313,8 +317,8 @@ def question_pool():
         elif qt == 2:
             qtype = "Text Based Question"
 
-        print(qtype)
-        print(qt)
+        # print(qtype)
+        # print(qt)
         return {
             "type": qtype,
             "id": question.id,
@@ -358,8 +362,8 @@ def create_survey():
 def create_question():
     user = g.current_user
     data = request.get_json()
-    print(data['qType'])
-    question = Question.create(description=data['title'], owner_id=user.id,\
+    # print(data['qType'])
+    question = Question.create(description=data['title'], owner_id=user.id,
                                q_type=int(data['qType']), optional=data['optional'])
     choices = data['choices']
     for choice in choices:
@@ -374,21 +378,23 @@ def create_question():
 def delete_question():
     data = request.get_json()
     id = data['id']
-    current_user = g.current_user
+    # current_user = g.current_user
     question_to_delete = Question.get_by_id(id)
+    question_to_delete.deleted = True
+    db.session.add(question_to_delete)
+    db.session.commit()
 
-    if current_user.id != question_to_delete.owner_id and current_user.is_admin is not True:
-        return jsonify({
-            'error': "You don't have sufficient permissions to delete this question."
-        })
+    # if current_user.id != question_to_delete.owner_id and current_user.is_admin is not True:
+    # return jsonify({
+    # 'error': "You don't have sufficient permissions to delete this question."
+    # })
 
-    if question_to_delete.surveys.first() is not None:
-        return jsonify({
-            'error': "The question is already assigned to a survey,\
-            please unassign it first, then come back to delete it."
-        })
+    # if question_to_delete.surveys.first() is not None:
+    # return jsonify({
+    # 'error': "The question is already assigned to a survey,\
+    # please unassign it first, then come back to delete it."
+    # })
 
-    Question.delete_by_id(id)
     return jsonify({
         "success": True,
     })

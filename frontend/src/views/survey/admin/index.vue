@@ -12,7 +12,7 @@
       <el-button class="filter-item" type="primary" v-waves icon="search" @click="handleFilter">Search</el-button>
       <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="edit">Add a Survey</el-button>
       <el-button class="filter-item" type="primary" icon="document" @click="loadUsers">Load Users</el-button>
-      <el-button class="filter-item" type="primary" icon="document" @click="handleDownload">Export</el-button>
+      <!-- <el-button class="filter-item" type="primary" icon="document" @click="handleDownload">Export</el-button> -->
     </div>
 
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="Loading!!!!" border fit highlight-current-row style="width: 100%">
@@ -53,11 +53,11 @@
         </template>
       </el-table-column>
 
-      <el-table-column width="110px" align="center" label="Owner">
-        <template scope="scope">
-          <span>{{scope.row.owner}}</span>
-        </template>
-      </el-table-column>
+      <!-- <el-table-column width="110px" align="center" label="Owner"> -->
+      <!-- <template scope="scope">
+                    <span>{{scope.row.owner}}</span>
+                  </template>
+                </el-table-column> -->
 
       <el-table-column align="center" label="Responses" width="110">
         <template scope="scope">
@@ -71,14 +71,11 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Operation" width="180">
+      <el-table-column align="center" label="Operation" width="110">
         <template scope="scope">
-          <el-button v-waves v-if="scope.row.status!='open'" size="small" type="success" @click="handleModifyStatus(scope.row,'open')">Open
-          </el-button>
-          <el-button v-waves v-if="scope.row.status!='review'" size="small" @click="handleModifyStatus(scope.row,'review')">Review
-          </el-button>
-          <el-button v-waves v-if="scope.row.status!='closed'" size="small" type="danger" @click="handleModifyStatus(scope.row,'closed')">Close
-          </el-button>
+          <!-- <el-button v-waves v-if="scope.row.status!='open'" size="small" type="success" @click="handleModifyStatus(scope.row,'open')">Open</el-button> -->
+          <!-- <el-button v-waves v-if="scope.row.status!='review'" size="small" @click="handleModifyStatus(scope.row,'review')">Review</el-button> -->
+          <el-button v-waves v-if="scope.row.status==='open'" size="small" type="danger" @click="handleModifyStatus(scope.row,'closed')">Close</el-button>
         </template>
       </el-table-column>
 
@@ -156,7 +153,8 @@
       </el-row>
       <div slot="footer" class="dialog-footer">
         <el-button style="margin-top: 12px;" @click="prev" v-if="active != 0">Previous</el-button>
-        <el-button style="margin-top: 12px;" @click="next" v-if="active != 2 && active != 0">Next</el-button>
+        <el-button style="margin-top: 12px;" @click="next" v-if="active != 2 && active != 0 && list1.length > 0 ">Next</el-button>
+        <el-button style="margin-top: 12px;" @click="openAlert" v-if="active != 2 && active != 0 && list1.length === 0 ">Next</el-button>
         <el-button style="margin-top: 12px;" @click="checkformAndNext" v-if="active == 0">Next</el-button>
         <!-- <el-button @click="handleClean" v-if="active == 2">Cancel</el-button> -->
         <el-button v-if="dialogStatus=='create' && active == 2" type="primary" @click="create">Submit</el-button>
@@ -324,6 +322,12 @@ export default {
     this.getCourse()
   },
   methods: {
+    openAlert() {
+      this.$message({
+        message: 'You must choose at least one mandatory question',
+        type: 'warning'
+      })
+    },
     checkformAndNext() {
       this.$refs['newSurvey'].validate((valid) => {
         if (valid) {
@@ -409,15 +413,6 @@ export default {
       this.listQuery.page = val
       this.getList()
     },
-    timeFilter(time) {
-      if (!time[0]) {
-        this.listQuery.start = undefined
-        this.listQuery.end = undefined
-        return
-      }
-      this.listQuery.start = parseInt(+time[0] / 1000)
-      this.listQuery.end = parseInt((+time[1] + 3600 * 1000 * 24) / 1000)
-    },
     handleModifyStatus(row, status) {
       row.status = status
       this.purpose = 'update_status'
@@ -444,16 +439,6 @@ export default {
     handleCQuestion(row) {
       this.resetQuestionTemp()
       this.dialogQuestion = true
-    },
-    handleDelete(row) {
-      this.$notify({
-        title: '成功',
-        message: '删除成功',
-        type: 'success',
-        duration: 2000
-      })
-      const index = this.list.indexOf(row)
-      this.list.splice(index, 1)
     },
     createQuestion() {
       var detail = {
