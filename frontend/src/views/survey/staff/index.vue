@@ -11,7 +11,8 @@
       <el-button class="filter-item" type="primary" v-waves icon="search" @click="handleFilter">Search</el-button>
     </div>
 
-    <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="Loading!!!!" border fit highlight-current-row style="width: 100%">
+    <h5 class="">Surveys to review</h5>
+    <el-table :key='tableKey' :data="list_open" v-loading="listLoading" element-loading-text="Loading!!!!" border fit highlight-current-row style="width: 100%">
 
       <el-table-column min-width="250px" label="Title">
         <template scope="scope">
@@ -59,6 +60,31 @@
         <template scope="scope">
           <router-link v-if="scope.row.status === 'closed'" v-waves class="el-button el-button--small" :to="'/result/'+scope.row.id">Result</router-link>
           <el-button v-waves v-if="scope.row.status === 'review'" size="small" @click="handleReview(scope.row)">Review</el-button>
+        </template>
+      </el-table-column>
+
+    </el-table>
+
+
+    <h5 class="">Survey Results</h5>
+    <el-table :key='tableKey2' :data="list_closed" v-loading="listLoading" element-loading-text="Loading!!!!" border fit highlight-current-row style="width: 100%">
+
+      <el-table-column min-width="250px" label="Title">
+        <template scope="scope">
+          <span>{{scope.row.title}}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column width="110px" align="center" label="Course">
+        <template scope="scope">
+          <span>{{scope.row.course}}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column width="110px" align="center" label="Links">
+        <template scope="scope">
+          <router-link v-if="scope.row.status === 'closed'" v-waves class="el-button el-button--small" :to="'/result/'+scope.row.id">Result</router-link>
+          <a v-if="scope.row.status === 'open'" v-waves class="el-button el-button--small" :href="'http://127.0.0.1:5000/answer/'+scope.row.id_hash+'?token='+token" target="_blank">Answer it!</a>
         </template>
       </el-table-column>
 
@@ -116,6 +142,8 @@ export default {
     return {
       active: 0,
       list: null,
+      list_open: [],
+      list_closed: [],
       total: null,
       listLoading: true,
       course: [],
@@ -156,6 +184,8 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       tableKey: 0,
+      tableKey1: 1,
+      tableKey2: 2,
       newQuestion: {
         title: '',
         qType: '',
@@ -200,6 +230,12 @@ export default {
     this.getCourse()
   },
   methods: {
+    filterList() {
+      for (let i = 0; i < this.list.length; i++) {
+        if (this.list[i].status === 'open') this.list_open.push(this.list[i])
+        if (this.list[i].status === 'closed') this.list_closed.push(this.list[i])
+      }
+    },
     checkformAndNext() {
       this.$refs['newSurvey'].validate((valid) => {
         if (valid) {
@@ -237,6 +273,8 @@ export default {
       fetchList(this.listQuery).then(response => {
         this.list = response.data.items
         this.total = response.data.total
+      }).then(() => {
+        this.filterList()
         this.listLoading = false
       })
       fetchQuestion().then(response => {

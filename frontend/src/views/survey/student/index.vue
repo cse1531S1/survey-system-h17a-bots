@@ -35,10 +35,10 @@
       </el-table-column>
 
       <!-- <el-table-column class-name="status-col" label="Status" width="90">
-        <template scope="scope">
-          <el-tag :type="scope.row.status | statusFilter">{{scope.row.status}}</el-tag>
-        </template>
-      </el-table-column> -->
+          <template scope="scope">
+            <el-tag :type="scope.row.status | statusFilter">{{scope.row.status}}</el-tag>
+          </template>
+        </el-table-column> -->
 
       <el-table-column width="110px" align="center" label="Links">
         <template scope="scope">
@@ -58,29 +58,11 @@
         </template>
       </el-table-column>
 
-      <!-- <el-table-column width="110px" align="center" label="Start Time">
-        <template scope="scope">
-          <span>{{parseTime(scope.row.start_time)}}</span>
-        </template>
-      </el-table-column> -->
-
-      <!-- <el-table-column width="110px" align="center" label="End Time">
-        <template scope="scope">
-          <span>{{parseTime(scope.row.end_time)}}</span>
-        </template>
-      </el-table-column> -->
-
       <el-table-column width="110px" align="center" label="Course">
         <template scope="scope">
           <span>{{scope.row.course}}</span>
         </template>
       </el-table-column>
-
-      <!-- <el-table-column class-name="status-col" label="Status" width="90">
-        <template scope="scope">
-          <el-tag :type="scope.row.status | statusFilter">{{scope.row.status}}</el-tag>
-        </template>
-      </el-table-column> -->
 
       <el-table-column width="110px" align="center" label="Links">
         <template scope="scope">
