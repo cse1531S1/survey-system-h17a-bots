@@ -17,18 +17,6 @@
 
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="Loading!!!!" border fit highlight-current-row style="width: 100%">
 
-      <!-- <el-table-column align="center" label="ID" width="55" prop="id">
-        <template scope="scope">
-          <span>{{scope.row.id}}</span>
-        </template>
-      </el-table-column> -->
-
-      <el-table-column width="150px" align="center" label="Creation time">
-        <template scope="scope">
-          <span>{{scope.row.timestamp}}</span>
-        </template>
-      </el-table-column>
-
       <el-table-column min-width="250px" label="Title">
         <template scope="scope">
           <span v-if="scope.row.status === 'review'" class="link-type" @click="handleUpdate(scope.row)">{{scope.row.title}}</span>
