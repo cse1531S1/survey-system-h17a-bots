@@ -55,8 +55,8 @@ def answer(hash_str):
     if survey.status != 'open':
         return redirect(url_for('.not_allowed'))
 
-    # if not Answer.check_answered(user.id, survey.id):
-        # return redirect(url_for('.answered'))
+    if not Answer.check_answered(user.id, survey.id):
+        return redirect(url_for('.answered'))
 
     if request.method == 'POST':
         questions = survey.questions.all()

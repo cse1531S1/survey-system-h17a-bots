@@ -251,7 +251,6 @@ def modify_survey():
     timeend = data['end']
     survey.end_date = timeend
 
-    survey.course = data['course']
     survey.status = data['status']
     db.session.add(survey)
     db.session.commit()
@@ -366,7 +365,6 @@ def create_survey():
     questions = data['questions_opt'] + data['questions_man']
     questions_dump = [i['id'] for i in questions]
     survey.set_questions(questions_dump)
-    # survey.status = data['status']
     db.session.add(survey)
     db.session.commit()
     return jsonify({
