@@ -7,7 +7,8 @@
       <el-button class="filter-item" type="primary" v-waves icon="search" @click="handleFilter">Search</el-button>
     </div>
 
-    <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="Loading!!!!" border fit highlight-current-row style="width: 100%">
+    <h5 class="">Surveys</h5>
+    <el-table :key='tableKey' :data="list_open" v-loading="listLoading" element-loading-text="Loading!!!!" border fit highlight-current-row style="width: 100%">
 
       <el-table-column min-width="250px" label="Title">
         <template scope="scope">
@@ -33,11 +34,53 @@
         </template>
       </el-table-column>
 
-      <el-table-column class-name="status-col" label="Status" width="90">
+      <!-- <el-table-column class-name="status-col" label="Status" width="90">
         <template scope="scope">
           <el-tag :type="scope.row.status | statusFilter">{{scope.row.status}}</el-tag>
         </template>
+      </el-table-column> -->
+
+      <el-table-column width="110px" align="center" label="Links">
+        <template scope="scope">
+          <router-link v-if="scope.row.status === 'closed'" v-waves class="el-button el-button--small" :to="'/result/'+scope.row.id">Result</router-link>
+          <a v-if="scope.row.status === 'open'" v-waves class="el-button el-button--small" :href="'http://127.0.0.1:5000/answer/'+scope.row.id_hash+'?token='+token" target="_blank">Answer it!</a>
+        </template>
       </el-table-column>
+
+    </el-table>
+
+    <h5 class="">Survey Results</h5>
+    <el-table :key='tableKey2' :data="list_closed" v-loading="listLoading" element-loading-text="Loading!!!!" border fit highlight-current-row style="width: 100%">
+
+      <el-table-column min-width="250px" label="Title">
+        <template scope="scope">
+          <span>{{scope.row.title}}</span>
+        </template>
+      </el-table-column>
+
+      <!-- <el-table-column width="110px" align="center" label="Start Time">
+        <template scope="scope">
+          <span>{{parseTime(scope.row.start_time)}}</span>
+        </template>
+      </el-table-column> -->
+
+      <!-- <el-table-column width="110px" align="center" label="End Time">
+        <template scope="scope">
+          <span>{{parseTime(scope.row.end_time)}}</span>
+        </template>
+      </el-table-column> -->
+
+      <el-table-column width="110px" align="center" label="Course">
+        <template scope="scope">
+          <span>{{scope.row.course}}</span>
+        </template>
+      </el-table-column>
+
+      <!-- <el-table-column class-name="status-col" label="Status" width="90">
+        <template scope="scope">
+          <el-tag :type="scope.row.status | statusFilter">{{scope.row.status}}</el-tag>
+        </template>
+      </el-table-column> -->
 
       <el-table-column width="110px" align="center" label="Links">
         <template scope="scope">
@@ -92,6 +135,8 @@ export default {
         sort: '+id'
       },
       token: '',
+      list_closed: [],
+      list_open: [],
       temp: {
         id: undefined,
         timestamp: 0,
@@ -117,6 +162,8 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       tableKey: 0,
+      tableKey2: 1,
+
       newQuestion: {
         title: '',
         qType: '',
@@ -184,6 +231,12 @@ export default {
         this.listLoading = false
       })
     },
+    filterList() {
+      for (let i = 0; i < this.list.length; i++) {
+        if (this.list[i].status === 'open') this.list_open.push(this.list[i])
+        if (this.list[i].status === 'closed') this.list_closed.push(this.list[i])
+      }
+    },
     handleClean() {
       this.dialogFormVisible = false
       this.$refs['newSurvey'].resetFields()
@@ -214,6 +267,8 @@ export default {
         this.list = response.data.items
         this.total = response.data.total
         this.listLoading = false
+      }).then(() => {
+        this.filterList()
       })
       fetchQuestion().then(response => {
         this.list2 = response.data

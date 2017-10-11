@@ -71,8 +71,16 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :close-on-click-modal="false">
       <el-row class="" type="flex" justify="center">
+        <h5>Mandatory questions chosen by admin</h5>
+      </el-row>
+      <el-row class="" type="flex" justify="center" v-for="i in list3" :key="i">
+        <el-row class="">{{ i.description }}: {{ i.type }}</el-row>
+      </el-row>
+      <br>
+      <br>
+      <br>
+      <el-row class="" type="flex" justify="center">
         <el-form :rules="rules" class="large-space" :model="temp" label-position="left" label-width="70px" style='width: 800px; margin-left:50px;' ref="newSurvey">
-          <!-- <el-button class="filter-item" style="margin-left: 10px;" @click="handleCQuestion" type="primary" icon="edit">Add a question</el-button> -->
 
           <div class="editor-container">
             <dnd-list :list1="list1" :list2="list2" list1Title="Chosen" list2Title="Optional Question Pool"></dnd-list>
@@ -83,52 +91,13 @@
         <el-button type="primary" @click="review">Submit</el-button>
       </div>
     </el-dialog>
-
-    <el-dialog title="Create Question" :visible.sync="dialogQuestion" size="small">
-      <el-form class="large-space" :model="newQuestion" label-position="left" label-width="70px" style='width: 400px; margin-left:50px;'>
-        <el-form-item label="Title">
-          <el-input v-model="newQuestion.title"></el-input>
-        </el-form-item>
-
-        <el-form-item label="Question Type">
-          <el-select class="filter-item" v-model="newQuestion.qType" placeholder="Choose...">
-            <el-option v-for="(item, index) in  qTypeAllowed" :key="index" :label="item" :value="index">
-            </el-option>
-          </el-select>
-          <div v-if="newQuestion.qType === '1'">
-            <el-button @click="addNewChoice">Add a Choice</el-button>
-            <draggable :list="newQuestion.choices" :options="{ handle: '.handler', draggable: '.list-complete-item'}">
-              <el-row class="list-complete-item " v-for="(element,index) in newQuestion.choices" :key='index'>
-                <el-col :span="2" class="handler">
-                  <icon-svg icon-class="tuozhuai"></icon-svg>
-                </el-col>
-                <el-col :span="2">
-                  <span style="" @click="deleteEle(element)">
-                    <i style="color:#ff4949" class="el-icon-delete"></i>
-                  </span>
-                </el-col>
-                <el-col :span="20">
-                  <el-input class="list-complete-item-handle" v-model.lazy="newQuestion.choices[index]"></el-input>
-                </el-col>
-              </el-row>
-            </draggable>
-          </div>
-        </el-form-item>
-
-      </el-form>
-
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogQuestion= false">Cancel</el-button>
-        <el-button type="primary" @click="createQuestion">Submit</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 
 
 <script>
-import { fetchList, fetchQuestion, fetchCourse, modifySurvey, createQuestion, loadUsers } from '@/api/article'
+import { fetchList, fetchQuestion, fetchCourse, modifySurvey, createQuestion } from '@/api/article'
 import draggable from 'vuedraggable'
 import DndList from '@/components/twoDndList'
 import waves from '@/directive/waves.js'// 水波纹指令
@@ -246,35 +215,6 @@ export default {
     prev() {
       if (this.active-- < 0) this.active = 0
     },
-    loadUsers() {
-      this.listLoading = true
-      loadUsers().then(response => {
-        if (response.data.success) {
-          this.$notify({
-            title: 'Success!',
-            message: 'You successfully load all users',
-            type: 'success',
-            duration: 2000
-          })
-        } else {
-          this.$notify({
-            title: 'Not Success!',
-            message: 'Some unknown error happened',
-            type: 'error',
-            duration: 2000
-          })
-        }
-      }).then(() => {
-        this.listLoading = false
-      })
-    },
-    handleClean() {
-      this.dialogFormVisible = false
-      this.$refs['newSurvey'].resetFields()
-    },
-    addNewChoice() {
-      this.newQuestion.choices.push('')
-    },
     deleteEle(ele) {
       for (const item of this.newQuestion.choices) {
         if (item === ele) {
@@ -301,6 +241,7 @@ export default {
       })
       fetchQuestion().then(response => {
         this.list2 = response.data.optional
+        this.questions_man = response.data.mandatory
       })
     },
     handleFilter() {

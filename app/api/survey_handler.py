@@ -139,6 +139,7 @@ pass
 def all_survey():
     user = g.current_user
     role = user.user_role
+
     if role == 'admin':
         surveys = Survey.get_all()
     else:
@@ -150,6 +151,13 @@ def all_survey():
             if to_append is not None:
                 surveys.append(to_append)
 
+    if role == 'student':
+        surveys = [i for i in surveys if i.status != 'review']
+    if role == 'staff':
+        surveys = [i for i in surveys if i.status ==
+                   'review' or i.status == 'closed']
+
+    # print(surveys)
     total = len(surveys)
 
     try:
@@ -174,6 +182,11 @@ def all_survey():
         pass
 
     def to_dict(survey):
+        def process_type(type_id):
+            if type_id == 1:
+                return 'Multiple Choices'
+            if type_id == 2:
+                return 'Text Based Question'
         return {
             'id': survey.id,
             'title': survey.description,
@@ -181,9 +194,9 @@ def all_survey():
             'responses': len(AnswerSurveyLink.get_by_survey_id(survey.id)),
             'timestamp': datetime.strftime(survey.timestamp, r'%d-%m-%Y %H:%M'),
             'course': survey.course,
-            'questions_man': [{"id": q.id, "description": q.description}
+            'questions_man': [{"id": q.id, "description": q.description, "type": process_type(q.q_type)}
                               for q in survey.questions.all() if q.optional is False],
-            'questions_opt': [{"id": q.id, "description": q.description}
+            'questions_opt': [{"id": q.id, "description": q.description, "type": process_type(q.q_type)}
                               for q in survey.questions.all() if q.optional is True],
             'start_time': survey.start_date,
             'end_time': survey.end_date,
@@ -261,8 +274,11 @@ def fetch_questions():
         qtype = ""
         if qt == 1:
             qtype = "Multiple Choices"
+        if qt == 2:
+            qtype = 'Text Based Question'
+
         return {
-            "Type": qtype,
+            "type": qtype,
             "id": question.id,
             "optional": question.optional,
             "choices": [i.content for i in question.choices.all()],

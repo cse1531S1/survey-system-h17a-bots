@@ -130,14 +130,18 @@ def answer(hash_str):
         This function is the view function for answering a survey.
         @id represents the survey ID.
     """
-    token = request.args['token']
-    user = User.verify_auth_token(token)
+    try:
+        token = request.args['token']
+        user = User.verify_auth_token(token)
+    except:
+        return redirect(url_for('.not_allowed'))
 
-    # print(user.user_role)
     if not user or user.user_role == 'staff' or user.user_role == 'admin':
         return redirect(url_for('.not_allowed'))
 
     survey = Survey.get_by_hash(hash_str)
+    if survey.status != 'open':
+        return redirect(url_for('.not_allowed'))
 
     if not AnswerSurveyLink.check_answered(user.id, survey.id):
         return redirect(url_for('.answered'))
@@ -147,14 +151,19 @@ def answer(hash_str):
         answer_survey_link = AnswerSurveyLink.create(
             survey_id=survey.id, owner_id=user.id)
 
+        print(questions)
         for question in questions:
-            answer_content = request.form[str(question.id)]
-            Answer.create(answer_survey_link_id=answer_survey_link.id,
-                          question_id=question.id, answer_content=answer_content)
+            try:
+                answer_content = request.form[str(question.id)]
+                Answer.create(answer_survey_link_id=answer_survey_link.id,
+                              question_id=question.id, answer_content=answer_content)
+            except:
+                pass
 
         db.session.commit()
         FileOperation.write_flatfile_async(survey.id)
         return redirect(url_for('.thankyou'))
+
     questions = survey.questions.all()
     questions_man = []
     questions_opt = []
@@ -165,7 +174,7 @@ def answer(hash_str):
             questions_man.append(i)
 
     #  print(questions_opt)
-    return render_template('answer_survey.html', survey=survey,\
+    return render_template('answer_survey.html', survey=survey,
                            questions_opt=questions_opt, questions_man=questions_man)
 
 
