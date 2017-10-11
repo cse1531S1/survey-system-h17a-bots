@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 from threading import Thread
-from .models import AnswerSurveyLink, Survey, User, db, Course
+from .models import Answer, Survey, User, db, Course
 from flask import current_app
 import re
 import csv
@@ -37,22 +37,22 @@ class FileOperation(object):
     def write_flatfile(id, app):
         with app.app_context():
             survey = Survey.get_by_id(id)
-            answer_survey_links = AnswerSurveyLink.query.filter_by(
-                survey_id=id).all()
+            answers = Answer.query.filter_by(survey_id=id).all()
             with open(str(survey.id) + '.csv', 'w') as csv_file:
                 writer = csv.writer(csv_file)
-                for link in answer_survey_links:
+                for answer in answers:
                     try:
-                        username = link.owner.username
+                        username = answer.owner.username
                     except AttributeError:
                         username = "Anonymous"
                     dic = {question.description: answer.content for question, answer in zip(
-                        survey.questions.all(), link.answers.all())}
+                        survey.questions.all(), answer.entities.all())}
                     writer.writerow(
                         [survey.description, username, dic])
 
     @staticmethod
     def load_users():
+        print('load start')
         app = current_app._get_current_object()
         thr = Thread(target=FileOperation.load_users_async, args=[app])
         thr.start()

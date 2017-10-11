@@ -3,7 +3,7 @@
 
 from flask import request, jsonify, g
 from . import api
-from ..models import Survey, AnswerSurveyLink, Question, Choice, db, Course
+from ..models import Survey, Answer, Question, Choice, db, Course
 from ..flatfile import FileOperation
 from datetime import datetime
 from .authentication import auth
@@ -12,8 +12,7 @@ import collections
 
 @api.route('/get_answer_data/type1/<int:survey_id>/<int:question_id>', methods=['GET', 'POST'])
 def get_answer_data(survey_id, question_id):
-    answer_survey_link = AnswerSurveyLink.query.filter_by(
-        survey_id=survey_id).all()
+    answers = Answer.query.filter_by(survey_id=survey_id).all()
     question = Question.get_by_id(question_id)
 
     def make_counter(counter):
@@ -24,10 +23,10 @@ def get_answer_data(survey_id, question_id):
         return rtn
 
     rst = []
-    for link in answer_survey_link:
-        for answer in link.answers.all():
-            if answer.question_id == question.id:
-                rst.append(answer.content)
+    for answer in answers:
+        for entity in answer.entities.all():
+            if entity.question_id == question.id:
+                rst.append(entity.content)
 
     counter = dict(collections.Counter(rst))
 
@@ -44,8 +43,7 @@ def fetch_pie_chart():
     data = request.get_json()
     survey_id = int(data['survey'])
     question_id = int(data['question'])
-    answer_survey_link = AnswerSurveyLink.query.filter_by(
-        survey_id=survey_id).all()
+    answers = Answer.query.filter_by(survey_id=survey_id).all()
     question = Question.get_by_id(question_id)
 
     def make_counter(counter):
@@ -56,10 +54,10 @@ def fetch_pie_chart():
         return rtn
 
     rst = []
-    for link in answer_survey_link:
-        for answer in link.answers.all():
-            if answer.question_id == question.id:
-                rst.append(answer.content)
+    for answer in answers:
+        for entity in answer.entities.all():
+            if entity.question_id == question.id:
+                rst.append(entity.content)
 
     counter = dict(collections.Counter(rst))
 
@@ -77,7 +75,7 @@ def fetch_pie_chart():
 def fetch_answers():
     data = request.get_json()
     id = data['id']
-    answers = AnswerSurveyLink.get_by_survey_id(id)
+    answers = Answer.get_by_survey_id(id)
     nq = len(Survey.get_by_id(id).questions.all())
 
     #  print(g.current_user.user_role, Survey.get_by_id(id).status)
@@ -101,22 +99,22 @@ def fetch_answers():
     except:
         pass
 
-    def to_dic(answerl):
+    def to_dic(answer):
         return {
-            'id': answerl.id,
+            'id': answer.id,
             'name': 'Anonymous',
-            'time': answerl.timestamp,
+            'time': answer.timestamp,
             'answers': [
                 {'question': Question.get_by_id(
-                    answer.question_id).description, 'answer': answer.content}
-                for answer in answerl.answers.all()]
+                    entity.question_id).description, 'answer': entity.content}
+                for entity in answer.entities.all()]
         }
 
     rtn = []
-    try:
-        rtn = [to_dic(a) for a in answers]
-    except:
-        pass
+    #  try:
+    rtn = [to_dic(a) for a in answers]
+    #  except:
+        #  pass
 
     survey = Survey.get_by_id(id)
     qus = [i.id for i in survey.questions.all()]
@@ -187,7 +185,7 @@ def fetch_all_survey():
             'id': survey.id,
             'title': survey.description,
             'owner': survey.owner.username if survey.owner else "AnoymousUser",
-            'responses': len(AnswerSurveyLink.get_by_survey_id(survey.id)),
+            'responses': len(Answer.get_by_survey_id(survey.id)),
             'timestamp': datetime.strftime(survey.timestamp, r'%d-%m-%Y %H:%M'),
             'course': survey.get_course_code(),
             'questions_man': [{"id": q.id, "description": q.description, "type": process_type(q.q_type)}
@@ -425,7 +423,7 @@ def delete_question():
 @auth.login_required
 def srstatic():
     survey_count = len(Survey.get_all())
-    response_count = len(AnswerSurveyLink.get_all())
+    response_count = len(Answer.get_all())
     return jsonify({
         "success": True,
         'surveys': survey_count,
@@ -436,10 +434,6 @@ def srstatic():
 @api.route('/load_user', methods=['GET'])
 def loadUser():
     FileOperation.load_users()
-    survey_count = len(Survey.get_all())
-    response_count = len(AnswerSurveyLink.get_all())
     return jsonify({
         "success": True,
-        'surveys': survey_count,
-        'responses': response_count
     })

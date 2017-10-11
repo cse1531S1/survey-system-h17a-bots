@@ -62,7 +62,7 @@ class User(UserMixin, db.Model, DatabaseUtil):
     surveys = db.relationship('Survey', backref='owner', lazy='dynamic')
     questions = db.relationship('Question', backref='owner', lazy='dynamic')
     answers = db.relationship(
-        'AnswerSurveyLink', backref='owner', lazy='dynamic')
+        'Answer', backref='owner', lazy='dynamic')
 
     is_admin = db.Column(db.Boolean, default=False)
 
@@ -276,33 +276,27 @@ class Question(db.Model, DatabaseUtil):
         return '<Question {}>'.format(self.id)
 
 
-class Answer(db.Model, DatabaseUtil):
-    __tablename__ = 'answers'
+class Choice(db.Model, DatabaseUtil):
+    __tablename__ = 'choices'
     id = db.Column(db.Integer, primary_key=True, index=True)
     question_id = db.Column(db.Integer, db.ForeignKey('questions.id'))
-    content = db.Column(db.String(512))
-    rep_id = db.Column(db.Integer, db.ForeignKey('answer_survey_link.id'))
+    content = db.Column(db.String(128))
 
     @classmethod
-    def create(cls, answer_survey_link_id, question_id, answer_content):
-        new = cls(rep_id=answer_survey_link_id,
-                  question_id=question_id, content=answer_content)
+    def create(cls, content, question_id):
+        new = cls(question_id=question_id, content=content)
         db.session.add(new)
         db.session.commit()
         return new
 
-    def __repr__(self):
-        return '<Answer {} for Question {}>'.format(
-            self.id, self.question_id)
 
-
-class AnswerSurveyLink(db.Model, DatabaseUtil):
-    __tablename__ = 'answer_survey_link'
+class Answer(db.Model, DatabaseUtil):
+    __tablename__ = 'answers'
     id = db.Column(db.Integer, primary_key=True, index=True)
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     timestamp = db.Column(db.DateTime(), default=datetime.utcnow)
     survey_id = db.Column(db.Integer, db.ForeignKey('surveys.id'))
-    answers = db.relationship('Answer', backref='rep', lazy='dynamic')
+    entities = db.relationship('AnswerEntity', backref='ans', lazy='dynamic')
 
     @classmethod
     def get_by_survey_id(cls, id):
@@ -319,18 +313,18 @@ class AnswerSurveyLink(db.Model, DatabaseUtil):
 
     @classmethod
     def delete_by_id(cls, id):
-        answer_survey_link_to_delete = cls.get_by_id(id)
-        for answer in answer_survey_link_to_delete.answers.all():
-            db.session.delete(answer)
-        db.session.delete(answer_survey_link_to_delete)
+        answer_to_delete = cls.get_by_id(id)
+        for entity in answer_to_delete.entities.all():
+            db.session.delete(entity)
+        db.session.delete(answer_to_delete)
 
     @classmethod
     def delete_by_survey_id(cls, id):
-        answer_survey_link_to_delete = cls.get_by_survey_id(id)
-        for answer_survey_link in answer_survey_link_to_delete:
-            for answer in answer_survey_link.answers.all():
-                db.session.delete(answer)
-            db.session.delete(answer_survey_link)
+        answer_to_delete = cls.get_by_survey_id(id)
+        for answer in answer_survey_link_to_delete:
+            for entity in answer_survey_link.entities.all():
+                db.session.delete(entity)
+            db.session.delete(answer)
 
     @classmethod
     def create(cls, survey_id, owner_id):
@@ -340,19 +334,25 @@ class AnswerSurveyLink(db.Model, DatabaseUtil):
         return new
 
     def __repr__(self):
-        return '<AnswerSurveyLink {} given by {} Survey {}>'.format(
+        return '<Answer {} given by {} Survey {}>'.format(
             self.id, self.owner_id, self.survey_id)
 
 
-class Choice(db.Model, DatabaseUtil):
-    __tablename__ = 'choices'
+class AnswerEntity(db.Model, DatabaseUtil):
+    __tablename__ = 'answer_entities'
     id = db.Column(db.Integer, primary_key=True, index=True)
     question_id = db.Column(db.Integer, db.ForeignKey('questions.id'))
-    content = db.Column(db.String(128))
+    content = db.Column(db.String(512))
+    answer_id = db.Column(db.Integer, db.ForeignKey('answers.id'))
 
     @classmethod
-    def create(cls, content, question_id):
-        new = cls(question_id=question_id, content=content)
+    def create(cls, answer_id, question_id, answer_content):
+        new = cls(answer_id=answer_id, question_id=question_id,
+                  content=answer_content)
         db.session.add(new)
         db.session.commit()
         return new
+
+    def __repr__(self):
+        return '<AnswerEntity {} for Question {}>'.format(
+            self.id, self.question_id)
