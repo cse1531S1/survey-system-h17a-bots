@@ -57,17 +57,12 @@ class User(UserMixin, db.Model, DatabaseUtil):
     email = db.Column(db.String(64), unique=True, index=True)
     username = db.Column(db.String(64), unique=True, index=True)
     password_hash = db.Column(db.String(128))
-
     last_login = db.Column(db.DateTime(), default=datetime.utcnow)
     surveys = db.relationship('Survey', backref='owner', lazy='dynamic')
     questions = db.relationship('Question', backref='owner', lazy='dynamic')
-    answers = db.relationship(
-        'Answer', backref='owner', lazy='dynamic')
-
+    answers = db.relationship('Answer', backref='owner', lazy='dynamic')
     is_admin = db.Column(db.Boolean, default=False)
-
     user_role = db.Column(db.String(32))
-
     courses = db.relationship('Course', secondary=UserCourse, backref=db.backref(
         'users', lazy='dynamic'), lazy='dynamic')
 
@@ -108,12 +103,6 @@ class User(UserMixin, db.Model, DatabaseUtil):
             self.is_admin = True
         else:
             self.is_admin = False
-
-    def is_administrator(self):
-        return self.is_admin
-
-    def can(self):
-        return self.is_admin
 
     def ping(self):
         self.last_login = datetime.utcnow()
@@ -182,8 +171,7 @@ class Survey(db.Model, DatabaseUtil):
 
     description = db.Column(db.String(512))
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    # course = db.Column(db.String(32))
-    course_db = db.relationship('Course', backref='survey', lazy='dynamic')
+    course = db.relationship('Course', backref='survey', lazy='dynamic')
     status = db.Column(db.String(32))
     start_date = db.Column(db.String(64))
     end_date = db.Column(db.String(64))
@@ -211,7 +199,7 @@ class Survey(db.Model, DatabaseUtil):
         return new
 
     def get_course_code(self):
-        return self.course_db.first().course_code
+        return self.course.first().course_code
 
     def set_questions(self, question_ids):
         for question_id in question_ids:

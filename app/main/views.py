@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
-from flask import request, redirect, render_template, url_for, flash, send_from_directory, g
+from flask import request, redirect, render_template, url_for, send_from_directory
 from flask_login import login_required, current_user
-from ..models import Survey, Question, Answer, AnswerEntity, Choice, User
+from ..models import Survey, Answer, AnswerEntity, User
 from .. import db
 from . import main
 from ..flatfile import FileOperation
 from config import basedir
-from datetime import datetime
-import builtins
 import os
 
 
