@@ -107,10 +107,3 @@ def answered():
 @main.route('/not_allowed')
 def not_allowed():
     return render_template('not_allowed.html')
-
-
-@login_required
-@main.route('/dashboard')
-def dashboard():
-    surveys = Survey.get_all()
-    return render_template('dashboard.html', surveys=surveys)

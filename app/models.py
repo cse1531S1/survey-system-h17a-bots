@@ -305,9 +305,9 @@ class Answer(db.Model, DatabaseUtil):
 
     @classmethod
     def check_answered(cls, id, survey_id):
-        links = cls.get_by_survey_id(survey_id)
-        for link in links:
-            if link.owner_id == id:
+        answers = cls.get_by_survey_id(survey_id)
+        for answer in answers:
+            if answer.owner_id == id:
                 return False
         return True
 
@@ -321,8 +321,8 @@ class Answer(db.Model, DatabaseUtil):
     @classmethod
     def delete_by_survey_id(cls, id):
         answer_to_delete = cls.get_by_survey_id(id)
-        for answer in answer_survey_link_to_delete:
-            for entity in answer_survey_link.entities.all():
+        for answer in answer_to_delete:
+            for entity in answer_to_delete.entities.all():
                 db.session.delete(entity)
             db.session.delete(answer)
 
