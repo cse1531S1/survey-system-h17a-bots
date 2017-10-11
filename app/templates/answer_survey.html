@@ -4,7 +4,7 @@
         <h3 class="center-align">
             {{ survey.description }}
         </h3>
-        <h5 class="center-align">{{ survey.course }} survey</h5>
+        <h5 class="center-align">{{ survey.get_course_code() }} survey</h5>
     </div>
 
     <form method="post">

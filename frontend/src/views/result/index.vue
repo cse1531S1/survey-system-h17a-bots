@@ -2,22 +2,16 @@
   <div class="app-container calendar-list-container">
     <div class="filter-container">
       <el-button class="filter-item" type="primary" v-waves icon="view" @click="handleShowPie">Statistic</el-button>
-      <el-button class="filter-item" type="primary" v-waves icon="document" @click="handleDownload">Export</el-button>
+      <!-- <el-button class="filter-item" type="primary" v-waves icon="document" @click="handleDownload">Export</el-button> -->
     </div>
 
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="Loading!!!!" border fit highlight-current-row style="width: 100%">
 
-      <!-- <el-table-column align="center" label="ID" width="55px" prop="id">
-        <template scope="scope">
-          <span>{{scope.row.id}}</span>
-        </template>
-      </el-table-column> -->
-
-      <el-table-column align="center" width="100px" label="User">
+      <!-- <el-table-column align="center" width="100px" label="User">
         <template scope="scope">
           <span>{{scope.row.name}}</span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
 
       <el-table-column width="100px" align="center" label="Time">
         <template scope="scope">
@@ -90,9 +84,18 @@ export default {
     getList() {
       this.listLoading = true
       fetchAnswers(this.listQuery, this.$route.params.id).then(response => {
-        this.list = response.data.items
-        this.questions = response.data.questions
-        this.total = response.data.total
+        if (response.data.success) {
+          this.list = response.data.items
+          this.questions = response.data.questions
+          this.total = response.data.total
+        } else {
+          this.$message({
+            message: response.data.message,
+            type: 'error',
+            duration: 6000
+          })
+        }
+      }).then(() => {
         this.listLoading = false
       })
     },
@@ -107,15 +110,6 @@ export default {
     handleCurrentChange(val) {
       this.listQuery.page = val
       this.getList()
-    },
-    handleDownload() {
-      require.ensure([], () => {
-        const { export_json_to_excel } = require('vendor/Export2Excel')
-        const tHeader = ['时间', '地区', '类型', '标题', '重要性']
-        const filterVal = ['timestamp', 'province', 'type', 'title', 'importance']
-        const data = this.formatJson(filterVal, this.list)
-        export_json_to_excel(tHeader, data, 'table数据')
-      })
     },
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => {

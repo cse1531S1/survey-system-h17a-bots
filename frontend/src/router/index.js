@@ -25,7 +25,6 @@ export const constantRouterMap = [
     component: Layout,
     redirect: '/dashboard',
     icon: 'wujiaoxing',
-    name: 'Dashboard',
     hidden: true,
     noDropdown: true,
     children: [{ path: 'dashboard', component: _import('dashboard/index'), name: 'Dashboard' }]

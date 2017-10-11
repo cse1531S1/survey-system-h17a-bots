@@ -39,7 +39,8 @@ def get_answer_data(survey_id, question_id):
 
 
 @api.route('/fetch_piechart', methods=['GET', 'POST'])
-def fetchpiechart():
+@auth.login_required
+def fetch_pie_chart():
     data = request.get_json()
     survey_id = int(data['survey'])
     question_id = int(data['question'])
@@ -79,12 +80,11 @@ def fetch_answers():
     answers = AnswerSurveyLink.get_by_survey_id(id)
     nq = len(Survey.get_by_id(id).questions.all())
 
+    #  print(g.current_user.user_role, Survey.get_by_id(id).status)
     if g.current_user.user_role != 'admin' and Survey.get_by_id(id).status != 'closed':
         return jsonify({
-            'items': None,
-            'count': None,
-            'nquestion': None,
-            'success': True
+            'message': 'This survey is not closed, don\'t hack boi.',
+            'success': False
         })
 
     try:
@@ -120,7 +120,6 @@ def fetch_answers():
 
     survey = Survey.get_by_id(id)
     qus = [i.id for i in survey.questions.all()]
-    # print(qus)
 
     return jsonify({
         'items': rtn,
@@ -131,12 +130,9 @@ def fetch_answers():
     })
 
 
-pass
-
-
 @api.route('/fetch_all_survey', methods=['GET'])
 @auth.login_required
-def all_survey():
+def fetch_all_survey():
     user = g.current_user
     role = user.user_role
 
@@ -146,8 +142,8 @@ def all_survey():
         surveys = []
         courses = user.courses.all()
         for course in courses:
-            to_append = Survey.query.filter_by(
-                course=course.course_code).first()
+            to_append = course.survey
+            #  Survey.query.filter_by(course=course.course_code).first()
             if to_append is not None:
                 surveys.append(to_append)
 
@@ -193,7 +189,7 @@ def all_survey():
             'owner': survey.owner.username if survey.owner else "AnoymousUser",
             'responses': len(AnswerSurveyLink.get_by_survey_id(survey.id)),
             'timestamp': datetime.strftime(survey.timestamp, r'%d-%m-%Y %H:%M'),
-            'course': survey.course,
+            'course': survey.get_course_code(),
             'questions_man': [{"id": q.id, "description": q.description, "type": process_type(q.q_type)}
                               for q in survey.questions.all() if q.optional is False],
             'questions_opt': [{"id": q.id, "description": q.description, "type": process_type(q.q_type)}
@@ -219,13 +215,15 @@ def fetch_course():
 
     def check(course_code):
         course = Course.get_by_code(course_code)
-        if course.survey_id is None:
-            return True
-        else:
-            return False
+        try:
+            if course.survey_id is None:
+                return True
+            else:
+                return False
+        except:
+            pass
 
     li = list(filter(check, li))
-    # print(li)
     return jsonify({
         'items': li
     })
@@ -268,6 +266,10 @@ def modify_survey():
 @auth.login_required
 def fetch_questions():
     questions = [i for i in Question.get_all() if i.deleted is not True]
+    courses = Course.get_all()
+    loaded = False
+    if len(courses) != 0:
+        loaded = True
 
     def to_dict(question):
         qt = question.q_type
@@ -295,6 +297,7 @@ def fetch_questions():
             man.append(i)
 
     return jsonify({
+        'loaded': loaded,
         'mandatory': man,
         'optional': opt
     })

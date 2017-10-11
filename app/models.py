@@ -138,7 +138,7 @@ class Course(db.Model, DatabaseUtil):
 
     """Docstring for Course. """
     __tablename__ = 'courses'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, index=True)
     course_code = db.Column(db.String(32), unique=True, index=True)
     survey_id = db.Column(db.Integer, db.ForeignKey('surveys.id'))
 
@@ -177,14 +177,13 @@ SurveyQuestion = db.Table('survey_question',
 
 class Survey(db.Model, DatabaseUtil):
     __tablename__ = 'surveys'
-    id = db.Column(db.Integer, primary_key=True)
-    id_hash = db.Column(db.String(128))
+    id = db.Column(db.Integer, primary_key=True, index=True)
+    id_hash = db.Column(db.String(128), index=True)
 
     description = db.Column(db.String(512))
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    course = db.Column(db.String(32))
+    # course = db.Column(db.String(32))
     course_db = db.relationship('Course', backref='survey', lazy='dynamic')
-    # surveys = db.relationship('Survey', backref='owner', lazy='dynamic')
     status = db.Column(db.String(32))
     start_date = db.Column(db.String(64))
     end_date = db.Column(db.String(64))
@@ -202,7 +201,7 @@ class Survey(db.Model, DatabaseUtil):
     def create(cls, description, owner_id, course, active, times):
         course_in_db = Course.get_by_code(course)
         new = cls(description=description, owner_id=owner_id, start_date=times[0],
-                  end_date=times[1], course=course, status="review")
+                  end_date=times[1], status="review")
         db.session.add(new)
         db.session.commit()
         course_in_db.survey_id = new.id
@@ -210,6 +209,9 @@ class Survey(db.Model, DatabaseUtil):
         db.session.add(new, course_in_db)
         db.session.commit()
         return new
+
+    def get_course_code(self):
+        return self.course_db.first().course_code
 
     def set_questions(self, question_ids):
         for question_id in question_ids:
@@ -249,7 +251,7 @@ class Survey(db.Model, DatabaseUtil):
 
 class Question(db.Model, DatabaseUtil):
     __tablename__ = 'questions'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, index=True)
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     optional = db.Column(db.Boolean)
     deleted = db.Column(db.Boolean, default=False)
@@ -276,7 +278,7 @@ class Question(db.Model, DatabaseUtil):
 
 class Answer(db.Model, DatabaseUtil):
     __tablename__ = 'answers'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, index=True)
     question_id = db.Column(db.Integer, db.ForeignKey('questions.id'))
     content = db.Column(db.String(512))
     rep_id = db.Column(db.Integer, db.ForeignKey('answer_survey_link.id'))
@@ -296,7 +298,7 @@ class Answer(db.Model, DatabaseUtil):
 
 class AnswerSurveyLink(db.Model, DatabaseUtil):
     __tablename__ = 'answer_survey_link'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, index=True)
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     timestamp = db.Column(db.DateTime(), default=datetime.utcnow)
     survey_id = db.Column(db.Integer, db.ForeignKey('surveys.id'))
@@ -344,7 +346,7 @@ class AnswerSurveyLink(db.Model, DatabaseUtil):
 
 class Choice(db.Model, DatabaseUtil):
     __tablename__ = 'choices'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, index=True)
     question_id = db.Column(db.Integer, db.ForeignKey('questions.id'))
     content = db.Column(db.String(128))
 

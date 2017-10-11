@@ -65,7 +65,6 @@
 
     </el-table>
 
-
     <h5 class="">Survey Results</h5>
     <el-table :key='tableKey2' :data="list_closed" v-loading="listLoading" element-loading-text="Loading!!!!" border fit highlight-current-row style="width: 100%">
 
@@ -99,7 +98,7 @@
       <el-row class="" type="flex" justify="center">
         <h5>Mandatory questions chosen by admin</h5>
       </el-row>
-      <el-row class="" type="flex" justify="center" v-for="i in list3" :key="i">
+      <el-row class="" type="flex" justify="center" v-for="i in list3" :key="i.description">
         <el-row class="">{{ i.description }}: {{ i.type }}</el-row>
       </el-row>
       <br>
@@ -123,7 +122,7 @@
 
 
 <script>
-import { fetchList, fetchQuestion, fetchCourse, modifySurvey, createQuestion } from '@/api/article'
+import { fetchList, fetchQuestion, fetchCourse, modifySurvey } from '@/api/article'
 import draggable from 'vuedraggable'
 import DndList from '@/components/twoDndList'
 import waves from '@/directive/waves.js'// 水波纹指令
@@ -231,8 +230,10 @@ export default {
   },
   methods: {
     filterList() {
+      this.list_open = []
+      this.list_closed = []
       for (let i = 0; i < this.list.length; i++) {
-        if (this.list[i].status === 'open') this.list_open.push(this.list[i])
+        if (this.list[i].status === 'review') this.list_open.push(this.list[i])
         if (this.list[i].status === 'closed') this.list_closed.push(this.list[i])
       }
     },
@@ -250,15 +251,6 @@ export default {
     },
     prev() {
       if (this.active-- < 0) this.active = 0
-    },
-    deleteEle(ele) {
-      for (const item of this.newQuestion.choices) {
-        if (item === ele) {
-          const index = this.newQuestion.choices.indexOf(item)
-          this.newQuestion.choices.splice(index, 1)
-          break
-        }
-      }
     },
     parseTime(time) {
       return parseTime(time)
@@ -303,17 +295,6 @@ export default {
       this.listQuery.start = parseInt(+time[0] / 1000)
       this.listQuery.end = parseInt((+time[1] + 3600 * 1000 * 24) / 1000)
     },
-    handleModifyStatus(row, status) {
-      row.status = status
-      this.temp = Object.assign({}, row)
-      this.update()
-    },
-    handleCreate() {
-      if (this.$refs['newSurvey']) this.$refs['newSurvey'].resetFields()
-      this.resetTemp()
-      this.dialogStatus = 'create'
-      this.dialogFormVisible = true
-    },
     handleReview(row) {
       this.resetTemp()
       this.listLoading = true
@@ -323,48 +304,6 @@ export default {
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.listLoading = false
-    },
-    handleCQuestion(row) {
-      this.resetQuestionTemp()
-      this.dialogQuestion = true
-    },
-    handleDelete(row) {
-      this.$notify({
-        title: '成功',
-        message: '删除成功',
-        type: 'success',
-        duration: 2000
-      })
-      const index = this.list.indexOf(row)
-      this.list.splice(index, 1)
-    },
-    createQuestion() {
-      var detail = {
-        title: this.newQuestion.title,
-        qType: this.newQuestion.qType,
-        choices: this.newQuestion.choices
-      }
-      createQuestion(detail).then(response => {
-        if (response.data.success) {
-          this.$notify({
-            title: 'Success!',
-            message: 'You successfully created a question!',
-            type: 'success',
-            duration: 2000
-          })
-        } else {
-          this.$notify({
-            title: 'Not Success!',
-            message: 'Some unknown error happened',
-            type: 'error',
-            duration: 2000
-          })
-        }
-      }).then(() => {
-        this.getList()
-        this.resetQuestionTemp()
-        this.dialogQuestion = false
-      })
     },
     review() {
       this.dialogFormVisible = false
@@ -414,33 +353,6 @@ export default {
       this.list1 = []
       this.list3 = []
       this.to_post = {}
-      this.active = 0
-      // this.$refs['newSurvey'].resetFields()
-    },
-    resetQuestionTemp() {
-      this.newQuestion = {
-        title: '',
-        qType: '',
-        choices: ['Very Strongly Agree', 'Strongly Agree', 'Agree', 'Disagree', 'Strongly Disagree', 'Very Strongly Disagree']
-      }
-    },
-    handleDownload() {
-      require.ensure([], () => {
-        const { export_json_to_excel } = require('vendor/Export2Excel')
-        const tHeader = ['时间', '地区', '类型', '标题', '重要性']
-        const filterVal = ['timestamp', 'province', 'type', 'title', 'importance']
-        const data = this.formatJson(filterVal, this.list)
-        export_json_to_excel(tHeader, data, 'table数据')
-      })
-    },
-    formatJson(filterVal, jsonData) {
-      return jsonData.map(v => filterVal.map(j => {
-        if (j === 'timestamp') {
-          return parseTime(v[j])
-        } else {
-          return v[j]
-        }
-      }))
     }
   }
 }

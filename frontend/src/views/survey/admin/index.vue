@@ -11,17 +11,17 @@
 
       <el-button class="filter-item" type="primary" v-waves icon="search" @click="handleFilter">Search</el-button>
       <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="edit">Add a Survey</el-button>
-      <el-button class="filter-item" type="primary" icon="document" @click="loadUsers">Load Users</el-button>
+      <el-button v-if="!loaded" class="filter-item" type="primary" icon="document" @click="loadUsers">Load Users</el-button>
       <!-- <el-button class="filter-item" type="primary" icon="document" @click="handleDownload">Export</el-button> -->
     </div>
 
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="Loading!!!!" border fit highlight-current-row style="width: 100%">
 
-      <el-table-column align="center" label="ID" width="55" prop="id">
+      <!-- <el-table-column align="center" label="ID" width="55" prop="id">
         <template scope="scope">
           <span>{{scope.row.id}}</span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
 
       <el-table-column width="150px" align="center" label="Creation time">
         <template scope="scope">
@@ -31,7 +31,8 @@
 
       <el-table-column min-width="250px" label="Title">
         <template scope="scope">
-          <span class="link-type" @click="handleUpdate(scope.row)">{{scope.row.title}}</span>
+          <span v-if="scope.row.status === 'review'" class="link-type" @click="handleUpdate(scope.row)">{{scope.row.title}}</span>
+          <span v-else>{{scope.row.title}}</span>
         </template>
       </el-table-column>
 
@@ -55,9 +56,9 @@
 
       <!-- <el-table-column width="110px" align="center" label="Owner"> -->
       <!-- <template scope="scope">
-                    <span>{{scope.row.owner}}</span>
-                  </template>
-                </el-table-column> -->
+                                  <span>{{scope.row.owner}}</span>
+                                </template>
+                              </el-table-column> -->
 
       <el-table-column align="center" label="Responses" width="110">
         <template scope="scope">
@@ -103,13 +104,12 @@
 
           <template v-if="active == 0">
 
-            <el-form-item label="Status">
-              <el-select class="filter-item" v-model="temp.status" placeholder="Choose...">
-                <!-- <el-option v-for="item in  statusOptions" :key="item" :label="item" :value="item"> -->
-                <!-- </el-option> -->
-                <el-option class="" key="review" label="review" value="review"></el-option>
-              </el-select>
-            </el-form-item>
+            <!-- <el-form-item label="Status">
+                            <el-select class="filter-item" v-model="temp.status" placeholder="Choose...">
+                              <el-option v-for="item in  statusOptions" :key="item" :label="item" :value="item"></el-option>
+                              <el-option class="" key="review" label="review" value="review"></el-option>
+                            </el-select>
+                          </el-form-item> -->
 
             <el-form-item label="Courses" prop="course">
               <el-select class="filter-item" v-model="temp.course" filterable placeholder="Choose...">
@@ -163,8 +163,8 @@
     </el-dialog>
 
     <el-dialog title="Create Question" :visible.sync="dialogQuestion" size="small">
-      <el-form class="large-space" :model="newQuestion" label-position="left" label-width="70px" style='width: 400px; margin-left:50px;'>
-        <el-form-item label="Title">
+      <el-form class="large-space" :model="newQuestion" label-position="left" label-width="70px" style='width: 400px; margin-left:50px;' :rules="createQuestionRules" ref="newQuestion">
+        <el-form-item label="Title" prop="title">
           <el-input v-model="newQuestion.title"></el-input>
         </el-form-item>
 
@@ -172,7 +172,7 @@
           <el-switch v-model="newQuestion.qOptional" on-color="#13ce66" off-color="#ff4949"></el-switch>
         </el-form-item>
 
-        <el-form-item label="Question Type">
+        <el-form-item label="Question Type" prop="qType">
           <el-select class="filter-item" v-model="newQuestion.qType" placeholder="Choose...">
             <el-option v-for="(item, index) in  qTypeAllowed" :key="index" :label="item" :value="index">
             </el-option>
@@ -288,6 +288,7 @@ export default {
       },
       dialogQuestion: false,
       to_post: {},
+      loaded: true,
       rules: {
         course: [
           { required: true, message: 'Please choose a course', trigger: 'change' }
@@ -300,6 +301,14 @@ export default {
         ],
         title: [
           { required: true, message: 'Please input a title', trigger: 'blur' }
+        ]
+      },
+      createQuestionRules: {
+        title: [
+          { required: true, message: 'Please enter a title for the question', trigger: 'blur' }
+        ],
+        qType: [
+          { required: true, message: 'Please Choose a type for the question', trigger: 'blur' }
         ]
       }
     }
@@ -362,6 +371,7 @@ export default {
           })
         }
       }).then(() => {
+        this.loaded = true
         this.listLoading = false
       })
     },
@@ -397,6 +407,7 @@ export default {
         this.listLoading = false
       })
       fetchQuestion().then(response => {
+        this.loaded = response.data.loaded
         this.list2 = response.data.mandatory
         this.list4 = response.data.optional
       })
@@ -441,32 +452,38 @@ export default {
       this.dialogQuestion = true
     },
     createQuestion() {
-      var detail = {
-        title: this.newQuestion.title,
-        qType: this.newQuestion.qType,
-        optional: this.newQuestion.qOptional,
-        choices: this.newQuestion.choices
-      }
-      createQuestion(detail).then(response => {
-        if (response.data.success) {
-          this.$notify({
-            title: 'Success!',
-            message: 'You successfully created a question!',
-            type: 'success',
-            duration: 2000
+      this.$refs['newQuestion'].validate((valid) => {
+        if (valid) {
+          var detail = {
+            title: this.newQuestion.title,
+            qType: this.newQuestion.qType,
+            optional: this.newQuestion.qOptional,
+            choices: this.newQuestion.choices
+          }
+          createQuestion(detail).then(response => {
+            if (response.data.success) {
+              this.$notify({
+                title: 'Success!',
+                message: 'You successfully created a question!',
+                type: 'success',
+                duration: 2000
+              })
+            } else {
+              this.$notify({
+                title: 'Not Success!',
+                message: 'Some unknown error happened',
+                type: 'error',
+                duration: 2000
+              })
+            }
+          }).then(() => {
+            this.getList()
+            this.resetQuestionTemp()
+            this.dialogQuestion = false
           })
         } else {
-          this.$notify({
-            title: 'Not Success!',
-            message: 'Some unknown error happened',
-            type: 'error',
-            duration: 2000
-          })
+          return false
         }
-      }).then(() => {
-        this.getList()
-        this.resetQuestionTemp()
-        this.dialogQuestion = false
       })
     },
     create() {
@@ -479,7 +496,7 @@ export default {
             'questions_opt': this.list3,
             'start': this.temp.start_time,
             'end': this.temp.end_time,
-            'status': this.temp.status,
+            'status': 'review',
             'id': -1
           }
           createSurvey(this.to_post).then(response => {

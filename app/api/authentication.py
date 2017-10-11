@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 from flask_httpauth import HTTPBasicAuth
-from ..models import User
+from ..models import User, Course
 from flask import g, jsonify, request
 from .errors import unauthorized
 from . import api
@@ -50,6 +50,11 @@ def log_off():
 @auth.login_required
 def get_info():
     user = g.current_user
+    courses = Course.get_all()
+    loaded = False
+    if len(courses) != 0:
+        loaded = True
+
     if not user:
         return unauthorized('Invalid credentials')
     rtn = jsonify({
@@ -59,6 +64,7 @@ def get_info():
         'courses': [i.course_code for i in user.courses.all()],
         'token': user.generate_auth_token(),
         'success': True,
+        'loaded': loaded,
         'introduction': ''
     })
     # print([i.course_code for i in user.courses.all()])
