@@ -381,12 +381,14 @@ def create_survey():
 def create_question():
     user = g.current_user
     data = request.get_json()
+    q_type = int(data['qType'])
     # print(data['qType'])
     question = Question.create(description=data['title'], owner_id=user.id,
-                               q_type=int(data['qType']), optional=data['optional'])
-    choices = data['choices']
-    for choice in choices:
-        Choice.create(choice, question.id)
+                               q_type=q_type, optional=data['optional'])
+    if q_type == 1:
+        choices = data['choices']
+        for choice in choices:
+            Choice.create(choice, question.id)
     return jsonify({
         "success": True,
     })
