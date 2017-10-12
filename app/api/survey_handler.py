@@ -346,7 +346,7 @@ def question_pool():
     result = [to_dict(question) for question in questions]
 
     return jsonify({
-        'total': len(Survey.get_all()),
+        'total': len(questions),
         'items': result
     })
 
