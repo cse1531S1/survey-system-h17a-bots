@@ -8,7 +8,7 @@
       <el-button class="filter-item" v-waves style="margin-left: 10px;" @click="handleCQuestion" type="primary" icon="edit">Add a question</el-button>
     </div>
 
-    <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="Loading!!!!" border fit highlight-current-row style="width: 100%">
+    <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="Loading..." border fit highlight-current-row style="width: 100%">
 
 
       <el-table-column min-width="250px" label="Title">
@@ -17,7 +17,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Optional" width="75">
+      <el-table-column align="center" label="Optional" width="100">
         <template scope="scope">
           <span v-if="scope.row.optional"><i class="el-icon-check"></i></span>
           <span v-else><i class="el-icon-close"></i></span>
@@ -38,7 +38,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Operation" width="180">
+      <el-table-column align="center" label="Operation" width="120">
         <template scope="scope">
           <el-button size="small" type="danger" @click="handleDelete(scope.row)">Delete
           </el-button>
@@ -96,7 +96,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="Are you sure to delete this question?" :visible.sync="showWarning" size="small">
+    <el-dialog title="Are you sure you want to delete this question?" :visible.sync="showWarning" size="small">
       <el-button @click="showWarning = false">Cancel</el-button>
       <el-button type="danger" @click="deleteQuestion">Delete</el-button>
     </el-dialog>
@@ -153,18 +153,18 @@ export default {
         choices: ['Very Strongly Agree', 'Strongly Agree', 'Agree', 'Disagree', 'Strongly Disagree', 'Very Strongly Disagree']
       },
       qTypeAllowed: {
-        1: 'Multiple Choices',
-        2: 'Text Based Question'
+        1: 'Multiple choice',
+        2: 'Text based'
       },
       dialogQuestion: false,
       to_post: {},
       to_delete: 0,
       rules: {
         title: [
-          { required: true, message: 'Please enter a title for the question', trigger: 'blur' }
+          { required: true, message: 'Please enter the question title', trigger: 'blur' }
         ],
         qType: [
-          { required: true, message: 'Please Choose a type for the question', trigger: 'blur' }
+          { required: true, message: 'Please choose the question type', trigger: 'blur' }
         ]
       }
     }
@@ -233,7 +233,7 @@ export default {
         if (response.data.success) {
           this.$notify({
             title: 'Success',
-            message: 'You successfully delete a question!',
+            message: 'You have successfully deleted a question!',
             type: 'success',
             duration: 4000
           })
@@ -264,14 +264,14 @@ export default {
             if (response.data.success) {
               this.$notify({
                 title: 'Success!',
-                message: 'You successfully created a question!',
+                message: 'You have successfully created a question!',
                 type: 'success',
                 duration: 2000
               })
             } else {
               this.$notify({
-                title: 'Not Success!',
-                message: 'Some unknown error happened',
+                title: 'Failed!',
+                message: 'An unknown error occured.',
                 type: 'error',
                 duration: 2000
               })

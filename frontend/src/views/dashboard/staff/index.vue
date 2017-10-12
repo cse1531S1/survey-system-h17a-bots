@@ -9,8 +9,8 @@
             </pan-thumb>
 
           </div>
-          <el-row type="flex" justify="center" class="display_name">User id: {{name}}</el-row>
-          <el-row type="flex" justify="center">You currently involved in</el-row>
+          <el-row type="flex" justify="center" class="display_name">User ID: {{name}}</el-row>
+          <el-row type="flex" justify="center">You're currently involved in</el-row>
           <el-row type="flex" justify="center" class="pan-info-roles" :key='item' v-for="item in courses">{{item}}</el-row>
         </el-card>
       </el-col>

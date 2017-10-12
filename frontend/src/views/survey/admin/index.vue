@@ -48,7 +48,7 @@
                                 </template>
                               </el-table-column> -->
 
-      <el-table-column align="center" label="Responses" width="110">
+      <el-table-column align="center" label="Responses" width="120">
         <template scope="scope">
           <span>{{scope.row.responses}}</span>
         </template>
@@ -86,7 +86,7 @@
         <el-form :rules="rules" class="large-space" :model="temp" label-position="left" label-width="70px" style='width: 800px; margin-left:50px;' ref="newSurvey">
           <el-steps :active="active" finish-status="success">
             <el-step title="General Info"></el-step>
-            <el-step title="Choose Generic Questions"></el-step>
+            <el-step title="Choose Mandatory Questions"></el-step>
             <el-step title="Choose Optional Questions"></el-step>
           </el-steps>
 
@@ -215,7 +215,7 @@ export default {
   data() {
     var validateDate = (rule, value, callback) => {
       if (value === undefined || value === '') {
-        callback(new Error('Please Choose a Date'))
+        callback(new Error('Please choose a date'))
       } else {
         callback()
       }
@@ -271,8 +271,8 @@ export default {
         choices: ['Very Strongly Agree', 'Strongly Agree', 'Agree', 'Disagree', 'Strongly Disagree', 'Very Strongly Disagree']
       },
       qTypeAllowed: {
-        1: 'Multiple Choices',
-        2: 'Text Based Question'
+        1: 'Multiple choice',
+        2: 'Text based'
       },
       dialogQuestion: false,
       to_post: {},
@@ -346,14 +346,14 @@ export default {
         if (response.data.success) {
           this.$notify({
             title: 'Success!',
-            message: 'You successfully load all users',
+            message: 'You successfully loaded all users',
             type: 'success',
             duration: 2000
           })
         } else {
           this.$notify({
-            title: 'Not Success!',
-            message: 'Some unknown error happened',
+            title: 'Failed!',
+            message: 'An unknown error occured',
             type: 'error',
             duration: 2000
           })
@@ -458,8 +458,8 @@ export default {
               })
             } else {
               this.$notify({
-                title: 'Not Success!',
-                message: 'Some unknown error happened',
+                title: 'Failed!',
+                message: 'An unknown error occured.',
                 type: 'error',
                 duration: 2000
               })
@@ -497,8 +497,8 @@ export default {
               })
             } else {
               this.$notify({
-                title: 'Not Success!',
-                message: 'Some unknown error happened',
+                title: 'Failed!',
+                message: 'An unknown error occured.',
                 type: 'error',
                 duration: 2000
               })
@@ -536,8 +536,8 @@ export default {
           })
         } else {
           this.$notify({
-            title: 'Not Success!',
-            message: 'Some unknown error happened',
+            title: 'Failed!',
+            message: 'An unknown error occured.',
             type: 'error',
             duration: 2000
           })
