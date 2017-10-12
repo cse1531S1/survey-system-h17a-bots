@@ -4,7 +4,7 @@
       <el-col :span="6">
         <el-card class="box-card">
           <div slot="header" class="box-card-header">
-            <pan-thumb class="panThumb" :name="name"> You Are:
+            <pan-thumb class="panThumb" :name="name"> You are:
               <span class="pan-info-roles" :key='item' v-for="item in roles">{{item}}</span>
             </pan-thumb>
           </div>
