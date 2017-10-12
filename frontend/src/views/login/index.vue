@@ -35,14 +35,14 @@ export default {
   data() {
     const validateUsername = (rule, value, callback) => {
       if (!isvalidUsername(value)) {
-        callback(new Error('Incorrect Username'))
+        callback(new Error('Incorrect username'))
       } else {
         callback()
       }
     }
     const validatePassword = (rule, value, callback) => {
       if (value.length < 4) {
-        callback(new Error('Password should be longer than 4'))
+        callback(new Error('Passwords must be longer than 4 characters'))
       } else {
         callback()
       }

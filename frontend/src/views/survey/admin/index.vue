@@ -133,7 +133,7 @@
             <el-button class="filter-item" style="margin-left: 10px;" @click="handleCQuestion" type="primary" icon="edit">Add a question</el-button>
 
             <div class="editor-container">
-              <dnd-list :list1="list3" :list2="list4" list1Title="Chosen" list2Title="Mandatory Question Pool"></dnd-list>
+              <dnd-list :list1="list3" :list2="list4" list1Title="Chosen" list2Title="Optional Question Pool"></dnd-list>
             </div>
           </template>
 
