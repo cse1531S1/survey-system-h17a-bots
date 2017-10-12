@@ -304,6 +304,7 @@ def fetch_questions():
 @auth.login_required
 def question_pool():
     questions = [i for i in Question.get_all() if i.deleted is not True]
+    totalnum = len(questions)
 
     try:
         order = request.args['sort']
@@ -311,12 +312,13 @@ def question_pool():
             questions = questions[::-1]
     except:
         pass
+
     try:
         limit = int(request.args['limit'])
-        start = (int(request.args['page']) - 1)
+        start = int(request.args['page']) - 1
         questions = questions[start * limit:(start + 1) * limit]
     except:
-        pass
+        print('error here')
 
     try:
         title = request.args['title']
@@ -346,7 +348,7 @@ def question_pool():
     result = [to_dict(question) for question in questions]
 
     return jsonify({
-        'total': len(questions),
+        'total': totalnum,
         'items': result
     })
 
