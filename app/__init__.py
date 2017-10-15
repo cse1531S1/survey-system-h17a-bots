@@ -9,6 +9,8 @@ from flask_login import LoginManager
 from flask_mail import Mail
 from flask_cors import CORS
 from config import config
+import os
+import json
 
 
 bootstrap = Bootstrap()
@@ -19,6 +21,23 @@ mail = Mail()
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'
 login_manager.login_view = 'auth.login'
+
+
+APP_DIR = os.path.dirname(__file__)
+
+
+def register_context_processors(app):
+    @app.context_processor
+    def manifest():
+        manifest = {}
+        try:
+            with open(APP_DIR + '/static/dist/manifest.json', 'r') as f:
+                manifest = json.load(f)
+        except Exception:
+            print(
+                'no manifest file found at ' + APP_DIR + '/static/dist/manifest.json'
+            )
+        return dict(manifest=manifest)
 
 
 def create_app(config_name):
@@ -40,5 +59,6 @@ def create_app(config_name):
     app.register_blueprint(main_blueprint)
     app.register_blueprint(auth_blueprint)
     app.register_blueprint(api_blueprint, url_prefix='/api/v1.0')
+    register_context_processors(app)
 
     return app

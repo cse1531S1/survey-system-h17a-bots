@@ -13,9 +13,14 @@ import os
 
 @main.route('/', methods=['GET'])
 def index():
+    return render_template('index.html')
+
+
+@main.route('/old', methods=['GET'])
+def old_index():
     survey_count = len(Survey.get_all())
     response_count = len(Answer.get_all())
-    return render_template('index.html', survey_count=survey_count, response_count=response_count)
+    return render_template('indexold.html', survey_count=survey_count, response_count=response_count)
 
 
 @main.route('/user/<int:id>')

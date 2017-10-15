@@ -11,19 +11,21 @@ auth = HTTPBasicAuth()
 
 @auth.verify_password
 def verify_password(name_or_token, password):
-    try:
-        token = request.headers['X-Token']
-        g.current_user = User.verify_auth_token(token)
-        return g.current_user is not None
-    except:
-        pass
     if name_or_token == '':
+        print('here')
         g.current_user = None
         return False
     if password == '':
         g.current_user = User.verify_auth_token(name_or_token)
         g.token_used = True
         return g.current_user is not None
+
+    # try:
+        # token = request.headers['X-Token']
+        # g.current_user = User.verify_auth_token(token)
+        # return g.current_user is not None
+    # except:
+        # pass
 
     user = User.query.filter_by(username=name_or_token).first()
     if not user:

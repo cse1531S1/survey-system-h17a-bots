@@ -1,31 +1,26 @@
-{% extends "base.html" %} {% block title %} Home {% endblock %} {% block page_content %}
+<!DOCTYPE html>
 
-<body>
-    <div align="center">
-        {% if current_user.is_authenticated %}
-        <div class="info-box">
-            <!-- Apply any bg-* class to to the icon to color it -->
-            <span class="info-box-icon bg-teal"><i class="fa fa-star-o"></i></span>
-            <div class="info-box-content">
-                <span class="info-box-text">Total amount of surveys</span>
-                <span class="info-box-number">{{survey_count}}</span>
-            </div>
-            <!-- /.info-box-content -->
-        </div>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 
-        <div class="info-box">
-            <!-- Apply any bg-* class to to the icon to color it -->
-            <span class="info-box-icon bg-teal"><i class="fa fa-star-o"></i></span>
-            <div class="info-box-content">
-                <span class="info-box-text">Total amount of survey responses</span>
-                <span class="info-box-number">{{response_count}}</span>
-            </div>
-            <!-- /.info-box-content -->
-        </div>
+    <title>Survey Manage System</title>
+    <link rel="shortcut icon" href="./favicon.ico">
+    <!-- <link href="./static/css/app.dd1a419b4552c8a432d635fcb79faac6.css" rel="stylesheet" type="text/css"> -->
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static',filename='css/app.dd1a419b4552c8a432d635fcb79faac6.css') }}">
+  </head>
 
-        <!-- /.info-box -->
-        <a href="{{ url_for('main.create_survey') }}" class="btn btn-primary btn-index">Create your own survey</a> {% else %}
-        <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-index">Create your own survey</a> {% endif %}
+  <body>
+    <div id="app">
     </div>
-</body>
-{% endblock %}
+    <!-- <script type="text/javascript" src="./static/js/manifest.1c94a3433c1e429beb95.js"></script> -->
+    <!-- <script type="text/javascript" src="./static/js/vendor.cf8233347eb9001e5b93.js"></script> -->
+    <script type="text/javascript" src="{{ url_for('static', filename='js/manifest.1c94a3433c1e429beb95.js') }}"> </script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/vendor.cf8233347eb9001e5b93.js') }}"> </script>
+    <!-- <script type="text/javascript" src="./static/js/app.84b6c58bf821eff21efc.js"></script> -->
+    <script type="text/javascript" src="{{ url_for('static', filename='js/app.84b6c58bf821eff21efc.js') }}"> </script>
+  </body>
+</html>
