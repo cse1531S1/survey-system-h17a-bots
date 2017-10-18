@@ -3,7 +3,7 @@
 
 from flask import request, jsonify, g
 from . import api
-from ..models import Survey, Answer, Question, Choice, db, Course
+from ..models import Survey, Answer, Question, Choice, db, Course, User
 from ..flatfile import FileOperation
 from datetime import datetime
 from .authentication import auth
@@ -114,7 +114,7 @@ def fetch_answers():
     #  try:
     rtn = [to_dic(a) for a in answers]
     #  except:
-        #  pass
+    #  pass
 
     survey = Survey.get_by_id(id)
     qus = [i.id for i in survey.questions.all()]
@@ -134,7 +134,7 @@ def fetch_all_survey():
     user = g.current_user
     role = user.user_role
 
-    if role == 'admin':
+    if role == 'admin' or role == 'guest':
         surveys = Survey.get_all()
     else:
         surveys = []
@@ -436,4 +436,24 @@ def loadUser():
     FileOperation.load_users()
     return jsonify({
         "success": True,
+    })
+
+
+@api.route('/register', methods=['GET', 'POST'])
+def register():
+    data = request.get_json()
+    username = data['username']
+    password = data['password']
+    if User.get_by_name(username) is not None:
+        return jsonify({
+            'success': False,
+            'message': 'this username already exists'
+        })
+
+    new = User(username=username, password=password, user_role='guest')
+    db.session.add(new)
+    db.session.commit()
+
+    return jsonify({
+        'success': True,
     })

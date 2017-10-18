@@ -12,7 +12,6 @@ auth = HTTPBasicAuth()
 @auth.verify_password
 def verify_password(name_or_token, password):
     if name_or_token == '':
-        print('here')
         g.current_user = None
         return False
     if password == '':
@@ -74,11 +73,17 @@ def get_info():
     return rtn
 
 
+# @auth.login_required
 @api.route('/get_token', methods=['POST', 'GET'])
-@auth.login_required
 def get_token():
-    if g.current_user.is_anonymous:
-        return unauthorized('Invalid credentials')
+    try:
+        if g.current_user.is_anonymous:
+            return unauthorized('Invalid credentials')
+    except:
+        data = request.get_json()
+        if not verify_password(data['username'], data['password']):
+            return unauthorized('Invalid credentials')
+
     return jsonify({
         'token': g.current_user.generate_auth_token(
             expiration=360000),

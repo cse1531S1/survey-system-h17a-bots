@@ -12,7 +12,6 @@
       <el-button class="filter-item" type="primary" v-waves icon="search" @click="handleFilter">Search</el-button>
       <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="edit">Add a Survey</el-button>
       <el-button v-if="!loaded" class="filter-item" type="primary" icon="document" @click="loadUsers">Load Users</el-button>
-      <!-- <el-button class="filter-item" type="primary" icon="document" @click="handleDownload">Export</el-button> -->
     </div>
 
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="Loading!!!!" border fit highlight-current-row style="width: 100%">
@@ -42,12 +41,6 @@
         </template>
       </el-table-column>
 
-      <!-- <el-table-column width="110px" align="center" label="Owner"> -->
-      <!-- <template scope="scope">
-                                  <span>{{scope.row.owner}}</span>
-                                </template>
-                              </el-table-column> -->
-
       <el-table-column align="center" label="Responses" width="120">
         <template scope="scope">
           <span>{{scope.row.responses}}</span>
@@ -62,8 +55,6 @@
 
       <el-table-column align="center" label="Operation" width="110">
         <template scope="scope">
-          <!-- <el-button v-waves v-if="scope.row.status!='open'" size="small" type="success" @click="handleModifyStatus(scope.row,'open')">Open</el-button> -->
-          <!-- <el-button v-waves v-if="scope.row.status!='review'" size="small" @click="handleModifyStatus(scope.row,'review')">Review</el-button> -->
           <el-button v-waves v-if="scope.row.status==='open'" size="small" type="danger" @click="handleModifyStatus(scope.row,'closed')">Close</el-button>
         </template>
       </el-table-column>
@@ -91,13 +82,6 @@
           </el-steps>
 
           <template v-if="active == 0">
-
-            <!-- <el-form-item label="Status">
-                            <el-select class="filter-item" v-model="temp.status" placeholder="Choose...">
-                              <el-option v-for="item in  statusOptions" :key="item" :label="item" :value="item"></el-option>
-                              <el-option class="" key="review" label="review" value="review"></el-option>
-                            </el-select>
-                          </el-form-item> -->
 
             <el-form-item label="Courses" prop="course">
               <el-select class="filter-item" v-model="temp.course" filterable placeholder="Choose...">
@@ -139,12 +123,12 @@
 
         </el-form>
       </el-row>
+
       <div slot="footer" class="dialog-footer">
         <el-button style="margin-top: 12px;" @click="prev" v-if="active != 0">Previous</el-button>
         <el-button style="margin-top: 12px;" @click="next" v-if="active != 2 && active != 0 && list1.length > 0 ">Next</el-button>
         <el-button style="margin-top: 12px;" @click="openAlert" v-if="active != 2 && active != 0 && list1.length === 0 ">Next</el-button>
         <el-button style="margin-top: 12px;" @click="checkformAndNext" v-if="active == 0">Next</el-button>
-        <!-- <el-button @click="handleClean" v-if="active == 2">Cancel</el-button> -->
         <el-button v-if="dialogStatus=='create' && active == 2" type="primary" @click="create">Submit</el-button>
         <el-button v-else-if="active == 2" type="primary" @click="update">Submit</el-button>
       </div>

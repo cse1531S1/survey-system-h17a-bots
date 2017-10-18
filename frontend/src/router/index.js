@@ -7,7 +7,6 @@ Vue.use(Router)
 
 /* layout */
 import Layout from '../views/layout/Layout'
-
 /**
 * icon : the icon show in the sidebar
 * hidden : if `hidden:true` will not show in the sidebar
@@ -15,6 +14,7 @@ import Layout from '../views/layout/Layout'
 * noDropdown : if `noDropdown:true` will has no submenu
 * meta : { role: ['admin'] }  will control the page role
 **/
+
 export const constantRouterMap = [
   { path: '/login', component: _import('login/index'), hidden: true },
   { path: '/authredirect', component: _import('login/authredirect'), hidden: true },
@@ -41,7 +41,7 @@ export const asyncRouterMap = [
   {
     path: '/survey',
     component: Layout,
-    meta: { role: ['admin', 'student', 'staff'] },
+    meta: { role: ['admin', 'student', 'staff', 'guest'] },
     icon: 'wujiaoxing',
     noDropdown: true,
     children: [
@@ -49,7 +49,7 @@ export const asyncRouterMap = [
         path: 'index',
         component: _import('survey/index'),
         name: 'Survey Panel',
-        meta: { role: ['admin', 'student', 'staff'] }
+        meta: { role: ['admin', 'student', 'staff', 'guest'] }
       }
     ]
   },
@@ -69,13 +69,28 @@ export const asyncRouterMap = [
     ]
   },
   {
+    path: '/user',
+    component: Layout,
+    meta: { role: ['admin'] },
+    icon: 'wujiaoxing',
+    noDropdown: true,
+    children: [
+      {
+        meta: { role: ['admin'] },
+        path: 'user_pool',
+        component: _import('user/index'),
+        name: 'User Pool'
+      }
+    ]
+  },
+  {
     path: '/result',
     hidden: true,
     component: Layout,
-    meta: { role: ['admin', 'student', 'staff'] },
+    meta: { role: ['admin', 'student', 'staff', 'guest'] },
     children: [
       {
-        meta: { role: ['admin', 'student', 'staff'] },
+        meta: { role: ['admin', 'student', 'staff', 'guest'] },
         path: '/result/:id',
         component: _import('result/index'),
         name: 'Survey Result'

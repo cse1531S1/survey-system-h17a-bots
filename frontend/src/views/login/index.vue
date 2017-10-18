@@ -20,14 +20,33 @@
         </span>
       </el-form-item>
 
-      <el-button type="primary" style="width:100%;margin-bottom:30px;" :loading="loading" @click.native.prevent="handleLogin">Login</el-button>
+      <el-button type="primary" style="width:100%;margin-bottom:20px;" :loading="loading" @click.native.prevent="handleLogin">Login</el-button>
+
+      <el-button style="width:100%;margin-bottom:30px;margin-left:0px;" @click="handleRegister">Register</el-button>
 
     </el-form>
+
+    <el-dialog title="Register" :visible.sync="dialogVisible" size="tiny" :close-on-click-modal="false">
+
+      <el-form :model="temp" :rules="newUserRule" ref="newUser">
+        <el-form-item label="Username" prop="username">
+          <el-input v-model="temp.username" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="Password" prop="password">
+          <el-input type="password" v-model="temp.password" placeholder=""></el-input>
+        </el-form-item>
+      </el-form>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="handleSubmit">Submit</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { isvalidUsername } from '@/utils/validate'
+import { register } from '@/api/login'
 
 export default {
   components: {},
@@ -41,13 +60,10 @@ export default {
       }
     }
     const validatePassword = (rule, value, callback) => {
-      if (value.length < 4) {
-        callback(new Error('Passwords must be longer than 4 characters'))
-      } else {
-        callback()
-      }
+      callback()
     }
     return {
+      dialogVisible: false,
       loginForm: {
         username: '',
         password: ''
@@ -58,7 +74,20 @@ export default {
       },
       pwdType: 'password',
       loading: false,
-      showDialog: false
+      showDialog: false,
+      formLabelWidth: '120px',
+      temp: {
+        username: '',
+        password: ''
+      },
+      newUserRule: {
+        username: [
+          { required: true, message: 'Please enter a username', trigger: 'blur' }
+        ],
+        password: [
+          { required: true, message: 'Please enter a password', trigger: 'blur' }
+        ]
+      }
     }
   },
   methods: {
@@ -68,6 +97,37 @@ export default {
       } else {
         this.pwdType = 'password'
       }
+    },
+    handleRegister() {
+      this.temp.username = ''
+      this.temp.password = ''
+      this.dialogVisible = true
+    },
+    handleSubmit() {
+      this.$refs['newUser'].validate((valid) => {
+        if (valid) {
+          register(this.temp).then(response => {
+            if (response.data.success) {
+              this.$notify({
+                title: 'Success!',
+                message: 'You have successfully created a guest user',
+                type: 'success',
+                duration: 4000
+              })
+              this.dialogVisible = false
+            } else {
+              this.$notify({
+                title: 'Failed!',
+                message: response.data.message,
+                type: 'error',
+                duration: 4000
+              })
+            }
+          })
+        } else {
+          return false
+        }
+      })
     },
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
@@ -113,19 +173,27 @@ $light_gray:#eee;
     -webkit-box-shadow: 0 0 0px 1000px #293444 inset !important;
     -webkit-text-fill-color: #fff !important;
   }
-  input {
-    background: transparent;
-    border: 0px;
-    -webkit-appearance: none;
-    border-radius: 0px;
-    padding: 12px 5px 12px 15px;
-    color: $light_gray;
-    height: 47px;
-  }
-  .el-input {
-    display: inline-block;
-    height: 47px;
-    width: 85%;
+  .card-box {
+    input {
+      background: transparent;
+      border: 0px;
+      -webkit-appearance: none;
+      border-radius: 0px;
+      padding: 12px 5px 12px 15px;
+      color: $light_gray;
+      height: 47px;
+    }
+    .el-input {
+      display: inline-block;
+      height: 47px;
+      width: 85%;
+    }
+    .el-form-item {
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 5px;
+      color: #454545;
+    }
   }
   .tips {
     font-size: 14px;
@@ -158,12 +226,6 @@ $light_gray:#eee;
     padding: 35px 35px 15px 35px;
     margin: 120px auto;
   }
-  .el-form-item {
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
-    color: #454545;
-  }
   .show-pwd {
     position: absolute;
     right: 10px;
@@ -171,11 +233,6 @@ $light_gray:#eee;
     font-size: 16px;
     color: $dark_gray;
     cursor: pointer;
-  }
-  .thirdparty-button {
-    position: absolute;
-    right: 35px;
-    bottom: 28px;
   }
 }
 </style>

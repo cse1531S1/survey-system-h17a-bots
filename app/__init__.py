@@ -26,20 +26,6 @@ login_manager.login_view = 'auth.login'
 APP_DIR = os.path.dirname(__file__)
 
 
-def register_context_processors(app):
-    @app.context_processor
-    def manifest():
-        manifest = {}
-        try:
-            with open(APP_DIR + '/static/dist/manifest.json', 'r') as f:
-                manifest = json.load(f)
-        except Exception:
-            print(
-                'no manifest file found at ' + APP_DIR + '/static/dist/manifest.json'
-            )
-        return dict(manifest=manifest)
-
-
 def create_app(config_name):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
@@ -59,6 +45,5 @@ def create_app(config_name):
     app.register_blueprint(main_blueprint)
     app.register_blueprint(auth_blueprint)
     app.register_blueprint(api_blueprint, url_prefix='/api/v1.0')
-    register_context_processors(app)
 
     return app

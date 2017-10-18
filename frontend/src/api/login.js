@@ -16,6 +16,14 @@ export function loginByUsername(username, password) {
   })
 }
 
+export function register(data) {
+  return fetch({
+    url: 'http://127.0.0.1:5000/api/v1.0/register',
+    method: 'post',
+    data: data
+  })
+}
+
 export function logout() {
   return fetch({
     url: 'http://127.0.0.1:5000/api/v1.0/logoff',
@@ -30,4 +38,3 @@ export function getUserInfo(token) {
     // params: { token }
   })
 }
-

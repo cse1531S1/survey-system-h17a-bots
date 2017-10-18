@@ -31,6 +31,10 @@ export default {
       this.currentRole = 'staffSurveyBoard'
       return
     }
+    if (this.roles.indexOf('student') >= 0) {
+      this.currentRole = 'studentSurveyBoard'
+      return
+    }
     this.currentRole = 'studentSurveyBoard'
   }
 }
