@@ -149,14 +149,14 @@ export default {
             title: 'Success!',
             message: 'You successfully updated the user status!',
             type: 'success',
-            duration: 2000
+            duration: 1000
           })
         } else {
           this.$notify({
             title: 'Failed!',
             message: 'An unknown error occured.',
             type: 'error',
-            duration: 2000
+            duration: 1000
           })
         }
       })

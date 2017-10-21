@@ -10,7 +10,6 @@ from flask_mail import Mail
 from flask_cors import CORS
 from config import config
 import os
-import json
 
 
 bootstrap = Bootstrap()
