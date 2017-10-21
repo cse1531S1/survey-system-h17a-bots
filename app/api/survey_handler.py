@@ -3,7 +3,7 @@
 
 from flask import request, jsonify, g
 from . import api
-from ..models import Survey, Answer, Question, Choice, db, Course, User
+from ..models import Survey, Answer, Question, Choice, db, Course, User, Role
 from ..flatfile import FileOperation
 from datetime import datetime
 from .authentication import auth
@@ -78,8 +78,7 @@ def fetch_answers():
     answers = Answer.get_by_survey_id(id)
     nq = len(Survey.get_by_id(id).questions.all())
 
-    #  print(g.current_user.user_role, Survey.get_by_id(id).status)
-    if g.current_user.user_role != 'admin' and Survey.get_by_id(id).status != 'closed':
+    if g.current_user.is_admin() is False and Survey.get_by_id(id).status != 'closed':
         return jsonify({
             'message': 'This survey is not closed, don\'t hack boi.',
             'success': False
@@ -132,7 +131,7 @@ def fetch_answers():
 @auth.login_required
 def fetch_all_survey():
     user = g.current_user
-    role = user.user_role
+    role = user.role.name
 
     if role == 'admin' or role == 'guest':
         surveys = Survey.get_all()
@@ -453,8 +452,9 @@ def register():
             'message': 'this username already exists'
         })
 
+    role = Role.get_by_name('guest')
     new = User(username=username, password=password,
-               user_role='guest', verified=False)
+               role=role, verified=False)
     db.session.add(new)
     db.session.commit()
 
@@ -468,7 +468,7 @@ def register():
 
 @api.route('/user_pool', methods=['GET', 'POST'])
 def guest_pool():
-    users = User.query.filter_by(user_role='guest').all()
+    users = User.query.filter_by(role=Role.get_by_name('guest')).all()
     totalnum = len(users)
 
     try:

@@ -59,7 +59,7 @@ def get_info():
     if not user:
         return unauthorized('Invalid credentials')
     rtn = jsonify({
-        'role': [user.user_role],
+        'role': [user.role.name],
         'name': user.username,
         'avatar': '',
         'courses': [i.course_code for i in user.courses.all()],

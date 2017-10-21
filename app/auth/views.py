@@ -4,7 +4,7 @@
 from flask import render_template, redirect, request, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from . import auth
-from ..models import db, User
+from ..models import db, User, Role
 from ..email import send_email
 from .forms import LoginForm, RegistForm, ChangePasswordForm, PasswordResetForm, PasswordResetRequestForm
 from .auth_util import verify_password
@@ -30,7 +30,7 @@ def login():
 def register():
     form = RegistForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data, user_role='admin',
+        user = User(username=form.username.data, role=Role.get_by_name('admin'),
                     email=form.email.data, password=form.password.data)
         db.session.add(user)
         flash('You are able to login now.')

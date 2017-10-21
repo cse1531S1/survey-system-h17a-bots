@@ -51,9 +51,37 @@ UserCourse = db.Table('user_course',
                       )
 
 
+class Role(db.Model):
+    __tablename__ = 'roles'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(32), unique=True)
+    users = db.relationship('User', backref='role', lazy='dynamic')
+
+    @staticmethod
+    def insert_roles():
+        roles = ['admin', 'student', 'staff', 'guest']
+        for r in roles:
+            role = Role.query.filter_by(name=r).first()
+            if role is None:
+                role = Role(name=r)
+            db.session.add(role)
+        db.session.commit()
+
+    @classmethod
+    def get_by_name(cls, name):
+        return cls.query.filter_by(name=name).first()
+
+    def is_staff(self):
+        return self.name is 'staff'
+
+    def is_admin(self):
+        return self.name is 'admin'
+
+
 class User(UserMixin, db.Model, DatabaseUtil):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     email = db.Column(db.String(64), unique=True, index=True)
     username = db.Column(db.String(64), unique=True, index=True)
     password_hash = db.Column(db.String(128))
@@ -61,15 +89,16 @@ class User(UserMixin, db.Model, DatabaseUtil):
     surveys = db.relationship('Survey', backref='owner', lazy='dynamic')
     questions = db.relationship('Question', backref='owner', lazy='dynamic')
     answers = db.relationship('Answer', backref='owner', lazy='dynamic')
-    is_admin = db.Column(db.Boolean, default=False)
     verified = db.Column(db.Boolean, default=True)
-    user_role = db.Column(db.String(32))
     courses = db.relationship('Course', secondary=UserCourse, backref=db.backref(
         'users', lazy='dynamic'), lazy='dynamic')
 
     def generate_auth_token(self, expiration=None):
         s = Serializer(current_app.config['SECRET_KEY'])
         return s.dumps({'id': self.id}).decode('ascii')
+
+    def is_admin(self):
+        return self.role.name is 'admin'
 
     @property
     def password(self):

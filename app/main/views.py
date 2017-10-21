@@ -18,15 +18,13 @@ def index():
 
 @main.route('/old', methods=['GET'])
 def old_index():
-    survey_count = len(Survey.get_all())
-    response_count = len(Answer.get_all())
-    return render_template('indexold.html', survey_count=survey_count, response_count=response_count)
+    return render_template('indexold.html')
 
 
 @main.route('/user/<int:id>')
 @login_required
 def user(id):
-    if current_user.is_admin:
+    if current_user.is_admin():
         surveys = Survey.get_all()
     else:
         surveys = Survey.get_by_owner_id(current_user.id)
@@ -53,7 +51,7 @@ def answer(hash_str):
     except:
         return redirect(url_for('.not_allowed'))
 
-    if not user or user.user_role == 'staff' or user.user_role == 'admin':
+    if not user or user.role.is_staff() or user.role.is_admin():
         return redirect(url_for('.not_allowed'))
 
     survey = Survey.get_by_hash(hash_str)

@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 from threading import Thread
-from .models import Answer, Survey, User, db, Course
+from .models import Answer, Survey, User, db, Course, Role
 from flask import current_app
 import re
 import csv
@@ -81,8 +81,9 @@ class FileOperation(object):
                 result = csv.reader(file_in)
                 for user in result:
                     try:
+                        role = Role.query.filter_by(name=user[2]).first()
                         new_user = User(username=str(
-                            user[0]), user_role=user[2], password=user[1])
+                            user[0]), password=user[1], role=role)
                         db.session.add(new_user)
                         db.session.commit()
                     except:
