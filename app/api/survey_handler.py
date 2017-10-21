@@ -207,7 +207,6 @@ def fetch_all_survey():
 
 
 @api.route('/fetch_course', methods=['GET', 'OPTION'])
-@auth.login_required
 def fetch_course():
     li = FileOperation.read_course()
 
@@ -256,6 +255,21 @@ def modify_survey():
     db.session.commit()
     return jsonify({
         "success": True
+    })
+
+
+@api.route('/user_verify', methods=['GET', 'POST'])
+def verify_user():
+    data = request.get_json()
+    username = data['name']
+
+    user = User.get_by_name(username)
+    user.verified = data['status']
+
+    db.session.add(user)
+    db.session.commit()
+    return jsonify({
+        'success': True
     })
 
 
@@ -397,22 +411,11 @@ def create_question():
 def delete_question():
     data = request.get_json()
     id = data['id']
-    # current_user = g.current_user
+
     question_to_delete = Question.get_by_id(id)
     question_to_delete.deleted = True
     db.session.add(question_to_delete)
     db.session.commit()
-
-    # if current_user.id != question_to_delete.owner_id and current_user.is_admin is not True:
-    # return jsonify({
-    # 'error': "You don't have sufficient permissions to delete this question."
-    # })
-
-    # if question_to_delete.surveys.first() is not None:
-    # return jsonify({
-    # 'error': "The question is already assigned to a survey,\
-    # please unassign it first, then come back to delete it."
-    # })
 
     return jsonify({
         "success": True,
@@ -450,10 +453,47 @@ def register():
             'message': 'this username already exists'
         })
 
-    new = User(username=username, password=password, user_role='guest')
+    new = User(username=username, password=password,
+               user_role='guest', verified=False)
     db.session.add(new)
     db.session.commit()
 
+    for c in data['course']:
+        new.add_course(c)
+
     return jsonify({
         'success': True,
+    })
+
+
+@api.route('/user_pool', methods=['GET', 'POST'])
+def guest_pool():
+    users = User.query.filter_by(user_role='guest').all()
+    totalnum = len(users)
+
+    try:
+        limit = int(request.args['limit'])
+        start = int(request.args['page']) - 1
+        users = users[start * limit:(start + 1) * limit]
+    except:
+        print('error here')
+
+    try:
+        title = request.args['title']
+        users = list(filter(lambda x: title.lower()
+                            in x.username.lower(), users))
+    except:
+        pass
+
+    def to_json(user):
+        return {
+            'name': user.username,
+            'courses': [i.course_code for i in user.courses.all()],
+            'status': 'verified' if user.verified else 'unverified',
+            'success': True
+        }
+
+    return jsonify({
+        'items': [to_json(i) for i in users],
+        'total': totalnum
     })

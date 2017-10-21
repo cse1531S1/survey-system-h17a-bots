@@ -82,7 +82,14 @@ def get_token():
     except:
         data = request.get_json()
         if not verify_password(data['username'], data['password']):
-            return unauthorized('Invalid credentials')
+            return jsonify({
+                'success': False
+            })
+
+    if g.current_user.verified is False:
+        return jsonify({
+            'unverified': True
+        })
 
     return jsonify({
         'token': g.current_user.generate_auth_token(

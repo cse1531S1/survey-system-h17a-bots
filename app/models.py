@@ -62,6 +62,7 @@ class User(UserMixin, db.Model, DatabaseUtil):
     questions = db.relationship('Question', backref='owner', lazy='dynamic')
     answers = db.relationship('Answer', backref='owner', lazy='dynamic')
     is_admin = db.Column(db.Boolean, default=False)
+    verified = db.Column(db.Boolean, default=True)
     user_role = db.Column(db.String(32))
     courses = db.relationship('Course', secondary=UserCourse, backref=db.backref(
         'users', lazy='dynamic'), lazy='dynamic')

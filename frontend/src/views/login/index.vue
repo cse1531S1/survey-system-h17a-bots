@@ -35,6 +35,13 @@
         <el-form-item label="Password" prop="password">
           <el-input type="password" v-model="temp.password" placeholder=""></el-input>
         </el-form-item>
+
+        <el-form-item label="Courses">
+          <el-select class="filter-item" v-model="temp.course" filterable multiple placeholder="Choose...">
+            <el-option v-for="item in  this.course" :key="item" :label="item" :value="item">
+            </el-option>
+          </el-select>
+        </el-form-item>
       </el-form>
 
       <span slot="footer" class="dialog-footer">
@@ -47,6 +54,7 @@
 <script>
 import { isvalidUsername } from '@/utils/validate'
 import { register } from '@/api/login'
+import { fetchCourse } from '@/api/article'
 
 export default {
   components: {},
@@ -78,8 +86,10 @@ export default {
       formLabelWidth: '120px',
       temp: {
         username: '',
-        password: ''
+        password: '',
+        course: []
       },
+      course: [],
       newUserRule: {
         username: [
           { required: true, message: 'Please enter a username', trigger: 'blur' }
@@ -91,6 +101,11 @@ export default {
     }
   },
   methods: {
+    getList() {
+      fetchCourse(this.listQuery).then(response => {
+        this.course = response.data.items
+      })
+    },
     showPwd() {
       if (this.pwdType === 'password') {
         this.pwdType = ''
@@ -101,6 +116,7 @@ export default {
     handleRegister() {
       this.temp.username = ''
       this.temp.password = ''
+      this.temp.course = []
       this.dialogVisible = true
     },
     handleSubmit() {
@@ -110,7 +126,7 @@ export default {
             if (response.data.success) {
               this.$notify({
                 title: 'Success!',
-                message: 'You have successfully created a guest user',
+                message: 'You have successfully created a guest user. You still cannot login until admin veifies your registation',
                 type: 'success',
                 duration: 4000
               })
@@ -136,9 +152,10 @@ export default {
           this.$store.dispatch('LoginByUsername', this.loginForm).then(() => {
             this.loading = false
             this.$router.push({ path: '/' })
-          }).catch(() => {
+          }).catch((rejectMessage) => {
             this.$message({
-              message: 'Invaild Credentials!',
+              // message: 'Invaild credentials or your account is not verified',
+              message: rejectMessage,
               type: 'error',
               duration: 0,
               showClose: true
@@ -153,6 +170,7 @@ export default {
     }
   },
   created() {
+    this.getList()
   },
   destroyed() {
   }
@@ -160,10 +178,10 @@ export default {
 </script>
 
 <style rel="stylesheet/scss" lang="scss">
-@import "src/styles/mixin.scss";
-$bg:#2d3a4b;
-$dark_gray:#889aa4;
-$light_gray:#eee;
+@import 'src/styles/mixin.scss';
+$bg: #2d3a4b;
+$dark_gray: #889aa4;
+$light_gray: #eee;
 
 .login-container {
   @include relative;

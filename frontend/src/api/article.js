@@ -30,13 +30,6 @@ export function fetchCourse(query) {
   })
 }
 
-export function fetchArticle() {
-  return fetch({
-    url: '/article/detail',
-    method: 'get'
-  })
-}
-
 export function fetchQuestion() {
   return fetch({
     url: 'http://127.0.0.1:5000/api/v1.0/fetch_question',
@@ -44,21 +37,26 @@ export function fetchQuestion() {
   })
 }
 
-export function fetchPv(pv) {
+export function modifyUser(to_post) {
   return fetch({
-    url: '/article/pv',
-    method: 'get',
-    params: {
-      pv
-    }
+    url: 'http://127.0.0.1:5000/api/v1.0/user_verify',
+    method: 'post',
+    data: to_post
   })
 }
-
 export function modifySurvey(to_post) {
   return fetch({
     url: 'http://127.0.0.1:5000/api/v1.0/modify_survey',
     method: 'post',
     data: to_post
+  })
+}
+
+export function fetchUnverified(to_post) {
+  return fetch({
+    url: 'http://127.0.0.1:5000/api/v1.0/user_pool',
+    method: 'post',
+    params: to_post
   })
 }
 

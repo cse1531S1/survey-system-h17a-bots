@@ -79,7 +79,7 @@ export const asyncRouterMap = [
         meta: { role: ['admin'] },
         path: 'user_pool',
         component: _import('user/index'),
-        name: 'User Pool'
+        name: 'Guest Pool'
       }
     ]
   },

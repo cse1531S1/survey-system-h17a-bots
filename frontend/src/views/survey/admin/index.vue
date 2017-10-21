@@ -396,12 +396,14 @@ export default {
       this.listQuery.page = val
       this.getList()
     },
+
     handleModifyStatus(row, status) {
       row.status = status
       this.purpose = 'update_status'
       this.temp = Object.assign({}, row)
       this.update()
     },
+
     handleCreate() {
       this.resetTemp()
       this.purpose = 'create'
