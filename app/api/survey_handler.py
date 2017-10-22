@@ -83,10 +83,7 @@ def fetch_answer():
         }
 
     rtn = []
-    #  try:
     rtn = [to_dic(a) for a in answers]
-    #  except:
-    #  pass
 
     survey = Survey.get_by_id(id)
     qus = [i.id for i in survey.questions.all()]
@@ -114,7 +111,7 @@ def fetch_all_survey():
     user = g.current_user
     role = user.role.name
 
-    if role == 'admin' or role == 'guest':
+    if role == 'admin':
         surveys = Survey.get_all()
     else:
         surveys = []
