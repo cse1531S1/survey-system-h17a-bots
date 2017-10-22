@@ -2,18 +2,14 @@
 # encoding: utf-8
 
 from flask import Flask
-from flask_bootstrap import Bootstrap
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from config import config
 import os
 
-
-bootstrap = Bootstrap()
 moment = Moment()
 db = SQLAlchemy()
-
 
 APP_DIR = os.path.dirname(__file__)
 
@@ -24,7 +20,6 @@ def create_app(config_name):
     config[config_name].init_app(app)
 
     CORS(app)
-    bootstrap.init_app(app)
     moment.init_app(app)
     db.init_app(app)
 

@@ -8,7 +8,7 @@ from .. import db
 from . import main
 from ..flatfile import FileOperation
 from config import basedir
-import datetime
+from datetime import datetime
 import os
 
 
