@@ -1,6 +1,6 @@
 import unittest
 from app import create_app, db
-from app.models import User, Role, Course, Survey, Question, Answer, AnswerEntity
+from app.models import User, Role, Course, Survey, Question
 
 
 class UserModelTestCase(unittest.TestCase):
@@ -83,7 +83,8 @@ class ModelInsertionTestCase(unittest.TestCase):
 
         survey = Survey.create(description='blah test', times=['1', '2'],
                                owner_id=user.id, course=c.course_code)
-        self.assertTrue(Survey.query.filter_by(description='blah test').first() is not None)
+        self.assertTrue(Survey.query.filter_by(
+            description='blah test').first() is not None)
         question = Question.create(
             description="a test question", owner_id=user.id, optional=False, q_type=1)
         self.assertTrue(question is not None)

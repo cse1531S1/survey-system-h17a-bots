@@ -3,7 +3,7 @@ import json
 from base64 import b64encode
 from flask import url_for
 from app import create_app, db
-from app.models import User, Role
+from app.models import User, Role, Course, Survey, Answer, AnswerEntity, Question
 
 
 class APITestCase(unittest.TestCase):
@@ -187,3 +187,4 @@ class APITestCase(unittest.TestCase):
         )
         json_response = json.loads(response.data.decode('utf-8'))
         self.assertTrue(json_response.get('unverified'))
+
