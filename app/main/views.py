@@ -11,14 +11,28 @@ from config import basedir
 import os
 
 
+@main.route('/thankyou')
+def thankyou():
+    """
+        This function is the view function for the thank you page the
+        respondent will see after survey completion.
+    """
+    return render_template('thank_you.html')
+
+
+@main.route('/answered')
+def answered():
+    return render_template('answered.html')
+
+
+@main.route('/not_allowed')
+def not_allowed():
+    return render_template('not_allowed.html')
+
+
 @main.route('/', methods=['GET'])
 def index():
     return render_template('index.html')
-
-
-@main.route('/old', methods=['GET'])
-def old_index():
-    return render_template('indexold.html')
 
 
 @login_required
@@ -79,22 +93,3 @@ def answer(hash_str):
 
     return render_template('answer_survey.html', survey=survey, course=survey.get_course_code(),
                            questions_opt=questions_opt, questions_man=questions_man)
-
-
-@main.route('/thankyou')
-def thankyou():
-    """
-        This function is the view function for the thank you page the
-        respondent will see after survey completion.
-    """
-    return render_template('thank_you.html')
-
-
-@main.route('/answered')
-def answered():
-    return render_template('answered.html')
-
-
-@main.route('/not_allowed')
-def not_allowed():
-    return render_template('not_allowed.html')

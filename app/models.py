@@ -3,9 +3,8 @@
 
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from flask_login import UserMixin, AnonymousUserMixin
 from flask import current_app
-from . import db, login_manager
+from . import db
 from datetime import datetime
 import hashlib
 
@@ -78,18 +77,16 @@ class Role(db.Model):
         return self.name is 'admin'
 
 
-class User(UserMixin, db.Model, DatabaseUtil):
+class User(db.Model, DatabaseUtil):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
-    email = db.Column(db.String(64), unique=True, index=True)
     username = db.Column(db.String(64), unique=True, index=True)
+    verified = db.Column(db.Boolean, default=True)
     password_hash = db.Column(db.String(128))
-    last_login = db.Column(db.DateTime(), default=datetime.utcnow)
     surveys = db.relationship('Survey', backref='owner', lazy='dynamic')
     questions = db.relationship('Question', backref='owner', lazy='dynamic')
     answers = db.relationship('Answer', backref='owner', lazy='dynamic')
-    verified = db.Column(db.Boolean, default=True)
     courses = db.relationship('Course', secondary=UserCourse, backref=db.backref(
         'users', lazy='dynamic'), lazy='dynamic')
 
@@ -134,10 +131,6 @@ class User(UserMixin, db.Model, DatabaseUtil):
         else:
             self.is_admin = False
 
-    def ping(self):
-        self.last_login = datetime.utcnow()
-        db.session.add(self)
-
     def generate_reset_token(self, expiration=1800):
         s = Serializer(current_app.config['SECRET_KEY'], expiration)
         return s.dumps({'reset': self.id})
@@ -164,26 +157,6 @@ class Course(db.Model, DatabaseUtil):
     @staticmethod
     def get_by_code(code):
         return Course.query.filter_by(course_code=code).first()
-
-
-class AnoymousUser(AnonymousUserMixin):
-    id = 0
-    is_admin = False
-    username = 'AnoymousUser'
-
-    def can(self):
-        return False
-
-    def is_administrator(self):
-        return False
-
-
-login_manager.anonymous_user = AnoymousUser
-
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
 
 
 SurveyQuestion = db.Table('survey_question',

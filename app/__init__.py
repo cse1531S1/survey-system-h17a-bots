@@ -5,7 +5,6 @@ from flask import Flask
 from flask_bootstrap import Bootstrap
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
 from flask_cors import CORS
 from config import config
 import os
@@ -14,10 +13,6 @@ import os
 bootstrap = Bootstrap()
 moment = Moment()
 db = SQLAlchemy()
-
-login_manager = LoginManager()
-login_manager.session_protection = 'strong'
-login_manager.login_view = 'auth.login'
 
 
 APP_DIR = os.path.dirname(__file__)
@@ -32,7 +27,6 @@ def create_app(config_name):
     bootstrap.init_app(app)
     moment.init_app(app)
     db.init_app(app)
-    login_manager.init_app(app)
 
     from .main import main as main_blueprint
     from .api import api as api_blueprint
