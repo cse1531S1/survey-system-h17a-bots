@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 from flask import request, redirect, render_template, url_for, send_from_directory
-from flask_login import login_required, current_user
+from flask_login import login_required
 from ..models import Survey, Answer, AnswerEntity, User
 from .. import db
 from . import main
@@ -21,17 +21,6 @@ def old_index():
     return render_template('indexold.html')
 
 
-@main.route('/user/<int:id>')
-@login_required
-def user(id):
-    if current_user.is_admin():
-        surveys = Survey.get_all()
-    else:
-        surveys = Survey.get_by_owner_id(current_user.id)
-
-    return render_template('user.html', surveys=surveys)
-
-
 @login_required
 @main.route('/download/<filename>')
 def download_csv(filename):
@@ -45,6 +34,7 @@ def answer(hash_str):
         This function is the view function for answering a survey.
         @id represents the survey ID.
     """
+
     try:
         token = request.args['token']
         user = User.verify_auth_token(token)
