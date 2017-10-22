@@ -42,7 +42,10 @@ class FileOperation(object):
                 writer = csv.writer(csv_file)
                 for answer in answers:
                     try:
-                        username = answer.owner.username
+                        if answer.owner.role.name == 'guest':
+                            username = 'guest'
+                        else:
+                            username = "Anoymous Student"
                     except AttributeError:
                         username = "Anonymous"
                     dic = {question.description: answer.content for question, answer in zip(

@@ -51,7 +51,7 @@ def fetch_answer():
     answers = Answer.get_by_survey_id(id)
     nq = len(Survey.get_by_id(id).questions.all())
 
-    if g.current_user.is_admin() is False and Survey.get_by_id(id).status != 'closed':
+    if not g.current_user.is_admin() and Survey.get_by_id(id).status != 'closed':
         return jsonify({
             'message': 'This survey is not closed, don\'t hack boi.',
             'success': False
@@ -83,10 +83,7 @@ def fetch_answer():
         }
 
     rtn = []
-    #  try:
     rtn = [to_dic(a) for a in answers]
-    #  except:
-    #  pass
 
     survey = Survey.get_by_id(id)
     qus = [i.id for i in survey.questions.all()]
@@ -103,10 +100,18 @@ def fetch_answer():
 @api.route('/fetch_all_survey', methods=['GET'])
 @auth.login_required
 def fetch_all_survey():
+    def filter_end_time(surveys):
+        for survey in surveys:
+            time_format = '%Y-%m-%d %H:%M:%S'
+            if not datetime.strptime(survey.end_date, time_format) > datetime.now():
+                survey.status = 'closed'
+                db.session.add(survey)
+                db.session.commit()
+
     user = g.current_user
     role = user.role.name
 
-    if role == 'admin' or role == 'guest':
+    if role == 'admin':
         surveys = Survey.get_all()
     else:
         surveys = []
@@ -123,7 +128,7 @@ def fetch_all_survey():
         surveys = [i for i in surveys if i.status ==
                    'review' or i.status == 'closed']
 
-    # print(surveys)
+    filter_end_time(surveys)
     total = len(surveys)
 
     try:
@@ -475,4 +480,13 @@ def guest_pool():
     return jsonify({
         'items': [to_json(i) for i in users],
         'total': totalnum
+    })
+
+
+@api.route('/fetch_all_course', methods=['GET', 'OPTION'])
+def fetch_all_course():
+    li = FileOperation.read_course()
+
+    return jsonify({
+        'items': li
     })

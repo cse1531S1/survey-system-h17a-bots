@@ -54,7 +54,7 @@
 <script>
 import { isvalidUsername } from '@/utils/validate'
 import { register } from '@/api/login'
-import { fetchCourse } from '@/api/article'
+import { fetchAllCourse } from '@/api/article'
 
 export default {
   components: {},
@@ -102,7 +102,7 @@ export default {
   },
   methods: {
     getList() {
-      fetchCourse(this.listQuery).then(response => {
+      fetchAllCourse().then(response => {
         this.course = response.data.items
       })
     },

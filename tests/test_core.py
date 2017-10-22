@@ -51,7 +51,7 @@ class CoreTestCase(unittest.TestCase):
             self.assertTrue(Survey.query.filter_by(description='blah test')
                             .first() is not None)
             self.assertTrue(Survey.query.filter_by(description='blah test')
-                            .first().status is 'review')
+                            .first().status == 'review')
             question1 = Question.create(
                 description="a test question1", owner_id=user.id, optional=False, q_type=2)
             question2 = Question.create(
@@ -71,9 +71,9 @@ class CoreTestCase(unittest.TestCase):
                             .first() is not None)
             survey = Survey.query.filter_by(description='blah test').first()
             self.assertTrue(survey is not None)
-            self.asserttrue(survey.status is 'review')
+            self.asserttrue(survey.status == 'review')
             survey.status = 'open'
-            self.assertTrue(survey.status is 'open')
+            self.assertTrue(survey.status == 'open')
             db.session.add(survey)
             db.session.commit()
 
@@ -85,19 +85,19 @@ class CoreTestCase(unittest.TestCase):
             db.session.commit()
             survey = Survey.filter_by(description='blah test').first()
             self.assertTrue(survey is not None)
-            self.assertTrue(survey.status is 'open')
+            self.assertTrue(survey.status == 'open')
             a = Answer.create(survey_id=survey.id, owner_id=user.id)
             self.assertTrue(a is not None)
-            self.assertTrue(a.survey_id is survey.id)
-            self.assertTrue(a.owner_id is user.id)
+            self.assertTrue(a.survey_id == survey.id)
+            self.assertTrue(a.owner_id == user.id)
             for question in survey.questions.all():
                 ae = AnswerEntity.create(answer_id=a.id,
                                          question_id=question.id,
                                          answer_content='blah'
                                          )
                 self.assertTrue(ae is not None)
-                self.assertTrue(ae.question_id is question.id)
-                self.assertTrue(ae.answer_id is a.id)
+                self.assertTrue(ae.question_id == question.id)
+                self.assertTrue(ae.answer_id == a.id)
 
         def admin_close_survey():
             user = User.filter_by(username='admin').first()
@@ -107,7 +107,7 @@ class CoreTestCase(unittest.TestCase):
             survey.status = 'closed'
             db.session.add(survey)
             db.session.commit()
-            self.assertTrue(survey.status is 'closed')
+            self.assertTrue(survey.status == 'closed')
 
         admin_create_survey()
         staff_review_survey()

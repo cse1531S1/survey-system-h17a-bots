@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 from werkzeug.security import generate_password_hash, check_password_hash
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from itsdangerous import JSONWebSignatureSerializer as Serializer
 from flask import current_app
 from . import db
 from datetime import datetime
@@ -77,10 +77,10 @@ class Role(db.Model):
         return cls.query.filter_by(name=name).first()
 
     def is_staff(self):
-        return self.name is 'staff'
+        return self.name == 'staff'
 
     def is_admin(self):
-        return self.name is 'admin'
+        return self.name == 'admin'
 
 
 class User(db.Model, DatabaseUtil):
@@ -106,7 +106,7 @@ class User(db.Model, DatabaseUtil):
         return s.dumps({'id': self.id}).decode('ascii')
 
     def is_admin(self):
-        return self.role.name is 'admin'
+        return self.role.name == 'admin'
 
     @property
     def password(self):
@@ -141,14 +141,6 @@ class User(db.Model, DatabaseUtil):
             self.is_admin = True
         else:
             self.is_admin = False
-
-    def generate_reset_token(self, expiration=1800):
-        s = Serializer(current_app.config['SECRET_KEY'], expiration)
-        return s.dumps({'reset': self.id})
-
-    def get_by_reset_token(token):
-        s = Serializer(current_app.config['SECRET_KEY'])
-        return s.loads(token).get('reset')
 
     def add_course(self, course_code):
         course = Course.get_by_code(course_code)
@@ -242,13 +234,6 @@ class Survey(db.Model, DatabaseUtil):
         db.session.add(self)
         db.session.commit()
 
-    def check_permission(self, id):
-        current_user = User.get_by_id(id)
-        if current_user.id != self.owner_id and current_user.is_admin is not True:
-            return False
-        else:
-            return True
-
     def generate_id_hash(id):
         m = hashlib.sha256()
         m.update(str(id).encode('utf-8'))
@@ -315,7 +300,7 @@ class Answer(db.Model, DatabaseUtil):
     __tablename__ = 'answers'
     id = db.Column(db.Integer, primary_key=True, index=True)
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    timestamp = db.Column(db.DateTime(), default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime(), default=datetime.now())
     survey_id = db.Column(db.Integer, db.ForeignKey('surveys.id'))
     entities = db.relationship('AnswerEntity', backref='ans', lazy='dynamic')
 

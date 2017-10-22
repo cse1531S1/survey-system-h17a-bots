@@ -8,6 +8,7 @@ from .. import db
 from . import main
 from ..flatfile import FileOperation
 from config import basedir
+from datetime import datetime
 import os
 
 
@@ -43,6 +44,11 @@ def not_allowed():
 @main.route('/', methods=['GET'])
 def index():
     return render_template('index.html')
+
+
+@main.route('/too_early', methods=['GET'])
+def too_early():
+    return render_template('too_early.html')
 
 
 @login_required
@@ -85,6 +91,10 @@ def answer(hash_str):
 
     if not Answer.check_answered(user.id, survey.id):
         return redirect(url_for('.answered'))
+
+    time_format = '%Y-%m-%d %H:%M:%S'
+    if datetime.strptime(survey.start_date, time_format) > datetime.now():
+        return redirect(url_for('.too_early'))
 
     if request.method == 'POST':
         questions = survey.questions.all()
