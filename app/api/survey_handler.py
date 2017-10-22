@@ -51,7 +51,7 @@ def fetch_answer():
     answers = Answer.get_by_survey_id(id)
     nq = len(Survey.get_by_id(id).questions.all())
 
-    if g.current_user.is_admin() is False and Survey.get_by_id(id).status != 'closed':
+    if not g.current_user.is_admin() and Survey.get_by_id(id).status != 'closed':
         return jsonify({
             'message': 'This survey is not closed, don\'t hack boi.',
             'success': False
@@ -103,6 +103,14 @@ def fetch_answer():
 @api.route('/fetch_all_survey', methods=['GET'])
 @auth.login_required
 def fetch_all_survey():
+    def filter_end_time(surveys):
+        for survey in surveys:
+            time_format = '%Y-%m-%d %H:%M:%S'
+            if not datetime.strptime(survey.end_date, time_format) > datetime.now():
+                survey.status = 'closed'
+                db.session.add(survey)
+                db.session.commit()
+
     user = g.current_user
     role = user.role.name
 
@@ -123,7 +131,7 @@ def fetch_all_survey():
         surveys = [i for i in surveys if i.status ==
                    'review' or i.status == 'closed']
 
-    # print(surveys)
+    filter_end_time(surveys)
     total = len(surveys)
 
     try:

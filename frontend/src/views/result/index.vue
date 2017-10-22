@@ -2,7 +2,7 @@
   <div class="app-container calendar-list-container">
     <div class="filter-container">
       <el-button class="filter-item" type="primary" v-waves icon="view" @click="handleShowPie">Statistic</el-button>
-      <!-- <el-button class="filter-item" type="primary" v-waves icon="document" @click="handleDownload">Export</el-button> -->
+      <a v-if="success_load" class="el-button el-button--primary filter-item" type="primary" v-waves icon="document" :href="'http://127.0.0.1:5000/download/'+surveyId+'.csv'"><i class="el-icon-document"></i> Download csv</a>
     </div>
 
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="Loading!!!!" border fit highlight-current-row style="width: 100%">
@@ -55,6 +55,7 @@ export default {
   },
   data() {
     return {
+      success_load: false,
       list: null,
       total: null,
       listLoading: true,
@@ -88,6 +89,7 @@ export default {
           this.list = response.data.items
           this.questions = response.data.questions
           this.total = response.data.total
+          this.success_load = true
         } else {
           this.$message({
             message: response.data.message,
