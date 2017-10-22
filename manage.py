@@ -26,6 +26,7 @@ manager.add_command("shell", Shell(make_context=make_shell_context))
 
 @manager.command
 def reset():
+    """Reset database and insert admin."""
     db.drop_all()
     db.create_all()
     Role.insert_roles()

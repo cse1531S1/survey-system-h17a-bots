@@ -6,7 +6,7 @@ export function loginByUsername(username, password) {
     password
   }
   return fetch({
-    url: 'http://127.0.0.1:9528/api/v1.0/get_token',
+    url: 'api/v1.0/get_token',
     method: 'post',
     data: data,
     auth: {
@@ -18,7 +18,7 @@ export function loginByUsername(username, password) {
 
 export function register(data) {
   return fetch({
-    url: 'http://127.0.0.1:9528/api/v1.0/register',
+    url: 'api/v1.0/register',
     method: 'post',
     data: data
   })
@@ -26,14 +26,14 @@ export function register(data) {
 
 export function logout() {
   return fetch({
-    url: 'http://127.0.0.1:9528/api/v1.0/logoff',
+    url: 'api/v1.0/logoff',
     method: 'post'
   })
 }
 
 export function getUserInfo(token) {
   return fetch({
-    url: 'http://127.0.0.1:9528/api/v1.0/get_info',
+    url: 'api/v1.0/get_info',
     method: 'get'
     // params: { token }
   })
