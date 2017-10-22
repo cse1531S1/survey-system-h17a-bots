@@ -30,6 +30,13 @@ export function fetchCourse(query) {
   })
 }
 
+export function fetchAllCourse(query) {
+  return fetch({
+    url: 'http://127.0.0.1:9528/api/v1.0/fetch_all_course',
+    method: 'get'
+  })
+}
+
 export function fetchQuestion() {
   return fetch({
     url: 'http://127.0.0.1:9528/api/v1.0/fetch_question',

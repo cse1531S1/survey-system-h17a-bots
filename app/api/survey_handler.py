@@ -481,3 +481,12 @@ def guest_pool():
         'items': [to_json(i) for i in users],
         'total': totalnum
     })
+
+
+@api.route('/fetch_all_course', methods=['GET', 'OPTION'])
+def fetch_all_course():
+    li = FileOperation.read_course()
+
+    return jsonify({
+        'items': li
+    })
