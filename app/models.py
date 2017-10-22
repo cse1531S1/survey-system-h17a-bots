@@ -171,7 +171,6 @@ class Survey(db.Model, DatabaseUtil):
     __tablename__ = 'surveys'
     id = db.Column(db.Integer, primary_key=True, index=True)
     id_hash = db.Column(db.String(128), index=True)
-
     description = db.Column(db.String(512))
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     course = db.relationship('Course', backref='survey', lazy='dynamic')
@@ -179,7 +178,6 @@ class Survey(db.Model, DatabaseUtil):
     start_date = db.Column(db.String(64))
     end_date = db.Column(db.String(64))
     timestamp = db.Column(db.DateTime(), default=datetime.utcnow)
-
     questions = db.relationship('Question', secondary=SurveyQuestion, backref=db.backref(
         'surveys', lazy='dynamic'), lazy='dynamic')
 
@@ -189,7 +187,7 @@ class Survey(db.Model, DatabaseUtil):
         return rtn
 
     @classmethod
-    def create(cls, description, owner_id, course, active, times):
+    def create(cls, description, owner_id, course, times):
         course_in_db = Course.get_by_code(course)
         new = cls(description=description, owner_id=owner_id, start_date=times[0],
                   end_date=times[1], status="review")

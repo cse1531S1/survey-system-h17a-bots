@@ -347,7 +347,7 @@ def create_survey():
         data['start'][0: -5], r'%Y-%m-%dT%H:%M:%S')
     timeend = datetime.strptime(data['end'][0: -5], r'%Y-%m-%dT%H:%M:%S')
     survey = Survey.create(description=data['title'], owner_id=user.id,
-                           times=[timestart, timeend], course=data['course'], active=True)
+                           times=[timestart, timeend], course=data['course'])
 
     questions = data['questions_opt'] + data['questions_man']
     questions_dump = [i['id'] for i in questions]

@@ -69,7 +69,6 @@ class ModelInsertionTestCase(unittest.TestCase):
     def test_insert(self):
         role = Role.get_by_name('admin')
         self.assertTrue(role is not None)
-
         user = User(username='admin', role=role, password='cat')
         db.session.add(user)
         db.session.commit()
@@ -82,4 +81,11 @@ class ModelInsertionTestCase(unittest.TestCase):
         self.assertTrue(Course.query.filter_by(
             course_code='TEST').first() is not None)
 
-        survey = Survey.create(description='blah test', owner_id=user.id)
+        survey = Survey.create(description='blah test', times=['1', '2'],
+                               owner_id=user.id, course=c.course_code)
+        self.assertTrue(Survey.query.filter_by(description='blah test').first() is not None)
+        question = Question.create(
+            description="a test question", owner_id=user.id, optional=False, q_type=1)
+        self.assertTrue(question is not None)
+        survey.set_questions([question.id])
+        self.assertTrue(survey.questions.all() is not None)
