@@ -16,9 +16,10 @@ so there won't be any comment
 
 class DatabaseUtil:
     """
-    this class is the class of helper functions will be inherited
+    This class is the class of helper functions will be inherited
     by all other database model classes
     """
+
     @classmethod
     def get_by_id(cls, id):
         return cls.query.filter_by(id=id).first()
@@ -51,6 +52,11 @@ UserCourse = db.Table('user_course',
 
 
 class Role(db.Model):
+    """
+    The role of the user.
+    Currently having: admin, staff, student and guest.
+    """
+
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(32), unique=True)
@@ -78,6 +84,11 @@ class Role(db.Model):
 
 
 class User(db.Model, DatabaseUtil):
+    """
+    Each user has a role and a username for login.
+    For security reason, password will be stored in hashed.
+    """
+
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
@@ -139,8 +150,11 @@ class User(db.Model, DatabaseUtil):
 
 
 class Course(db.Model, DatabaseUtil):
+    """
+    Used to store all courses.
+    A survey belongs to a course.
+    """
 
-    """Docstring for Course. """
     __tablename__ = 'courses'
     id = db.Column(db.Integer, primary_key=True, index=True)
     course_code = db.Column(db.String(32), unique=True, index=True)
@@ -160,6 +174,12 @@ SurveyQuestion = db.Table('survey_question',
 
 
 class Survey(db.Model, DatabaseUtil):
+    """
+    Hashed survey id will be used to generating survey link.
+    For future development, survey should have a owner.
+    Currently, all surveys belong to admin.
+    """
+
     __tablename__ = 'surveys'
     id = db.Column(db.Integer, primary_key=True, index=True)
     id_hash = db.Column(db.String(128), index=True)
@@ -224,6 +244,12 @@ class Survey(db.Model, DatabaseUtil):
 
 
 class Question(db.Model, DatabaseUtil):
+    """
+    Store all questions
+    Deleted questions won't be shown in question pool,
+    but still be used by surveys if there is one.
+    """
+
     __tablename__ = 'questions'
     id = db.Column(db.Integer, primary_key=True, index=True)
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
@@ -231,9 +257,11 @@ class Question(db.Model, DatabaseUtil):
     deleted = db.Column(db.Boolean, default=False)
     description = db.Column(db.String(512))
 
-    # q_type : question type
-    # 1 : multiple choices
-    # 2 : text based question
+    """
+    q_type : question type
+    1 : multiple choices
+    2 : text based question
+    """
     q_type = db.Column(db.Integer, default=1)
 
     choices = db.relationship('Choice', backref='question', lazy='dynamic')
@@ -265,6 +293,10 @@ class Choice(db.Model, DatabaseUtil):
 
 
 class Answer(db.Model, DatabaseUtil):
+    """
+    A set of AnswerEntity for a survey
+    """
+
     __tablename__ = 'answers'
     id = db.Column(db.Integer, primary_key=True, index=True)
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
@@ -313,6 +345,10 @@ class Answer(db.Model, DatabaseUtil):
 
 
 class AnswerEntity(db.Model, DatabaseUtil):
+    """
+    Answer for a single question
+    """
+
     __tablename__ = 'answer_entities'
     id = db.Column(db.Integer, primary_key=True, index=True)
     question_id = db.Column(db.Integer, db.ForeignKey('questions.id'))

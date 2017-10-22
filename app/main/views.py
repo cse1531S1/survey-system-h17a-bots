@@ -15,19 +15,29 @@ import os
 @main.route('/thankyou')
 def thankyou():
     """
-        This function is the view function for the thank you page the
-        respondent will see after survey completion.
+        This function is the view function for the thank you page.
+        The respondent will see after survey completion.
     """
     return render_template('thank_you.html')
 
 
 @main.route('/answered')
 def answered():
+    """
+        This function is the view function for the answered page.
+        The respondent will see when trying to access answered surveys.
+    """
+
     return render_template('answered.html')
 
 
 @main.route('/not_allowed')
 def not_allowed():
+    """
+        This function is the view function for the warning page.
+        The user will see when trying to access restricted surveys.
+    """
+
     return render_template('not_allowed.html')
 
 
@@ -44,6 +54,11 @@ def too_early():
 @login_required
 @main.route('/download/<filename>')
 def download_csv(filename):
+     """
+        This function is the view function for the download csv page.
+        The user will see when having ability to download responses of a survey.
+    """
+
     path = os.path.join(basedir)
     return send_from_directory(path, filename)
 
@@ -53,6 +68,12 @@ def answer(hash_str):
     """
         This function is the view function for answering a survey.
         @id represents the survey ID.
+        A survey could be answered when:
+            1. user is authenticated
+            2. user is not a staff or an admin
+            3. the status of survey is open
+            4. user has not answered the survey
+        User will have to answer all mandatory questions in order to submit.
     """
 
     try:
