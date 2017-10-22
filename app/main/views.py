@@ -54,7 +54,7 @@ def too_early():
 @login_required
 @main.route('/download/<filename>')
 def download_csv(filename):
-     """
+    """
         This function is the view function for the download csv page.
         The user will see when having ability to download responses of a survey.
     """

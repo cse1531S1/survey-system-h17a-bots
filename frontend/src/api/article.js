@@ -2,7 +2,7 @@ import fetch from '@/utils/fetch'
 
 export function fetchList(query) {
   return fetch({
-    url: 'http://127.0.0.1:9528/api/v1.0/fetch_all_survey',
+    url: 'api/v1.0/fetch_all_survey',
     method: 'get',
     params: query
   })
