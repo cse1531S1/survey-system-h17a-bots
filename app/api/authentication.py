@@ -68,7 +68,6 @@ def get_info():
         'loaded': loaded,
         'introduction': ''
     })
-    # print([i.course_code for i in user.courses.all()])
 
     return rtn
 

@@ -10,33 +10,6 @@ from .authentication import auth
 import collections
 
 
-@api.route('/get_answer_data/type1/<int:survey_id>/<int:question_id>', methods=['GET', 'POST'])
-def get_answer_data(survey_id, question_id):
-    answers = Answer.query.filter_by(survey_id=survey_id).all()
-    question = Question.get_by_id(question_id)
-
-    def make_counter(counter):
-        rtn = []
-        for key, value in counter.items():
-            rtn.append({'label': key, 'value': value})
-
-        return rtn
-
-    rst = []
-    for answer in answers:
-        for entity in answer.entities.all():
-            if entity.question_id == question.id:
-                rst.append(entity.content)
-
-    counter = dict(collections.Counter(rst))
-
-    rtn = {
-        "result": make_counter(counter),
-        "success": True
-    }
-    return jsonify(rtn)
-
-
 @api.route('/fetch_piechart', methods=['GET', 'POST'])
 @auth.login_required
 def fetch_pie_chart():
@@ -70,9 +43,9 @@ def fetch_pie_chart():
     return jsonify(rtn)
 
 
-@api.route('/fetch_answer', methods=['POST'])
+@api.route('/fetch_answer', methods=['POST', 'GET'])
 @auth.login_required
-def fetch_answers():
+def fetch_answer():
     data = request.get_json()
     id = data['id']
     answers = Answer.get_by_survey_id(id)
@@ -232,10 +205,8 @@ def modify_survey():
     survey_id = int(data['id'])
     questions = data['questions_opt'] + data['questions_man']
     questions_dump = [i['id'] for i in questions]
-    # print(questions_dump)
 
     survey = Survey.get_by_id(survey_id)
-    #  print(data['purpose'])
     if data['purpose'] != 'update_status':
         survey.remove_all_questions()
         survey.set_questions(questions_dump)
@@ -258,6 +229,7 @@ def modify_survey():
 
 
 @api.route('/user_verify', methods=['GET', 'POST'])
+@auth.login_required
 def verify_user():
     data = request.get_json()
     username = data['name']
@@ -274,7 +246,7 @@ def verify_user():
 
 @api.route('/fetch_question', methods=['GET', 'OPTION'])
 @auth.login_required
-def fetch_questions():
+def fetch_question():
     questions = [i for i in Question.get_all() if i.deleted is not True]
     courses = Course.get_all()
     loaded = False
@@ -387,7 +359,7 @@ def create_survey():
     })
 
 
-@api.route('/create_question', methods=['POST'])
+@api.route('/create_question', methods=['POST', 'GET'])
 @auth.login_required
 def create_question():
     user = g.current_user
@@ -434,7 +406,8 @@ def srstatic():
 
 
 @api.route('/load_user', methods=['GET'])
-def loadUser():
+@auth.login_required
+def load_user():
     FileOperation.load_users()
     return jsonify({
         "success": True,
@@ -443,30 +416,36 @@ def loadUser():
 
 @api.route('/register', methods=['GET', 'POST'])
 def register():
-    data = request.get_json()
-    username = data['username']
-    password = data['password']
-    if User.get_by_name(username) is not None:
+    try:
+        data = request.get_json()
+        username = data['username']
+        password = data['password']
+        if User.get_by_name(username) is not None:
+            return jsonify({
+                'success': False,
+                'message': 'this username already exists'
+            })
+
+        role = Role.get_by_name('guest')
+        new = User(username=username, password=password,
+                   role=role, verified=False)
+        db.session.add(new)
+        db.session.commit()
+
+        for c in data['course']:
+            new.add_course(c)
+
         return jsonify({
-            'success': False,
-            'message': 'this username already exists'
+            'success': True,
         })
-
-    role = Role.get_by_name('guest')
-    new = User(username=username, password=password,
-               role=role, verified=False)
-    db.session.add(new)
-    db.session.commit()
-
-    for c in data['course']:
-        new.add_course(c)
-
-    return jsonify({
-        'success': True,
-    })
+    except:
+        return jsonify({
+            'success': False
+        })
 
 
 @api.route('/user_pool', methods=['GET', 'POST'])
+@auth.login_required
 def guest_pool():
     users = User.query.filter_by(role=Role.get_by_name('guest')).all()
     totalnum = len(users)
@@ -476,7 +455,7 @@ def guest_pool():
         start = int(request.args['page']) - 1
         users = users[start * limit:(start + 1) * limit]
     except:
-        print('error here')
+        pass
 
     try:
         title = request.args['title']

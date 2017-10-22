@@ -4,7 +4,7 @@ import re
 from base64 import b64encode
 from flask import url_for
 from app import create_app, db
-from app.models import User, Course, Survey, Question, Answer, AnswerEntity
+from app.models import User, Course, Survey, Question, Answer, AnswerEntity, Role
 
 
 class APITestCase(unittest.TestCase):
@@ -13,6 +13,7 @@ class APITestCase(unittest.TestCase):
         self.app_context = self.app.app_context()
         self.app_context.push()
         db.create_all()
+        Role.insert_roles()
         self.client = self.app.test_client()
 
     def tearDown(self):
@@ -28,53 +29,138 @@ class APITestCase(unittest.TestCase):
             'Content-Type': 'application/json'
         }
 
+    def get_api_data(self, username, password):
+        return json.dumps({'username': username, 'password': password})
+
     def test_404(self):
         response = self.client.get(
-            '/wrong/url',
-            headers=self.get_api_headers('email', 'password'))
+            '/not/exists/page',
+            headers=self.get_api_headers('username', 'password'))
         self.assertTrue(response.status_code == 404)
-        json_response = json.loads(response.data.decode('utf-8'))
-        self.assertTrue(json_response['error'] == 'not found')
 
     def test_no_auth(self):
-        response = self.client.get(url_for('api.get_posts'),
-                                   content_type='application/json')
+        response = self.client.get(
+            url_for('api.fetch_course'), content_type='application/json')
         self.assertTrue(response.status_code == 200)
+        response = self.client.get(
+            url_for('api.fetch_pie_chart'), content_type='application/json')
+        self.assertTrue(response.status_code == 401)
+        response = self.client.get(
+            url_for('api.fetch_answer'), content_type='application/json')
+        self.assertTrue(response.status_code == 401)
+        response = self.client.get(
+            url_for('api.fetch_all_survey'), content_type='application/json')
+        self.assertTrue(response.status_code == 401)
+        response = self.client.get(
+            url_for('api.modify_survey'), content_type='application/json')
+        self.assertTrue(response.status_code == 401)
+        response = self.client.get(
+            url_for('api.verify_user'), content_type='application/json')
+        self.assertTrue(response.status_code == 401)
+        response = self.client.get(
+            url_for('api.fetch_question'), content_type='application/json')
+        self.assertTrue(response.status_code == 401)
+        response = self.client.get(
+            url_for('api.question_pool'), content_type='application/json')
+        self.assertTrue(response.status_code == 401)
+        response = self.client.get(
+            url_for('api.create_survey'), content_type='application/json')
+        self.assertTrue(response.status_code == 401)
+        response = self.client.get(
+            url_for('api.create_question'), content_type='application/json')
+        self.assertTrue(response.status_code == 401)
+        response = self.client.get(
+            url_for('api.delete_question'), content_type='application/json')
+        self.assertTrue(response.status_code == 401)
+        response = self.client.get(
+            url_for('api.srstatic'), content_type='application/json')
+        self.assertTrue(response.status_code == 401)
+        response = self.client.get(
+            url_for('api.load_user'), content_type='application/json')
+        self.assertTrue(response.status_code == 401)
+        response = self.client.get(
+            url_for('api.register'), content_type='application/json')
+        self.assertTrue(response.status_code == 200)
+        response = self.client.get(
+            url_for('api.guest_pool'), content_type='application/json')
+        self.assertTrue(response.status_code == 401)
 
     def test_bad_auth(self):
         # add a user
-        r = Role.query.filter_by(name='User').first()
+        r = Role.query.filter_by(name='admin').first()
         self.assertIsNotNone(r)
-        u = User(email='john@example.com', password='cat', confirmed=True,
-                 role=r)
+        u = User(username='admin', password='cat', role=r)
         db.session.add(u)
         db.session.commit()
 
         # authenticate with bad password
         response = self.client.get(
-            url_for('api.get_posts'),
-            headers=self.get_api_headers('john@example.com', 'dog'))
+            url_for('api.guest_pool'), headers=self.get_api_headers('admin', 'dog'))
+        self.assertTrue(response.status_code == 401)
+        response = self.client.get(
+            url_for('api.fetch_course'), headers=self.get_api_headers('admin', 'dog'))
+        self.assertTrue(response.status_code == 200)
+        response = self.client.get(
+            url_for('api.fetch_pie_chart'), headers=self.get_api_headers('admin', 'dog'))
+        self.assertTrue(response.status_code == 401)
+        response = self.client.get(
+            url_for('api.fetch_answer'), headers=self.get_api_headers('admin', 'dog'))
+        self.assertTrue(response.status_code == 401)
+        response = self.client.get(
+            url_for('api.fetch_all_survey'), headers=self.get_api_headers('admin', 'dog'))
+        self.assertTrue(response.status_code == 401)
+        response = self.client.get(
+            url_for('api.modify_survey'), headers=self.get_api_headers('admin', 'dog'))
+        self.assertTrue(response.status_code == 401)
+        response = self.client.get(
+            url_for('api.verify_user'), headers=self.get_api_headers('admin', 'dog'))
+        self.assertTrue(response.status_code == 401)
+        response = self.client.get(
+            url_for('api.fetch_question'), headers=self.get_api_headers('admin', 'dog'))
+        self.assertTrue(response.status_code == 401)
+        response = self.client.get(
+            url_for('api.question_pool'), headers=self.get_api_headers('admin', 'dog'))
+        self.assertTrue(response.status_code == 401)
+        response = self.client.get(
+            url_for('api.create_survey'), headers=self.get_api_headers('admin', 'dog'))
+        self.assertTrue(response.status_code == 401)
+        response = self.client.get(
+            url_for('api.create_question'), headers=self.get_api_headers('admin', 'dog'))
+        self.assertTrue(response.status_code == 401)
+        response = self.client.get(
+            url_for('api.delete_question'), headers=self.get_api_headers('admin', 'dog'))
+        self.assertTrue(response.status_code == 401)
+        response = self.client.get(
+            url_for('api.srstatic'), headers=self.get_api_headers('admin', 'dog'))
+        self.assertTrue(response.status_code == 401)
+        response = self.client.get(
+            url_for('api.load_user'), headers=self.get_api_headers('admin', 'dog'))
+        self.assertTrue(response.status_code == 401)
+        response = self.client.get(
+            url_for('api.register'), headers=self.get_api_headers('admin', 'dog'))
+        self.assertTrue(response.status_code == 200)
+        response = self.client.get(
+            url_for('api.guest_pool'), headers=self.get_api_headers('admin', 'dog'))
         self.assertTrue(response.status_code == 401)
 
     def test_token_auth(self):
         # add a user
-        r = Role.query.filter_by(name='User').first()
+        r = Role.query.filter_by(name='admin').first()
         self.assertIsNotNone(r)
-        u = User(email='john@example.com', password='cat', confirmed=True,
-                 role=r)
+        u = User(username='admin', password='cat', role=r)
         db.session.add(u)
         db.session.commit()
 
         # issue a request with a bad token
         response = self.client.get(
-            url_for('api.get_posts'),
+            url_for('api.guest_pool'),
             headers=self.get_api_headers('bad-token', ''))
         self.assertTrue(response.status_code == 401)
 
         # get a token
         response = self.client.get(
-            url_for('api.get_token'),
-            headers=self.get_api_headers('john@example.com', 'cat'))
+            url_for('api.get_token'), headers=self.get_api_headers('admin', 'cat'),
+            data=json.dumps({'username': 'admin', 'password': 'cat'}))
         self.assertTrue(response.status_code == 200)
         json_response = json.loads(response.data.decode('utf-8'))
         self.assertIsNotNone(json_response.get('token'))
@@ -82,183 +168,23 @@ class APITestCase(unittest.TestCase):
 
         # issue a request with the token
         response = self.client.get(
-            url_for('api.get_posts'),
+            url_for('api.guest_pool'),
             headers=self.get_api_headers(token, ''))
         self.assertTrue(response.status_code == 200)
 
-    def test_anonymous(self):
-        response = self.client.get(
-            url_for('api.get_posts'),
-            headers=self.get_api_headers('', ''))
-        self.assertTrue(response.status_code == 200)
-
-    def test_unconfirmed_account(self):
+    def test_unverified(self):
         # add an unconfirmed user
-        r = Role.query.filter_by(name='User').first()
+        r = Role.query.filter_by(name='guest').first()
         self.assertIsNotNone(r)
-        u = User(email='john@example.com', password='cat', confirmed=False,
-                 role=r)
+        u = User(username='guest', password='cat', verified=False, role=r)
         db.session.add(u)
         db.session.commit()
 
         # get list of posts with the unconfirmed account
         response = self.client.get(
-            url_for('api.get_posts'),
-            headers=self.get_api_headers('john@example.com', 'cat'))
-        self.assertTrue(response.status_code == 403)
-
-    def test_posts(self):
-        # add a user
-        r = Role.query.filter_by(name='User').first()
-        self.assertIsNotNone(r)
-        u = User(email='john@example.com', password='cat', confirmed=True,
-                 role=r)
-        db.session.add(u)
-        db.session.commit()
-
-        # write an empty post
-        response = self.client.post(
-            url_for('api.new_post'),
-            headers=self.get_api_headers('john@example.com', 'cat'),
-            data=json.dumps({'body': ''}))
-        self.assertTrue(response.status_code == 400)
-
-        # write a post
-        response = self.client.post(
-            url_for('api.new_post'),
-            headers=self.get_api_headers('john@example.com', 'cat'),
-            data=json.dumps({'body': 'body of the *blog* post'}))
-        self.assertTrue(response.status_code == 201)
-        url = response.headers.get('Location')
-        self.assertIsNotNone(url)
-
-        # get the new post
-        response = self.client.get(
-            url,
-            headers=self.get_api_headers('john@example.com', 'cat'))
-        self.assertTrue(response.status_code == 200)
+            url_for('api.get_token'),
+            headers=self.get_api_headers('guest', 'cat'),
+            data=self.get_api_data('guest', 'cat')
+        )
         json_response = json.loads(response.data.decode('utf-8'))
-        self.assertTrue(json_response['url'] == url)
-        self.assertTrue(json_response['body'] == 'body of the *blog* post')
-        self.assertTrue(json_response['body_html'] ==
-                        '<p>body of the <em>blog</em> post</p>')
-        json_post = json_response
-
-        # get the post from the user
-        response = self.client.get(
-            url_for('api.get_user_posts', id=u.id),
-            headers=self.get_api_headers('john@example.com', 'cat'))
-        self.assertTrue(response.status_code == 200)
-        json_response = json.loads(response.data.decode('utf-8'))
-        self.assertIsNotNone(json_response.get('posts'))
-        self.assertTrue(json_response.get('count', 0) == 1)
-        self.assertTrue(json_response['posts'][0] == json_post)
-
-        # get the post from the user as a follower
-        response = self.client.get(
-            url_for('api.get_user_followed_posts', id=u.id),
-            headers=self.get_api_headers('john@example.com', 'cat'))
-        self.assertTrue(response.status_code == 200)
-        json_response = json.loads(response.data.decode('utf-8'))
-        self.assertIsNotNone(json_response.get('posts'))
-        self.assertTrue(json_response.get('count', 0) == 1)
-        self.assertTrue(json_response['posts'][0] == json_post)
-
-        # edit post
-        response = self.client.put(
-            url,
-            headers=self.get_api_headers('john@example.com', 'cat'),
-            data=json.dumps({'body': 'updated body'}))
-        self.assertTrue(response.status_code == 200)
-        json_response = json.loads(response.data.decode('utf-8'))
-        self.assertTrue(json_response['url'] == url)
-        self.assertTrue(json_response['body'] == 'updated body')
-        self.assertTrue(json_response['body_html'] == '<p>updated body</p>')
-
-    def test_users(self):
-        # add two users
-        r = Role.query.filter_by(name='User').first()
-        self.assertIsNotNone(r)
-        u1 = User(email='john@example.com', username='john',
-                  password='cat', confirmed=True, role=r)
-        u2 = User(email='susan@example.com', username='susan',
-                  password='dog', confirmed=True, role=r)
-        db.session.add_all([u1, u2])
-        db.session.commit()
-
-        # get users
-        response = self.client.get(
-            url_for('api.get_user', id=u1.id),
-            headers=self.get_api_headers('susan@example.com', 'dog'))
-        self.assertTrue(response.status_code == 200)
-        json_response = json.loads(response.data.decode('utf-8'))
-        self.assertTrue(json_response['username'] == 'john')
-        response = self.client.get(
-            url_for('api.get_user', id=u2.id),
-            headers=self.get_api_headers('susan@example.com', 'dog'))
-        self.assertTrue(response.status_code == 200)
-        json_response = json.loads(response.data.decode('utf-8'))
-        self.assertTrue(json_response['username'] == 'susan')
-
-    def test_comments(self):
-        # add two users
-        r = Role.query.filter_by(name='User').first()
-        self.assertIsNotNone(r)
-        u1 = User(email='john@example.com', username='john',
-                  password='cat', confirmed=True, role=r)
-        u2 = User(email='susan@example.com', username='susan',
-                  password='dog', confirmed=True, role=r)
-        db.session.add_all([u1, u2])
-        db.session.commit()
-
-        # add a post
-        post = Post(body='body of the post', author=u1)
-        db.session.add(post)
-        db.session.commit()
-
-        # write a comment
-        response = self.client.post(
-            url_for('api.new_post_comment', id=post.id),
-            headers=self.get_api_headers('susan@example.com', 'dog'),
-            data=json.dumps({'body': 'Good [post](http://example.com)!'}))
-        self.assertTrue(response.status_code == 201)
-        json_response = json.loads(response.data.decode('utf-8'))
-        url = response.headers.get('Location')
-        self.assertIsNotNone(url)
-        self.assertTrue(json_response['body'] ==
-                        'Good [post](http://example.com)!')
-        self.assertTrue(
-            re.sub('<.*?>', '', json_response['body_html']) == 'Good post!')
-
-        # get the new comment
-        response = self.client.get(
-            url,
-            headers=self.get_api_headers('john@example.com', 'cat'))
-        self.assertTrue(response.status_code == 200)
-        json_response = json.loads(response.data.decode('utf-8'))
-        self.assertTrue(json_response['url'] == url)
-        self.assertTrue(json_response['body'] ==
-                        'Good [post](http://example.com)!')
-
-        # add another comment
-        comment = Comment(body='Thank you!', author=u1, post=post)
-        db.session.add(comment)
-        db.session.commit()
-
-        # get the two comments from the post
-        response = self.client.get(
-            url_for('api.get_post_comments', id=post.id),
-            headers=self.get_api_headers('susan@example.com', 'dog'))
-        self.assertTrue(response.status_code == 200)
-        json_response = json.loads(response.data.decode('utf-8'))
-        self.assertIsNotNone(json_response.get('comments'))
-        self.assertTrue(json_response.get('count', 0) == 2)
-
-        # get all the comments
-        response = self.client.get(
-            url_for('api.get_comments', id=post.id),
-            headers=self.get_api_headers('susan@example.com', 'dog'))
-        self.assertTrue(response.status_code == 200)
-        json_response = json.loads(response.data.decode('utf-8'))
-        self.assertIsNotNone(json_response.get('comments'))
-        self.assertTrue(json_response.get('count', 0) == 2)
+        self.assertTrue(json_response.get('unverified'))

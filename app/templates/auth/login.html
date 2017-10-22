@@ -11,8 +11,6 @@
     </div>
     <div class="col-md-4 col-md-offset-4">
         {{ wtf.quick_form(form, form_type="basic", button_map={'submit':'primary', }) }}
-        <br>
-        <p><a href="{{ url_for('auth.password_reset_request') }}">Forgot your password?</a></p>
         <p>New user? <a href="{{ url_for('auth.register')}}">Click here to register</a></p>
     </div>
 </div>
