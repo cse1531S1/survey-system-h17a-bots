@@ -5,9 +5,9 @@
       </el-input>
 
       <!-- <el-select @change='handleFilter' style="width: 120px" class="filter-item" v-model="listQuery.sort" placeholder="Sort">
-        <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key">
-        </el-option>
-      </el-select> -->
+                  <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key">
+                  </el-option>
+                </el-select> -->
 
       <el-button class="filter-item" type="primary" v-waves icon="search" @click="handleFilter">Search</el-button>
       <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="edit">Add a Survey</el-button>
@@ -428,33 +428,42 @@ export default {
     createQuestion() {
       this.$refs['newQuestion'].validate((valid) => {
         if (valid) {
-          var detail = {
-            title: this.newQuestion.title,
-            qType: this.newQuestion.qType,
-            optional: this.newQuestion.qOptional,
-            choices: this.newQuestion.choices
-          }
-          createQuestion(detail).then(response => {
-            if (response.data.success) {
-              this.$notify({
-                title: 'Success!',
-                message: 'You successfully created a question!',
-                type: 'success',
-                duration: 2000
-              })
-            } else {
-              this.$notify({
-                title: 'Failed!',
-                message: 'An unknown error occured.',
-                type: 'error',
-                duration: 2000
-              })
+          if (this.newQuestion.qType === '1' && this.newQuestion.choices.length === 0) {
+            this.$notify({
+              title: 'Failed!',
+              message: 'A MCQ question should have at least 1 choice',
+              type: 'error',
+              duration: 2000
+            })
+          } else {
+            var detail = {
+              title: this.newQuestion.title,
+              qType: this.newQuestion.qType,
+              optional: this.newQuestion.qOptional,
+              choices: this.newQuestion.choices
             }
-          }).then(() => {
-            this.getList()
-            this.resetQuestionTemp()
-            this.dialogQuestion = false
-          })
+            createQuestion(detail).then(response => {
+              if (response.data.success) {
+                this.$notify({
+                  title: 'Success!',
+                  message: 'You have successfully created a question!',
+                  type: 'success',
+                  duration: 2000
+                })
+              } else {
+                this.$notify({
+                  title: 'Failed!',
+                  message: 'An unknown error occured.',
+                  type: 'error',
+                  duration: 2000
+                })
+              }
+            }).then(() => {
+              this.getList()
+              this.resetQuestionTemp()
+              this.dialogQuestion = false
+            })
+          }
         } else {
           return false
         }
@@ -593,10 +602,10 @@ export default {
 }
 
 .list-complete-item.sortable-chosen {
-  background: #4AB7BD;
+  background: #4ab7bd;
 }
 
 .list-complete-item.sortable-ghost {
-  background: #30B08F;
+  background: #30b08f;
 }
 </style>

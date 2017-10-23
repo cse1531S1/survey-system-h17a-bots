@@ -259,33 +259,42 @@ export default {
     createQuestion() {
       this.$refs['newQuestion'].validate((valid) => {
         if (valid) {
-          var detail = {
-            title: this.newQuestion.title,
-            qType: this.newQuestion.qType,
-            choices: this.newQuestion.choices,
-            optional: this.newQuestion.qOptional
-          }
-          createQuestion(detail).then(response => {
-            if (response.data.success) {
-              this.$notify({
-                title: 'Success!',
-                message: 'You have successfully created a question!',
-                type: 'success',
-                duration: 2000
-              })
-            } else {
-              this.$notify({
-                title: 'Failed!',
-                message: 'An unknown error occured.',
-                type: 'error',
-                duration: 2000
-              })
+          if (this.newQuestion.qType === '1' && this.newQuestion.choices.length === 0) {
+            this.$notify({
+              title: 'Failed!',
+              message: 'A MCQ question should have at least 1 choice',
+              type: 'error',
+              duration: 2000
+            })
+          } else {
+            var detail = {
+              title: this.newQuestion.title,
+              qType: this.newQuestion.qType,
+              choices: this.newQuestion.choices,
+              optional: this.newQuestion.qOptional
             }
-          }).then(() => {
-            this.getList()
-            this.resetTemp()
-            this.dialogQuestion = false
-          })
+            createQuestion(detail).then(response => {
+              if (response.data.success) {
+                this.$notify({
+                  title: 'Success!',
+                  message: 'You have successfully created a question!',
+                  type: 'success',
+                  duration: 2000
+                })
+              } else {
+                this.$notify({
+                  title: 'Failed!',
+                  message: 'An unknown error occured.',
+                  type: 'error',
+                  duration: 2000
+                })
+              }
+            }).then(() => {
+              this.getList()
+              this.resetTemp()
+              this.dialogQuestion = false
+            })
+          }
         } else {
           return false
         }
