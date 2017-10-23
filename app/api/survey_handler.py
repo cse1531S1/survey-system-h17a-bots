@@ -113,6 +113,14 @@ def fetch_all_survey():
                 db.session.add(survey)
                 db.session.commit()
 
+    def filter_answered(survey):
+        user = g.current_user
+        answers = Answer.query.filter_by(survey_id=survey.id).all()
+        for a in answers:
+            if(a.owner_id == user.id):
+                return False
+        return True
+
     user = g.current_user
     role = user.role.name
 
@@ -134,6 +142,9 @@ def fetch_all_survey():
                    'review' or i.status == 'closed']
 
     filter_end_time(surveys)
+    if role == 'guest' or role == 'student':
+        surveys = [i for i in surveys if filter_answered(i)]
+
     total = len(surveys)
 
     try:
