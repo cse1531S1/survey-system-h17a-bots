@@ -56,7 +56,7 @@ def load():
     load all courses and students into the database
     """
 
-    print('Start Loading, That might cost up to 3 minutes')
+    print('Loading data from the CSV files. Please note that this might take about 5 minutes')
     with open('courses.csv', 'r') as file_in:
         result = map(str, csv.reader(file_in))
         # match '["ZZZZ9999 99z9"]' like string and get the
@@ -91,7 +91,7 @@ def load():
             user = User.get_by_name(enrolment[0])
             course = enrolment[1] + " " + enrolment[2]
             user.add_course(course)
-    print('done')
+    print('Data successfully loaded into database.')
 
 
 @manager.command
