@@ -36,12 +36,6 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Responses" width="120">
-        <template scope="scope">
-          <span>{{scope.row.responses}}</span>
-        </template>
-      </el-table-column>
-
       <el-table-column class-name="status-col" label="Status" width="90">
         <template scope="scope">
           <el-tag :type="scope.row.status | statusFilter">{{scope.row.status}}</el-tag>
