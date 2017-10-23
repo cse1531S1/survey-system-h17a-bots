@@ -83,7 +83,6 @@
       <el-table-column width="110px" align="center" label="Links">
         <template scope="scope">
           <router-link v-if="scope.row.status === 'closed'" v-waves class="el-button el-button--small" :to="'/result/'+scope.row.id">Result</router-link>
-          <a v-if="scope.row.status === 'open'" v-waves class="el-button el-button--small" :href="'http://127.0.0.1:5000/answer/'+scope.row.id_hash+'?token='+token" target="_blank">Answer it!</a>
         </template>
       </el-table-column>
 

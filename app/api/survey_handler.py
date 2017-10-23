@@ -127,7 +127,7 @@ def fetch_all_survey():
             if to_append is not None:
                 surveys.append(to_append)
 
-    if role == 'student':
+    if role == 'student' or role == 'guest':
         surveys = [i for i in surveys if i.status != 'review']
     if role == 'staff':
         surveys = [i for i in surveys if i.status ==
