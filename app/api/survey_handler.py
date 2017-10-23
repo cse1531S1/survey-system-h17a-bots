@@ -9,7 +9,9 @@ from datetime import datetime
 from .authentication import auth
 import collections
 
+# Fetcher Functions
 
+# Returns the data needed to generate the pie charts in the front end
 @api.route('/fetch_piechart', methods=['GET', 'POST'])
 @auth.login_required
 def fetch_pie_chart():
@@ -42,7 +44,7 @@ def fetch_pie_chart():
     }
     return jsonify(rtn)
 
-
+# Returns all answers to all questions for a survey
 @api.route('/fetch_answer', methods=['POST', 'GET'])
 @auth.login_required
 def fetch_answer():
@@ -53,7 +55,7 @@ def fetch_answer():
 
     if not g.current_user.is_admin() and Survey.get_by_id(id).status != 'closed':
         return jsonify({
-            'message': 'This survey is not closed, don\'t hack boi.',
+            'message': 'This survey has not closed yet, please try again later.',
             'success': False
         })
 
@@ -96,7 +98,7 @@ def fetch_answer():
         'success': True
     })
 
-
+# Returns all of the surveys currently in the database based on the user role
 @api.route('/fetch_all_survey', methods=['GET'])
 @auth.login_required
 def fetch_all_survey():
@@ -182,7 +184,7 @@ def fetch_all_survey():
         'items': result
     })
 
-
+# Returns all of the courses that don't have surveys that are in the pre-supplied data
 @api.route('/fetch_course', methods=['GET', 'OPTION'])
 def fetch_course():
     li = FileOperation.read_course()
@@ -202,53 +204,7 @@ def fetch_course():
         'items': li
     })
 
-
-@api.route('/modify_survey', methods=['GET', 'POST'])
-@auth.login_required
-def modify_survey():
-    data = request.get_json()
-    survey_id = int(data['id'])
-    questions = data['questions_opt'] + data['questions_man']
-    questions_dump = [i['id'] for i in questions]
-
-    survey = Survey.get_by_id(survey_id)
-    if data['purpose'] != 'update_status':
-        survey.remove_all_questions()
-        survey.set_questions(questions_dump)
-    elif data['purpose'] == 'review':
-        survey.remove_optional_questions()
-        survey.set_questions(questions_dump)
-
-    survey.description = data['title']
-    timestart = data['start']
-    survey.start_date = timestart
-    timeend = data['end']
-    survey.end_date = timeend
-
-    survey.status = data['status']
-    db.session.add(survey)
-    db.session.commit()
-    return jsonify({
-        "success": True
-    })
-
-
-@api.route('/user_verify', methods=['GET', 'POST'])
-@auth.login_required
-def verify_user():
-    data = request.get_json()
-    username = data['name']
-
-    user = User.get_by_name(username)
-    user.verified = data['status']
-
-    db.session.add(user)
-    db.session.commit()
-    return jsonify({
-        'success': True
-    })
-
-
+# Returns the questions for a specific survey
 @api.route('/fetch_question', methods=['GET', 'OPTION'])
 @auth.login_required
 def fetch_question():
@@ -289,7 +245,16 @@ def fetch_question():
         'optional': opt
     })
 
+# Returns all of the courses in the pre-supplied data
+@api.route('/fetch_all_course', methods=['GET', 'OPTION'])
+def fetch_all_course():
+    li = FileOperation.read_course()
 
+    return jsonify({
+        'items': li
+    })
+
+# Returns all the questions for use in the displaying of the question pool
 @api.route('/question_pool', methods=['GET', 'OPTION'])
 @auth.login_required
 def question_pool():
@@ -342,113 +307,7 @@ def question_pool():
         'items': result
     })
 
-
-@api.route('/create_survey', methods=['GET', 'POST'])
-@auth.login_required
-def create_survey():
-    user = g.current_user
-    data = request.get_json()
-    timestart = datetime.strptime(
-        data['start'][0: -5], r'%Y-%m-%dT%H:%M:%S')
-    timeend = datetime.strptime(data['end'][0: -5], r'%Y-%m-%dT%H:%M:%S')
-    survey = Survey.create(description=data['title'], owner_id=user.id,
-                           times=[timestart, timeend], course=data['course'])
-
-    questions = data['questions_opt'] + data['questions_man']
-    questions_dump = [i['id'] for i in questions]
-    survey.set_questions(questions_dump)
-    db.session.add(survey)
-    db.session.commit()
-    return jsonify({
-        "success": True
-    })
-
-
-@api.route('/create_question', methods=['POST', 'GET'])
-@auth.login_required
-def create_question():
-    user = g.current_user
-    data = request.get_json()
-    q_type = int(data['qType'])
-    # print(data['qType'])
-    question = Question.create(description=data['title'], owner_id=user.id,
-                               q_type=q_type, optional=data['optional'])
-    if q_type == 1:
-        choices = data['choices']
-        for choice in choices:
-            Choice.create(choice, question.id)
-    return jsonify({
-        "success": True,
-    })
-
-
-@api.route('/delete_question', methods=['POST', 'GET'])
-@auth.login_required
-def delete_question():
-    data = request.get_json()
-    id = data['id']
-
-    question_to_delete = Question.get_by_id(id)
-    question_to_delete.deleted = True
-    db.session.add(question_to_delete)
-    db.session.commit()
-
-    return jsonify({
-        "success": True,
-    })
-
-
-@api.route('/srstatic', methods=['GET'])
-@auth.login_required
-def srstatic():
-    survey_count = len(Survey.get_all())
-    response_count = len(Answer.get_all())
-    return jsonify({
-        "success": True,
-        'surveys': survey_count,
-        'responses': response_count
-    })
-
-
-@api.route('/load_user', methods=['GET'])
-@auth.login_required
-def load_user():
-    FileOperation.load_users()
-    return jsonify({
-        "success": True,
-    })
-
-
-@api.route('/register', methods=['GET', 'POST'])
-def register():
-    try:
-        data = request.get_json()
-        username = data['username']
-        password = data['password']
-        if User.get_by_name(username) is not None:
-            return jsonify({
-                'success': False,
-                'message': 'this username already exists'
-            })
-
-        role = Role.get_by_name('guest')
-        new = User(username=username, password=password,
-                   role=role, verified=False)
-        db.session.add(new)
-        db.session.commit()
-
-        for c in data['course']:
-            new.add_course(c)
-
-        return jsonify({
-            'success': True,
-        })
-    except:
-        return jsonify({
-            'success': False
-        })
-
-
+# Returns the guest user data for use in displaying guest pool
 @api.route('/user_pool', methods=['GET', 'POST'])
 @auth.login_required
 def guest_pool():
@@ -482,11 +341,145 @@ def guest_pool():
         'total': totalnum
     })
 
+# Commits changes made by user for a survey to the database
+@api.route('/modify_survey', methods=['GET', 'POST'])
+@auth.login_required
+def modify_survey():
+    data = request.get_json()
+    survey_id = int(data['id'])
+    questions = data['questions_opt'] + data['questions_man']
+    questions_dump = [i['id'] for i in questions]
 
-@api.route('/fetch_all_course', methods=['GET', 'OPTION'])
-def fetch_all_course():
-    li = FileOperation.read_course()
+    survey = Survey.get_by_id(survey_id)
+    if data['purpose'] != 'update_status':
+        survey.remove_all_questions()
+        survey.set_questions(questions_dump)
+    elif data['purpose'] == 'review':
+        survey.remove_optional_questions()
+        survey.set_questions(questions_dump)
+
+    survey.description = data['title']
+    timestart = data['start']
+    survey.start_date = timestart
+    timeend = data['end']
+    survey.end_date = timeend
+
+    survey.status = data['status']
+    db.session.add(survey)
+    db.session.commit()
+    return jsonify({
+        "success": True
+    })
+
+# Verifies an unverified guest user
+@api.route('/user_verify', methods=['GET', 'POST'])
+@auth.login_required
+def verify_user():
+    data = request.get_json()
+    username = data['name']
+
+    user = User.get_by_name(username)
+    user.verified = data['status']
+
+    db.session.add(user)
+    db.session.commit()
+    return jsonify({
+        'success': True
+    })
+
+# Creates a survey and commits it to the database
+@api.route('/create_survey', methods=['GET', 'POST'])
+@auth.login_required
+def create_survey():
+    user = g.current_user
+    data = request.get_json()
+    timestart = datetime.strptime(
+        data['start'][0: -5], r'%Y-%m-%dT%H:%M:%S')
+    timeend = datetime.strptime(data['end'][0: -5], r'%Y-%m-%dT%H:%M:%S')
+    survey = Survey.create(description=data['title'], owner_id=user.id,
+                           times=[timestart, timeend], course=data['course'])
+
+    questions = data['questions_opt'] + data['questions_man']
+    questions_dump = [i['id'] for i in questions]
+    survey.set_questions(questions_dump)
+    db.session.add(survey)
+    db.session.commit()
+    return jsonify({
+        "success": True
+    })
+
+# Creates a question and commits it to the database
+@api.route('/create_question', methods=['POST', 'GET'])
+@auth.login_required
+def create_question():
+    user = g.current_user
+    data = request.get_json()
+    q_type = int(data['qType'])
+    # print(data['qType'])
+    question = Question.create(description=data['title'], owner_id=user.id,
+                               q_type=q_type, optional=data['optional'])
+    if q_type == 1:
+        choices = data['choices']
+        for choice in choices:
+            Choice.create(choice, question.id)
+    return jsonify({
+        "success": True,
+    })
+
+# Deletes a question a commits it to the database
+@api.route('/delete_question', methods=['POST', 'GET'])
+@auth.login_required
+def delete_question():
+    data = request.get_json()
+    id = data['id']
+
+    question_to_delete = Question.get_by_id(id)
+    question_to_delete.deleted = True
+    db.session.add(question_to_delete)
+    db.session.commit()
 
     return jsonify({
-        'items': li
+        "success": True,
     })
+
+# Returns the data necessary for the survey response count in the front page
+@api.route('/srstatic', methods=['GET'])
+@auth.login_required
+def srstatic():
+    survey_count = len(Survey.get_all())
+    response_count = len(Answer.get_all())
+    return jsonify({
+        "success": True,
+        'surveys': survey_count,
+        'responses': response_count
+    })
+
+# Registers a guest user
+@api.route('/register', methods=['GET', 'POST'])
+def register():
+    try:
+        data = request.get_json()
+        username = data['username']
+        password = data['password']
+        if User.get_by_name(username) is not None:
+            return jsonify({
+                'success': False,
+                'message': 'this username already exists'
+            })
+
+        role = Role.get_by_name('guest')
+        new = User(username=username, password=password,
+                   role=role, verified=False)
+        db.session.add(new)
+        db.session.commit()
+
+        for c in data['course']:
+            new.add_course(c)
+
+        return jsonify({
+            'success': True,
+        })
+    except:
+        return jsonify({
+            'success': False
+        })
