@@ -166,14 +166,14 @@ class APITestCase(unittest.TestCase):
         self.assertTrue(response.status_code == 200)
 
     def test_unverified(self):
-        # add an unconfirmed user
+        # add an unverified user
         r = Role.query.filter_by(name='guest').first()
         self.assertIsNotNone(r)
         u = User(username='guest', password='cat', verified=False, role=r)
         db.session.add(u)
         db.session.commit()
 
-        # get list of posts with the unconfirmed account
+        # get list of posts with the unverified account
         response = self.client.get(
             url_for('api.get_token'),
             headers=self.get_api_headers('guest', 'cat'),

@@ -341,6 +341,18 @@ def guest_pool():
         'total': totalnum
     })
 
+# Returns the data necessary for the survey response count in the front page
+@api.route('/srstatic', methods=['GET'])
+@auth.login_required
+def srstatic():
+    survey_count = len(Survey.get_all())
+    response_count = len(Answer.get_all())
+    return jsonify({
+        "success": True,
+        'surveys': survey_count,
+        'responses': response_count
+    })
+
 # Commits changes made by user for a survey to the database
 @api.route('/modify_survey', methods=['GET', 'POST'])
 @auth.login_required
@@ -369,22 +381,6 @@ def modify_survey():
     db.session.commit()
     return jsonify({
         "success": True
-    })
-
-# Verifies an unverified guest user
-@api.route('/user_verify', methods=['GET', 'POST'])
-@auth.login_required
-def verify_user():
-    data = request.get_json()
-    username = data['name']
-
-    user = User.get_by_name(username)
-    user.verified = data['status']
-
-    db.session.add(user)
-    db.session.commit()
-    return jsonify({
-        'success': True
     })
 
 # Creates a survey and commits it to the database
@@ -442,16 +438,20 @@ def delete_question():
         "success": True,
     })
 
-# Returns the data necessary for the survey response count in the front page
-@api.route('/srstatic', methods=['GET'])
+# Verifies an unverified guest user
+@api.route('/user_verify', methods=['GET', 'POST'])
 @auth.login_required
-def srstatic():
-    survey_count = len(Survey.get_all())
-    response_count = len(Answer.get_all())
+def verify_user():
+    data = request.get_json()
+    username = data['name']
+
+    user = User.get_by_name(username)
+    user.verified = data['status']
+
+    db.session.add(user)
+    db.session.commit()
     return jsonify({
-        "success": True,
-        'surveys': survey_count,
-        'responses': response_count
+        'success': True
     })
 
 # Registers a guest user
