@@ -15,6 +15,7 @@ class FlaskClientTestCase(unittest.TestCase):
         Role.insert_roles()
         self.client = self.app.test_client(use_cookies=True)
         print('Database successfully set up.')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
 
     def tearDown(self):
         print('')
@@ -23,6 +24,7 @@ class FlaskClientTestCase(unittest.TestCase):
         db.drop_all()
         self.app_context.pop()
         print('Database successfully destroyed.')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
 
     def test_home_page(self):
         print('')
@@ -30,4 +32,5 @@ class FlaskClientTestCase(unittest.TestCase):
         response = self.client.get(url_for('main.index'))
         self.assertTrue(b'Survey Manage' in response.data)
         print('Index page successfully returned.')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
         print('')

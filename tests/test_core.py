@@ -17,6 +17,7 @@ class SystemTestCase(unittest.TestCase):
         Role.insert_roles()
         self.client = self.app.test_client()
         print('Successfully set up database with user roles.')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
 
     def tearDown(self):
         print('')
@@ -25,6 +26,7 @@ class SystemTestCase(unittest.TestCase):
         db.drop_all()
         self.app_context.pop()
         print('Database successfully destroyed.')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
 
     def get_api_headers(self, username, password):
         return {
@@ -51,6 +53,7 @@ class SystemTestCase(unittest.TestCase):
             username='admin').first() is not None)
         print('Successfully added and committed data to database.')
         print('Administrator user successfully created.')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
 
         print('Creating course...')
         c = Course(course_code='TEST')
@@ -60,6 +63,7 @@ class SystemTestCase(unittest.TestCase):
         self.assertTrue(Course.query.filter_by(
             course_code='TEST').first() is not None)
         print('Successfully added and committed data to database.')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
 
         print('Creating a survey with the course code...')
         survey = Survey.create(description='blah test', times=['1', '2'],
@@ -69,6 +73,7 @@ class SystemTestCase(unittest.TestCase):
         self.assertTrue(Survey.query.filter_by(description='blah test')
                         .first().status == 'review')
         print('Survey successfully created with the course code.')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
         print('Creating questions for survey...')
         question1 = Question.create(
             description="a test question1", owner_id=user.id, optional=False, q_type=2)
@@ -77,10 +82,12 @@ class SystemTestCase(unittest.TestCase):
         self.assertTrue(question1 is not None)
         self.assertTrue(question2 is not None)
         print('Successfully created questions.')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
         print('Setting questions to survey...')
         survey.set_questions([question1.id, question2.id])
         self.assertTrue(survey.questions.all() is not None)
         print('Successfully assigned questions to survey.')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
 
         # staff_review_survey
         print('Creating staff user...')
@@ -96,12 +103,14 @@ class SystemTestCase(unittest.TestCase):
         self.assertTrue(survey is not None)
         self.assertTrue(survey.status == 'review')
         print('Successfully added and committed data to database.')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
         print('Setting survey phase to open...')
         survey.status = 'open'
         self.assertTrue(survey.status == 'open')
         db.session.add(survey)
         db.session.commit()
         print('Successfully set survey phase to open and made changes to database.')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
 
         # student_answer_survey
         print('Creating a student user...')
@@ -111,11 +120,13 @@ class SystemTestCase(unittest.TestCase):
         db.session.add(user)
         db.session.commit()
         print('Successfully created student user.')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
         print('Creating a survey...')
         survey = Survey.query.filter_by(description='blah test').first()
         self.assertTrue(survey is not None)
         self.assertTrue(survey.status == 'open')
         print('Successfully created a survey.')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
         print('Creating answers for the survey...')
         a = Answer.create(survey_id=survey.id, owner_id=user.id)
         self.assertTrue(a is not None)
@@ -130,22 +141,26 @@ class SystemTestCase(unittest.TestCase):
             self.assertTrue(ae.question_id == question.id)
             self.assertTrue(ae.answer_id == a.id)
         print('Successfully created answers for the survey.')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
 
         # admin_close_survey
         print('Creating an administrator user...')
         user = User.query.filter_by(username='admin').first()
         self.assertTrue(user is not None)
         print('Administrator user successfully created.')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
         print('Creating a survey...')
         survey = Survey.query.filter_by(description='blah test').first()
         self.assertTrue(survey is not None)
         print('Survey successfully created.')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
         print('Setting survey phase to closed...')
         survey.status = 'closed'
         db.session.add(survey)
         db.session.commit()
         self.assertTrue(survey.status == 'closed')
         print('Successfully set survey to closed.')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
         print('')
 
     def test_core_api_functionality(self):
@@ -164,19 +179,23 @@ class SystemTestCase(unittest.TestCase):
         student = User(username='student', role=role_student, password='cat')
         self.assertTrue(student is not None)
         print('Student successfully created.')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
         print('Creating administrator...')
         admin = User(username='admin', role=role_admin, password='cat')
         self.assertTrue(admin is not None)
         print('Administrator successfully created.')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
         print('Creating staff member...')
         staff = User(username='staff', role=role_staff, password='cat')
         self.assertTrue(staff is not None)
         print('Staff member successfully created.')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
         print('Creating guest user...')
         guest = User(username='guest', role=role_guest,
                      password='cat', verified=True)
         self.assertTrue(guest is not None)
         print('Guest user successfully created.')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
         print('Assigning courses to users...')
         course = Course(course_code='COMP2511 17s2')
         db.session.add(course)
