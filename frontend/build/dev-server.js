@@ -1,4 +1,4 @@
-require('./check-versions')() // 检查 Node 和 npm 版本
+require('./check-versions')() // check version of Node and npm
 
 var config = require('../config')
 if (!process.env.NODE_ENV) {

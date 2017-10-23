@@ -189,6 +189,7 @@ class SystemTestCase(unittest.TestCase):
         self.assertTrue(course is not None)
         print('Courses successfully assigned.')
         print('Users successfully created.')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
 
         print('Trying to login as an administrator...')
         # login admin and get token
@@ -203,6 +204,7 @@ class SystemTestCase(unittest.TestCase):
         self.assertIsNotNone(json_response.get('token'))
         admin_token = json_response['token']
         print('Successfully logged in as an administrator.')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
 
         print('Trying to create a mandatory question as an administrator...')
         # admin create mandatory question
@@ -219,6 +221,7 @@ class SystemTestCase(unittest.TestCase):
         q1 = Question.query.filter_by(description='test question').first()
         self.assertTrue(q1 is not None)
         print('Successfully created a mandatory question as an administrator.')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
 
         print('Trying to create an optional question as an administrator...')
         # admin create optional question
@@ -235,6 +238,7 @@ class SystemTestCase(unittest.TestCase):
             description='test optional question').first()
         self.assertTrue(q2 is not None)
         print('Successfully created an optional question as an administrator.')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
 
         print('Trying to create a survey as an administrator...')
         # admin create survey
@@ -257,6 +261,7 @@ class SystemTestCase(unittest.TestCase):
         self.assertTrue(survey is not None)
         self.assertTrue(survey.status == 'review')
         print('Successfully created a survey as an administrator.')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
 
         print('Trying to review a survey as a staff member...')
         # staff review survey
@@ -295,6 +300,7 @@ class SystemTestCase(unittest.TestCase):
         self.assertTrue(survey is not None)
         self.assertTrue(survey.status == 'open')
         print('Successfully reviewed a survey as a staff member.')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
 
         print('Trying to answer a survey as a student...')
         # student answer survey
@@ -323,6 +329,7 @@ class SystemTestCase(unittest.TestCase):
         self.assertTrue(Answer.query.all() is not None)
         self.assertTrue(b'thank' in response.data)
         print('Successfully answered a survey as a student.')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
 
         print('Trying to login as a guest...')
         response = self.client.get(
@@ -336,6 +343,7 @@ class SystemTestCase(unittest.TestCase):
         guest_token = json_response['token']
         self.assertTrue(guest_token is not None)
         print('Successfully logged in as a guest.')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
 
         print('Trying to answer a survey as a guest...')
         response = self.client.post(
@@ -351,6 +359,7 @@ class SystemTestCase(unittest.TestCase):
         self.assertTrue(Answer.query.all() is not None)
         self.assertTrue(b'thank' in response.data)
         print('Successfully answered survey as a guest.')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
 
         print('Trying to close a survey as an administrator...')
         # admin close the survey
@@ -378,6 +387,7 @@ class SystemTestCase(unittest.TestCase):
         self.assertTrue(survey is not None)
         self.assertTrue(survey.status == 'closed')
         print('Successfully closed a survey as an administrator.')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
 
         print('Trying to answer a closed survey as a student...')
         # student answer after closed
@@ -389,6 +399,7 @@ class SystemTestCase(unittest.TestCase):
         self.assertTrue(response.status_code == 302)
         self.assertTrue(b'not' in response.data)
         print('Student was shown the appropriate error message.')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
 
         print('Trying to generate a pie chart as a student...')
         # student get survey result
@@ -402,6 +413,7 @@ class SystemTestCase(unittest.TestCase):
         )
         self.assertTrue(response.status_code == 200)
         print('Successfully generated a pie chart as a student.')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
 
         print('Trying to delete a question as an administrator...')
         # admin delete question
@@ -414,3 +426,4 @@ class SystemTestCase(unittest.TestCase):
         self.assertTrue(q2.deleted is True)
         print('Successfully deleted a question as an administrator.')
         print('')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')

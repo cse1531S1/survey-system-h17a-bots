@@ -259,6 +259,7 @@ class APITestCase(unittest.TestCase):
 
         # get list of posts with the unverified account
         print('Trying to log in as an unverified guest...')
+
         response = self.client.get(
             url_for('api.get_token'),
             headers=self.get_api_headers('guest', 'cat'),

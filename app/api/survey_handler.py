@@ -11,6 +11,7 @@ import collections
 
 # Fetcher Functions
 
+
 # Returns the data needed to generate the pie charts in the front end
 @api.route('/fetch_piechart', methods=['GET', 'POST'])
 @auth.login_required
@@ -43,6 +44,7 @@ def fetch_pie_chart():
         "title": question.description
     }
     return jsonify(rtn)
+
 
 # Returns all answers to all questions for a survey
 @api.route('/fetch_answer', methods=['POST', 'GET'])
@@ -97,6 +99,7 @@ def fetch_answer():
         'questions': qus,
         'success': True
     })
+
 
 # Returns all of the surveys currently in the database based on the user role
 @api.route('/fetch_all_survey', methods=['GET'])
@@ -184,6 +187,7 @@ def fetch_all_survey():
         'items': result
     })
 
+
 # Returns all of the courses that don't have surveys that are in the pre-supplied data
 @api.route('/fetch_course', methods=['GET', 'OPTION'])
 def fetch_course():
@@ -203,6 +207,7 @@ def fetch_course():
     return jsonify({
         'items': li
     })
+
 
 # Returns the questions for a specific survey
 @api.route('/fetch_question', methods=['GET', 'OPTION'])
@@ -245,6 +250,7 @@ def fetch_question():
         'optional': opt
     })
 
+
 # Returns all of the courses in the pre-supplied data
 @api.route('/fetch_all_course', methods=['GET', 'OPTION'])
 def fetch_all_course():
@@ -253,6 +259,7 @@ def fetch_all_course():
     return jsonify({
         'items': li
     })
+
 
 # Returns all the questions for use in the displaying of the question pool
 @api.route('/question_pool', methods=['GET', 'OPTION'])
@@ -307,6 +314,7 @@ def question_pool():
         'items': result
     })
 
+
 # Returns the guest user data for use in displaying guest pool
 @api.route('/user_pool', methods=['GET', 'POST'])
 @auth.login_required
@@ -341,6 +349,7 @@ def guest_pool():
         'total': totalnum
     })
 
+
 # Returns the data necessary for the survey response count in the front page
 @api.route('/srstatic', methods=['GET'])
 @auth.login_required
@@ -352,6 +361,7 @@ def srstatic():
         'surveys': survey_count,
         'responses': response_count
     })
+
 
 # Commits changes made by user for a survey to the database
 @api.route('/modify_survey', methods=['GET', 'POST'])
@@ -383,6 +393,7 @@ def modify_survey():
         "success": True
     })
 
+
 # Creates a survey and commits it to the database
 @api.route('/create_survey', methods=['GET', 'POST'])
 @auth.login_required
@@ -404,6 +415,7 @@ def create_survey():
         "success": True
     })
 
+
 # Creates a question and commits it to the database
 @api.route('/create_question', methods=['POST', 'GET'])
 @auth.login_required
@@ -422,6 +434,7 @@ def create_question():
         "success": True,
     })
 
+
 # Deletes a question a commits it to the database
 @api.route('/delete_question', methods=['POST', 'GET'])
 @auth.login_required
@@ -438,6 +451,7 @@ def delete_question():
         "success": True,
     })
 
+
 # Verifies an unverified guest user
 @api.route('/user_verify', methods=['GET', 'POST'])
 @auth.login_required
@@ -453,6 +467,7 @@ def verify_user():
     return jsonify({
         'success': True
     })
+
 
 # Registers a guest user
 @api.route('/register', methods=['GET', 'POST'])
