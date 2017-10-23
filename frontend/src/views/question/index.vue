@@ -10,7 +10,6 @@
 
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="Loading..." border fit highlight-current-row style="width: 100%">
 
-
       <el-table-column min-width="250px" label="Title">
         <template scope="scope">
           <span class="link-type" @click="handleUpdate(scope.row)">{{scope.row.title}}</span>
@@ -19,8 +18,12 @@
 
       <el-table-column align="center" label="Optional" width="100">
         <template scope="scope">
-          <span v-if="scope.row.optional"><i class="el-icon-check"></i></span>
-          <span v-else><i class="el-icon-close"></i></span>
+          <span v-if="scope.row.optional">
+            <i class="el-icon-check"></i>
+          </span>
+          <span v-else>
+            <i class="el-icon-close"></i>
+          </span>
         </template>
       </el-table-column>
 
@@ -97,8 +100,10 @@
     </el-dialog>
 
     <el-dialog title="Are you sure you want to delete this question?" :visible.sync="showWarning" size="small">
-      <el-button @click="showWarning = false">Cancel</el-button>
-      <el-button type="danger" @click="deleteQuestion">Delete</el-button>
+      <el-row type="flex" justify="center">
+        <el-button @click="showWarning = false">Cancel</el-button>
+        <el-button type="danger" @click="deleteQuestion">Delete</el-button>
+      </el-row>
     </el-dialog>
   </div>
 </template>
@@ -329,10 +334,10 @@ export default {
 }
 
 .list-complete-item.sortable-chosen {
-  background: #4AB7BD;
+  background: #4ab7bd;
 }
 
 .list-complete-item.sortable-ghost {
-  background: #30B08F;
+  background: #30b08f;
 }
 </style>
