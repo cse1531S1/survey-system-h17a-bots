@@ -116,6 +116,8 @@ def fetch_all_survey():
     def filter_answered(survey):
         user = g.current_user
         answers = Answer.query.filter_by(survey_id=survey.id).all()
+        if(survey.status == 'closed'):
+            return True
         for a in answers:
             if(a.owner_id == user.id):
                 return False
