@@ -20,12 +20,6 @@
         </template>
       </el-table-column>
 
-      <el-table-column width="150px" align="center" label="Creation time">
-        <template scope="scope">
-          <span>{{scope.row.timestamp}}</span>
-        </template>
-      </el-table-column>
-
       <el-table-column width="110px" align="center" label="Start Time">
         <template scope="scope">
           <span>{{parseTime(scope.row.start_time)}}</span>
