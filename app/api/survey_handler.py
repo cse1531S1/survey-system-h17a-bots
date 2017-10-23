@@ -460,10 +460,15 @@ def verify_user():
     username = data['name']
 
     user = User.get_by_name(username)
-    user.verified = data['status']
+
+    if(data['status'] == 'verified'):
+        user.verified = True
+    else:
+        user.verified = False
 
     db.session.add(user)
     db.session.commit()
+
     return jsonify({
         'success': True
     })
