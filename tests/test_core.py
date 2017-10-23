@@ -8,17 +8,23 @@ from app.models import User, Role, Course, Survey, Question, Answer, AnswerEntit
 
 class SystemTestCase(unittest.TestCase):
     def setUp(self):
+        print('')
+        print('Setting up database with user roles...')
         self.app = create_app('testing')
         self.app_context = self.app.app_context()
         self.app_context.push()
         db.create_all()
         Role.insert_roles()
         self.client = self.app.test_client()
+        print('Successfully set up database with user roles.')
 
     def tearDown(self):
+        print('')
+        print('Destroying database...')
         db.session.remove()
         db.drop_all()
         self.app_context.pop()
+        print('Database successfully destroyed.')
 
     def get_api_headers(self, username, password):
         return {
@@ -33,38 +39,55 @@ class SystemTestCase(unittest.TestCase):
 
     def test_core_database_functionality(self):
         # admin_create_survey
+        print('')
+        print('Creating an administrator user...')
         role = Role.get_by_name('admin')
         self.assertTrue(role is not None)
         user = User(username='admin', role=role, password='cat')
+        print('Adding and commiting data to database...')
         db.session.add(user)
         db.session.commit()
         self.assertTrue(User.query.filter_by(
             username='admin').first() is not None)
+        print('Successfully added and committed data to database.')
+        print('Administrator user successfully created.')
 
+        print('Creating course...')
         c = Course(course_code='TEST')
+        print('Adding and commiting data to database...')
         db.session.add(c)
         db.session.commit()
         self.assertTrue(Course.query.filter_by(
             course_code='TEST').first() is not None)
+        print('Successfully added and committed data to database.')
+
+        print('Creating a survey with the course code...')
         survey = Survey.create(description='blah test', times=['1', '2'],
                                owner_id=user.id, course=c.course_code)
         self.assertTrue(Survey.query.filter_by(description='blah test')
                         .first() is not None)
         self.assertTrue(Survey.query.filter_by(description='blah test')
                         .first().status == 'review')
+        print('Survey successfully created with the course code.')
+        print('Creating questions for survey...')
         question1 = Question.create(
             description="a test question1", owner_id=user.id, optional=False, q_type=2)
         question2 = Question.create(
             description="a test question2", owner_id=user.id, optional=True, q_type=2)
         self.assertTrue(question1 is not None)
         self.assertTrue(question2 is not None)
+        print('Successfully created questions.')
+        print('Setting questions to survey...')
         survey.set_questions([question1.id, question2.id])
         self.assertTrue(survey.questions.all() is not None)
+        print('Successfully assigned questions to survey.')
 
         # staff_review_survey
+        print('Creating staff user...')
         role = Role.get_by_name('staff')
         self.assertTrue(role is not None)
         user = User(username='staff', role=role, password='cat')
+        print('Adding and commiting data to database...')
         db.session.add(user)
         db.session.commit()
         self.assertTrue(User.query.filter_by(username='staff')
@@ -72,20 +95,28 @@ class SystemTestCase(unittest.TestCase):
         survey = Survey.query.filter_by(description='blah test').first()
         self.assertTrue(survey is not None)
         self.assertTrue(survey.status == 'review')
+        print('Successfully added and committed data to database.')
+        print('Setting survey phase to open...')
         survey.status = 'open'
         self.assertTrue(survey.status == 'open')
         db.session.add(survey)
         db.session.commit()
+        print('Successfully set survey phase to open and made changes to database.')
 
         # student_answer_survey
+        print('Creating a student user...')
         role = Role.get_by_name('student')
         self.assertTrue(role is not None)
         user = User(username='student', role=role, password='cat')
         db.session.add(user)
         db.session.commit()
+        print('Successfully created student user.')
+        print('Creating a survey...')
         survey = Survey.query.filter_by(description='blah test').first()
         self.assertTrue(survey is not None)
         self.assertTrue(survey.status == 'open')
+        print('Successfully created a survey.')
+        print('Creating answers for the survey...')
         a = Answer.create(survey_id=survey.id, owner_id=user.id)
         self.assertTrue(a is not None)
         self.assertTrue(a.survey_id == survey.id)
@@ -98,16 +129,24 @@ class SystemTestCase(unittest.TestCase):
             self.assertTrue(ae is not None)
             self.assertTrue(ae.question_id == question.id)
             self.assertTrue(ae.answer_id == a.id)
+        print('Successfully created answers for the survey.')
 
         # admin_close_survey
+        print('Creating an administrator user...')
         user = User.query.filter_by(username='admin').first()
         self.assertTrue(user is not None)
+        print('Administrator user successfully created.')
+        print('Creating a survey...')
         survey = Survey.query.filter_by(description='blah test').first()
         self.assertTrue(survey is not None)
+        print('Survey successfully created.')
+        print('Setting survey phase to closed...')
         survey.status = 'closed'
         db.session.add(survey)
         db.session.commit()
         self.assertTrue(survey.status == 'closed')
+        print('Successfully set survey to closed.')
+        print('')
 
     def test_core_api_functionality(self):
         print('')
@@ -151,7 +190,6 @@ class SystemTestCase(unittest.TestCase):
         print('Courses successfully assigned.')
         print('Users successfully created.')
 
-        print('')
         print('Trying to login as an administrator...')
         # login admin and get token
         response = self.client.get(
@@ -166,7 +204,6 @@ class SystemTestCase(unittest.TestCase):
         admin_token = json_response['token']
         print('Successfully logged in as an administrator.')
 
-        print('')
         print('Trying to create a mandatory question as an administrator...')
         # admin create mandatory question
         response = self.client.get(
@@ -183,8 +220,6 @@ class SystemTestCase(unittest.TestCase):
         self.assertTrue(q1 is not None)
         print('Successfully created a mandatory question as an administrator.')
 
-
-        print('')
         print('Trying to create an optional question as an administrator...')
         # admin create optional question
         response = self.client.get(
@@ -201,7 +236,6 @@ class SystemTestCase(unittest.TestCase):
         self.assertTrue(q2 is not None)
         print('Successfully created an optional question as an administrator.')
 
-        print('')
         print('Trying to create a survey as an administrator...')
         # admin create survey
         response = self.client.post(
@@ -224,7 +258,6 @@ class SystemTestCase(unittest.TestCase):
         self.assertTrue(survey.status == 'review')
         print('Successfully created a survey as an administrator.')
 
-        print('')
         print('Trying to review a survey as a staff member...')
         # staff review survey
         # login staff and get token
@@ -263,8 +296,6 @@ class SystemTestCase(unittest.TestCase):
         self.assertTrue(survey.status == 'open')
         print('Successfully reviewed a survey as a staff member.')
 
-
-        print('')
         print('Trying to answer a survey as a student...')
         # student answer survey
         # login student and get token
@@ -293,8 +324,6 @@ class SystemTestCase(unittest.TestCase):
         self.assertTrue(b'thank' in response.data)
         print('Successfully answered a survey as a student.')
 
-
-        print('')
         print('Trying to login as a guest...')
         response = self.client.get(
             url_for('api.get_token'),
@@ -308,8 +337,6 @@ class SystemTestCase(unittest.TestCase):
         self.assertTrue(guest_token is not None)
         print('Successfully logged in as a guest.')
 
-
-        print('')
         print('Trying to answer a survey as a guest...')
         response = self.client.post(
             url_for('main.answer', hash_str=survey.id_hash) +
@@ -325,8 +352,6 @@ class SystemTestCase(unittest.TestCase):
         self.assertTrue(b'thank' in response.data)
         print('Successfully answered survey as a guest.')
 
-
-        print('')
         print('Trying to close a survey as an administrator...')
         # admin close the survey
         response = self.client.post(
@@ -354,8 +379,6 @@ class SystemTestCase(unittest.TestCase):
         self.assertTrue(survey.status == 'closed')
         print('Successfully closed a survey as an administrator.')
 
-
-        print('')
         print('Trying to answer a closed survey as a student...')
         # student answer after closed
         response = self.client.post(
@@ -367,7 +390,6 @@ class SystemTestCase(unittest.TestCase):
         self.assertTrue(b'not' in response.data)
         print('Student was shown the appropriate error message.')
 
-        print('')
         print('Trying to generate a pie chart as a student...')
         # student get survey result
         response = self.client.post(
@@ -381,7 +403,6 @@ class SystemTestCase(unittest.TestCase):
         self.assertTrue(response.status_code == 200)
         print('Successfully generated a pie chart as a student.')
 
-        print('')
         print('Trying to delete a question as an administrator...')
         # admin delete question
         response = self.client.get(

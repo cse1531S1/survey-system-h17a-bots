@@ -8,17 +8,23 @@ from app.models import User, Role
 
 class APITestCase(unittest.TestCase):
     def setUp(self):
+        print('')
+        print('Setting up database with user roles...')
         self.app = create_app('testing')
         self.app_context = self.app.app_context()
         self.app_context.push()
         db.create_all()
         Role.insert_roles()
         self.client = self.app.test_client()
+        print('Database successfully set up with user roles.')
 
     def tearDown(self):
+        print('')
+        print('Destroying database...')
         db.session.remove()
         db.drop_all()
         self.app_context.pop()
+        print('Database successfully destroyed.')
 
     def get_api_headers(self, username, password):
         return {
@@ -32,6 +38,7 @@ class APITestCase(unittest.TestCase):
         return json.dumps({'username': username, 'password': password})
 
     def test_404(self):
+        print('')
         print('Trying to access a page that does not exist...')
         response = self.client.get(
             '/not/exists/page',
@@ -114,6 +121,7 @@ class APITestCase(unittest.TestCase):
 
     def test_bad_auth(self):
         # add a user
+        print('')
         print('Creating an administrator user...')
         r = Role.query.filter_by(name='admin').first()
         self.assertIsNotNone(r)
@@ -240,6 +248,7 @@ class APITestCase(unittest.TestCase):
 
     def test_unverified(self):
         # add an unverified user
+        print('')
         print('Creating an unverified guest user...')
         r = Role.query.filter_by(name='guest').first()
         self.assertIsNotNone(r)
