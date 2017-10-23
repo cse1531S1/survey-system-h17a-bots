@@ -5,28 +5,13 @@
       </el-input>
 
       <el-button class="filter-item" type="primary" v-waves icon="search" @click="handleFilter">Search</el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="edit">Add a Survey</el-button>
-      <!-- <el-button v-if="!loaded" class="filter-item" type="primary" icon="document" @click="loadUsers">Load Users</el-button> -->
     </div>
 
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="Loading!!!!" border fit highlight-current-row style="width: 100%">
 
       <el-table-column min-width="250px" label="Title">
         <template scope="scope">
-          <span v-if="scope.row.status === 'review'" class="link-type" @click="handleUpdate(scope.row)">{{scope.row.title}}</span>
-          <span v-else>{{scope.row.title}}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column width="110px" align="center" label="Start Time">
-        <template scope="scope">
-          <span>{{parseTime(scope.row.start_time)}}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column width="110px" align="center" label="End Time">
-        <template scope="scope">
-          <span>{{parseTime(scope.row.end_time)}}</span>
+          <span>{{scope.row.title}}</span>
         </template>
       </el-table-column>
 
@@ -48,9 +33,9 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Operation" width="110">
+      <el-table-column width="110px" align="center" label="Links">
         <template scope="scope">
-          <el-button v-waves v-if="scope.row.status==='open'" size="small" type="danger" @click="handleModifyStatus(scope.row,'closed')">Close</el-button>
+          <router-link v-waves class="el-button el-button--small" :to="'/result/'+scope.row.id">Result</router-link>
         </template>
       </el-table-column>
 

@@ -69,6 +69,21 @@ export const asyncRouterMap = [
     ]
   },
   {
+    path: '/matrics',
+    component: Layout,
+    meta: { role: ['admin'] },
+    icon: 'wujiaoxing',
+    noDropdown: true,
+    children: [
+      {
+        meta: { role: ['admin'] },
+        path: 'matrics',
+        component: _import('matrics/index'),
+        name: 'Matrics'
+      }
+    ]
+  },
+  {
     path: '/user',
     component: Layout,
     meta: { role: ['admin'] },
