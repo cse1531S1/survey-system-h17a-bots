@@ -11,6 +11,10 @@ auth = HTTPBasicAuth()
 
 @auth.verify_password
 def verify_password(name_or_token, password):
+    """
+    This function is used to verify users' password.
+    """
+
     if name_or_token == '':
         g.current_user = None
         return False
@@ -36,11 +40,19 @@ def verify_password(name_or_token, password):
 
 @auth.error_handler
 def auth_error():
+    """
+    Authentication error handler
+    """
+
     return unauthorized('Invalid credentials')
 
 
 @api.route('/logoff', methods=['GET', 'POST'])
 def log_off():
+    """
+    Log off the system
+    """
+
     g.current_user = None
     return jsonify({
         'success': True
@@ -50,6 +62,10 @@ def log_off():
 @api.route('/get_info')
 @auth.login_required
 def get_info():
+    """
+    Get User infomation (Login required).
+    """
+
     user = g.current_user
     courses = Course.get_all()
     loaded = False
@@ -75,6 +91,11 @@ def get_info():
 # @auth.login_required
 @api.route('/get_token', methods=['POST', 'GET'])
 def get_token():
+    """
+    Generate token for current user,
+    who is not anonymous and has been verified
+    """
+
     try:
         if g.current_user.is_anonymous:
             return unauthorized('Invalid credentials')

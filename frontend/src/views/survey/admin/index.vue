@@ -11,7 +11,7 @@
 
       <el-button class="filter-item" type="primary" v-waves icon="search" @click="handleFilter">Search</el-button>
       <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="edit">Add a Survey</el-button>
-      <el-button v-if="!loaded" class="filter-item" type="primary" icon="document" @click="loadUsers">Load Users</el-button>
+      <!-- <el-button v-if="!loaded" class="filter-item" type="primary" icon="document" @click="loadUsers">Load Users</el-button> -->
     </div>
 
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="Loading!!!!" border fit highlight-current-row style="width: 100%">
