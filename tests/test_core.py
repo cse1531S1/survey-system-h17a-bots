@@ -140,7 +140,7 @@ class SystemTestCase(unittest.TestCase):
         staff.add_course(code)
         guest.add_course(code)
         self.assertTrue(course is not None)
-        print('\x1b[0;32;40m'+'pass'+'\x1b[0m')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
 
         print('In test_core_api_functionality...')
         print('testing login admin')
@@ -155,7 +155,7 @@ class SystemTestCase(unittest.TestCase):
         json_response = json.loads(response.data.decode('utf-8'))
         self.assertIsNotNone(json_response.get('token'))
         admin_token = json_response['token']
-        print('\x1b[0;32;40m'+'pass'+'\x1b[0m')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
 
         print('In test_core_api_functionality...')
         print('testing admin create mandatory question')
@@ -172,7 +172,7 @@ class SystemTestCase(unittest.TestCase):
 
         q1 = Question.query.filter_by(description='test question').first()
         self.assertTrue(q1 is not None)
-        print('\x1b[0;32;40m'+'pass'+'\x1b[0m')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
 
         print('In test_core_api_functionality...')
         print('testing admin create optional question')
@@ -189,7 +189,7 @@ class SystemTestCase(unittest.TestCase):
         q2 = Question.query.filter_by(
             description='test optional question').first()
         self.assertTrue(q2 is not None)
-        print('\x1b[0;32;40m'+'pass'+'\x1b[0m')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
 
         print('In test_core_api_functionality...')
         print('testing admin create survey')
@@ -212,7 +212,7 @@ class SystemTestCase(unittest.TestCase):
         survey = Survey.query.all()[0]
         self.assertTrue(survey is not None)
         self.assertTrue(survey.status == 'review')
-        print('\x1b[0;32;40m'+'pass'+'\x1b[0m')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
 
         print('In test_core_api_functionality...')
         print('testing staff review survey')
@@ -251,7 +251,7 @@ class SystemTestCase(unittest.TestCase):
         survey = Survey.query.all()[0]
         self.assertTrue(survey is not None)
         self.assertTrue(survey.status == 'open')
-        print('\x1b[0;32;40m'+'pass'+'\x1b[0m')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
 
         print('In test_core_api_functionality...')
         print('testing student answer survey')
@@ -280,7 +280,7 @@ class SystemTestCase(unittest.TestCase):
         self.assertTrue(response.status_code == 302)
         self.assertTrue(Answer.query.all() is not None)
         self.assertTrue(b'thank' in response.data)
-        print('\x1b[0;32;40m'+'pass'+'\x1b[0m')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
 
         print('In test_core_api_functionality...')
         print('testing guest login')
@@ -294,7 +294,7 @@ class SystemTestCase(unittest.TestCase):
         self.assertIsNotNone(json_response.get('token'))
         guest_token = json_response['token']
         self.assertTrue(guest_token is not None)
-        print('\x1b[0;32;40m'+'pass'+'\x1b[0m')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
 
         print('In test_core_api_functionality...')
         print('testing guest answer survey')
@@ -310,7 +310,7 @@ class SystemTestCase(unittest.TestCase):
         self.assertTrue(response.status_code == 302)
         self.assertTrue(Answer.query.all() is not None)
         self.assertTrue(b'thank' in response.data)
-        print('\x1b[0;32;40m'+'pass'+'\x1b[0m')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
 
         print('In test_core_api_functionality...')
         print('testing admin close survey')
@@ -338,7 +338,7 @@ class SystemTestCase(unittest.TestCase):
         survey = Survey.query.all()[0]
         self.assertTrue(survey is not None)
         self.assertTrue(survey.status == 'closed')
-        print('\x1b[0;32;40m'+'pass'+'\x1b[0m')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
 
         print('In test_core_api_functionality...')
         print('testing student answer survey after closed')
@@ -350,7 +350,7 @@ class SystemTestCase(unittest.TestCase):
         )
         self.assertTrue(response.status_code == 302)
         self.assertTrue(b'not' in response.data)
-        print('\x1b[0;32;40m'+'pass'+'\x1b[0m')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
 
         print('In test_core_api_functionality...')
         print('testing student get piechart')
@@ -364,7 +364,7 @@ class SystemTestCase(unittest.TestCase):
             })
         )
         self.assertTrue(response.status_code == 200)
-        print('\x1b[0;32;40m'+'pass'+'\x1b[0m')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')
 
         print('In test_core_api_functionality...')
         print('testing admin delete question')
@@ -376,4 +376,4 @@ class SystemTestCase(unittest.TestCase):
         )
         q2 = Question.get_by_id(q2.id)
         self.assertTrue(q2.deleted is True)
-        print('\x1b[0;32;40m'+'pass'+'\x1b[0m')
+        print('\x1b[0;32;40m' + 'pass' + '\x1b[0m')

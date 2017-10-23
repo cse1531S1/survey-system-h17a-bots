@@ -7,6 +7,7 @@ from flask_script import Manager, Shell
 import os
 import csv
 import re
+
 COV = None
 if os.environ.get('FLASK_COVERAGE'):
     import coverage
