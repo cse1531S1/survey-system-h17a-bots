@@ -43,13 +43,19 @@ def reset():
 
 @manager.command
 def run():
-    """ Run the survey system """
+    """
+    Run the survey system
+    """
+
     app.run(port=9528)
 
 
 @manager.command
 def load():
-    """ load all courses and students into the database """
+    """
+    load all courses and students into the database
+    """
+
     print('Start Loading, That might cost up to 3 minutes')
     with open('courses.csv', 'r') as file_in:
         result = map(str, csv.reader(file_in))
