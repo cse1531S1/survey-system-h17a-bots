@@ -157,8 +157,7 @@ export default {
               // message: 'Invaild credentials or your account is not verified',
               message: rejectMessage,
               type: 'error',
-              duration: 0,
-              showClose: true
+              duration: 3000
             })
             this.loading = false
           })
