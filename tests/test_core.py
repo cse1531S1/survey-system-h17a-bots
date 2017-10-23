@@ -110,9 +110,8 @@ class SystemTestCase(unittest.TestCase):
         self.assertTrue(survey.status == 'closed')
 
     def test_core_api_functionality(self):
-        print()
-        print('In test_core_api_functionality...')
-        print('testing insert users')
+        print('')
+        print('Trying to create users...')
         # insert admin staff guest student and a course
         role_student = Role.get_by_name('student')
         self.assertTrue(role_student is not None)
@@ -122,15 +121,24 @@ class SystemTestCase(unittest.TestCase):
         self.assertTrue(role_staff is not None)
         role_guest = Role.get_by_name('guest')
         self.assertTrue(role_guest is not None)
+        print('Creating student...')
         student = User(username='student', role=role_student, password='cat')
         self.assertTrue(student is not None)
+        print('Student successfully created.')
+        print('Creating administrator...')
         admin = User(username='admin', role=role_admin, password='cat')
         self.assertTrue(admin is not None)
+        print('Administrator successfully created.')
+        print('Creating staff member...')
         staff = User(username='staff', role=role_staff, password='cat')
         self.assertTrue(staff is not None)
+        print('Staff member successfully created.')
+        print('Creating guest user...')
         guest = User(username='guest', role=role_guest,
                      password='cat', verified=True)
         self.assertTrue(guest is not None)
+        print('Guest user successfully created.')
+        print('Assigning courses to users...')
         course = Course(course_code='COMP2511 17s2')
         db.session.add(course)
         db.session.commit()
@@ -140,10 +148,11 @@ class SystemTestCase(unittest.TestCase):
         staff.add_course(code)
         guest.add_course(code)
         self.assertTrue(course is not None)
-        print('test ok')
+        print('Courses successfully assigned.')
+        print('Users successfully created.')
 
-        print('In test_core_api_functionality...')
-        print('testing login admin')
+        print('')
+        print('Trying to login as an administrator...')
         # login admin and get token
         response = self.client.get(
             url_for('api.get_token'),
@@ -155,10 +164,10 @@ class SystemTestCase(unittest.TestCase):
         json_response = json.loads(response.data.decode('utf-8'))
         self.assertIsNotNone(json_response.get('token'))
         admin_token = json_response['token']
-        print('test ok')
+        print('Successfully logged in as an administrator.')
 
-        print('In test_core_api_functionality...')
-        print('testing admin create mandatory question')
+        print('')
+        print('Trying to create a mandatory question as an administrator...')
         # admin create mandatory question
         response = self.client.get(
             url_for('api.create_question'),
@@ -172,10 +181,11 @@ class SystemTestCase(unittest.TestCase):
 
         q1 = Question.query.filter_by(description='test question').first()
         self.assertTrue(q1 is not None)
-        print('test ok')
+        print('Successfully created a mandatory question as an administrator.')
 
-        print('In test_core_api_functionality...')
-        print('testing admin create optional question')
+
+        print('')
+        print('Trying to create an optional question as an administrator...')
         # admin create optional question
         response = self.client.get(
             url_for('api.create_question'),
@@ -189,10 +199,10 @@ class SystemTestCase(unittest.TestCase):
         q2 = Question.query.filter_by(
             description='test optional question').first()
         self.assertTrue(q2 is not None)
-        print('test ok')
+        print('Successfully created an optional question as an administrator.')
 
-        print('In test_core_api_functionality...')
-        print('testing admin create survey')
+        print('')
+        print('Trying to create a survey as an administrator...')
         # admin create survey
         response = self.client.post(
             url_for('api.create_survey'),
@@ -212,10 +222,10 @@ class SystemTestCase(unittest.TestCase):
         survey = Survey.query.all()[0]
         self.assertTrue(survey is not None)
         self.assertTrue(survey.status == 'review')
-        print('test ok')
+        print('Successfully created a survey as an administrator.')
 
-        print('In test_core_api_functionality...')
-        print('testing staff review survey')
+        print('')
+        print('Trying to review a survey as a staff member...')
         # staff review survey
         # login staff and get token
         response = self.client.get(
@@ -251,10 +261,11 @@ class SystemTestCase(unittest.TestCase):
         survey = Survey.query.all()[0]
         self.assertTrue(survey is not None)
         self.assertTrue(survey.status == 'open')
-        print('test ok')
+        print('Successfully reviewed a survey as a staff member.')
 
-        print('In test_core_api_functionality...')
-        print('testing student answer survey')
+
+        print('')
+        print('Trying to answer a survey as a student...')
         # student answer survey
         # login student and get token
         response = self.client.get(
@@ -280,10 +291,11 @@ class SystemTestCase(unittest.TestCase):
         self.assertTrue(response.status_code == 302)
         self.assertTrue(Answer.query.all() is not None)
         self.assertTrue(b'thank' in response.data)
-        print('test ok')
+        print('Successfully answered a survey as a student.')
 
-        print('In test_core_api_functionality...')
-        print('testing guest login')
+
+        print('')
+        print('Trying to login as a guest...')
         response = self.client.get(
             url_for('api.get_token'),
             headers=self.get_api_headers('guest', 'cat'),
@@ -294,10 +306,11 @@ class SystemTestCase(unittest.TestCase):
         self.assertIsNotNone(json_response.get('token'))
         guest_token = json_response['token']
         self.assertTrue(guest_token is not None)
-        print('test ok')
+        print('Successfully logged in as a guest.')
 
-        print('In test_core_api_functionality...')
-        print('testing guest answer survey')
+
+        print('')
+        print('Trying to answer a survey as a guest...')
         response = self.client.post(
             url_for('main.answer', hash_str=survey.id_hash) +
             '?token=' + guest_token,
@@ -310,10 +323,11 @@ class SystemTestCase(unittest.TestCase):
         self.assertTrue(response.status_code == 302)
         self.assertTrue(Answer.query.all() is not None)
         self.assertTrue(b'thank' in response.data)
-        print('test ok')
+        print('Successfully answered survey as a guest.')
 
-        print('In test_core_api_functionality...')
-        print('testing admin close survey')
+
+        print('')
+        print('Trying to close a survey as an administrator...')
         # admin close the survey
         response = self.client.post(
             url_for('api.modify_survey'),
@@ -338,10 +352,11 @@ class SystemTestCase(unittest.TestCase):
         survey = Survey.query.all()[0]
         self.assertTrue(survey is not None)
         self.assertTrue(survey.status == 'closed')
-        print('test ok')
+        print('Successfully closed a survey as an administrator.')
 
-        print('In test_core_api_functionality...')
-        print('testing student answer survey after closed')
+
+        print('')
+        print('Trying to answer a closed survey as a student...')
         # student answer after closed
         response = self.client.post(
             url_for('main.answer', hash_str=survey.id_hash) +
@@ -350,10 +365,10 @@ class SystemTestCase(unittest.TestCase):
         )
         self.assertTrue(response.status_code == 302)
         self.assertTrue(b'not' in response.data)
-        print('test ok')
+        print('Student was shown the appropriate error message.')
 
-        print('In test_core_api_functionality...')
-        print('testing student get piechart')
+        print('')
+        print('Trying to generate a pie chart as a student...')
         # student get survey result
         response = self.client.post(
             url_for('api.fetch_pie_chart'),
@@ -364,10 +379,10 @@ class SystemTestCase(unittest.TestCase):
             })
         )
         self.assertTrue(response.status_code == 200)
-        print('test ok')
+        print('Successfully generated a pie chart as a student.')
 
-        print('In test_core_api_functionality...')
-        print('testing admin delete question')
+        print('')
+        print('Trying to delete a question as an administrator...')
         # admin delete question
         response = self.client.get(
             url_for('api.delete_question'),
@@ -376,4 +391,5 @@ class SystemTestCase(unittest.TestCase):
         )
         q2 = Question.get_by_id(q2.id)
         self.assertTrue(q2.deleted is True)
-        print('test ok')
+        print('Successfully deleted a question as an administrator.')
+        print('')
