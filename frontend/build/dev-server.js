@@ -50,7 +50,6 @@ compiler.plugin('compilation', function(compilation) {
 //   app.use(proxyMiddleware(options.filter || context, options))
 // })
 
-
 // handle fallback for HTML5 history API
 app.use(require('connect-history-api-fallback')())
 

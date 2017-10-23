@@ -75,9 +75,6 @@ class APITestCase(unittest.TestCase):
             url_for('api.srstatic'), content_type='application/json')
         self.assertTrue(response.status_code == 401)
         response = self.client.get(
-            url_for('api.load_user'), content_type='application/json')
-        self.assertTrue(response.status_code == 401)
-        response = self.client.get(
             url_for('api.register'), content_type='application/json')
         self.assertTrue(response.status_code == 200)
         response = self.client.get(
@@ -131,9 +128,6 @@ class APITestCase(unittest.TestCase):
         self.assertTrue(response.status_code == 401)
         response = self.client.get(
             url_for('api.srstatic'), headers=self.get_api_headers('admin', 'dog'))
-        self.assertTrue(response.status_code == 401)
-        response = self.client.get(
-            url_for('api.load_user'), headers=self.get_api_headers('admin', 'dog'))
         self.assertTrue(response.status_code == 401)
         response = self.client.get(
             url_for('api.register'), headers=self.get_api_headers('admin', 'dog'))
