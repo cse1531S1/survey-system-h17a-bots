@@ -45,7 +45,8 @@ WTForms==2.1
 
 Section 2.
 
-Firstly, you will need to activate the Python virtual environment and install all of the dependencies by entering "pip install -r requirement.txt" in the console while in the project’s root directory.
+Firstly, install the Python virtual environment (Python 3.2+).
+After which you will need to install all of the dependencies by entering "pip install -r requirement.txt" in the console while in the project’s root directory.
 
 Secondly, you will need to setup the database by entering ”python manage.py reset" in the console while in the project’s root directory.
 
