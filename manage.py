@@ -28,7 +28,10 @@ manager.add_command("shell", Shell(make_context=make_shell_context))
 
 @manager.command
 def reset():
-    """Reset database and insert admin."""
+    """
+    Reset database and insert admin.
+    """
+
     db.drop_all()
     db.create_all()
     Role.insert_roles()
@@ -86,7 +89,10 @@ def load():
 
 @manager.command
 def test(coverage=False):
-    """Run the unit tests."""
+    """
+    Run the unit tests.
+    """
+
     if coverage and not os.environ.get('FLASK_COVERAGE'):
         import sys
         os.environ['FLASK_COVERAGE'] = '1'
@@ -94,6 +100,7 @@ def test(coverage=False):
     import unittest
     tests = unittest.TestLoader().discover('tests')
     unittest.TextTestRunner(verbosity=2).run(tests)
+
     if COV:
         COV.stop()
         COV.save()
