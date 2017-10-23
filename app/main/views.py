@@ -86,6 +86,11 @@ def answer(hash_str):
         return redirect(url_for('.not_allowed'))
 
     survey = Survey.get_by_hash(hash_str)
+    course_list = [i.course_code for i in user.courses.all()]
+
+    if survey.course.first().course_code not in course_list:
+        return redirect(url_for('.not_allowed'))
+
     if survey.status != 'open':
         return redirect(url_for('.not_allowed'))
 

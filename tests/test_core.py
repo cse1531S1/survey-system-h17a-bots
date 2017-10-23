@@ -1,6 +1,7 @@
 import unittest
 import json
 from base64 import b64encode
+from flask import url_for
 from app import create_app, db
 from app.models import User, Role, Course, Survey, Question, Answer, AnswerEntity
 
@@ -30,7 +31,7 @@ class SystemTestCase(unittest.TestCase):
     def get_api_data(self, username, password):
         return json.dumps({'username': username, 'password': password})
 
-    def test_core_functionality(self):
+    def test_core_database_functionality(self):
         # admin_create_survey
         role = Role.get_by_name('admin')
         self.assertTrue(role is not None)
@@ -107,3 +108,272 @@ class SystemTestCase(unittest.TestCase):
         db.session.add(survey)
         db.session.commit()
         self.assertTrue(survey.status == 'closed')
+
+    def test_core_api_functionality(self):
+        print()
+        print('In test_core_api_functionality...')
+        print('testing insert users')
+        # insert admin staff guest student and a course
+        role_student = Role.get_by_name('student')
+        self.assertTrue(role_student is not None)
+        role_admin = Role.get_by_name('admin')
+        self.assertTrue(role_admin is not None)
+        role_staff = Role.get_by_name('staff')
+        self.assertTrue(role_staff is not None)
+        role_guest = Role.get_by_name('guest')
+        self.assertTrue(role_guest is not None)
+        student = User(username='student', role=role_student, password='cat')
+        self.assertTrue(student is not None)
+        admin = User(username='admin', role=role_admin, password='cat')
+        self.assertTrue(admin is not None)
+        staff = User(username='staff', role=role_staff, password='cat')
+        self.assertTrue(staff is not None)
+        guest = User(username='guest', role=role_guest,
+                     password='cat', verified=True)
+        self.assertTrue(guest is not None)
+        course = Course(course_code='COMP2511 17s2')
+        db.session.add(course)
+        db.session.commit()
+        code = course.course_code
+        admin.add_course(code)
+        student.add_course(code)
+        staff.add_course(code)
+        guest.add_course(code)
+        self.assertTrue(course is not None)
+        print('test ok')
+
+        print('In test_core_api_functionality...')
+        print('testing login admin')
+        # login admin and get token
+        response = self.client.get(
+            url_for('api.get_token'),
+            headers=self.get_api_headers('admin', 'cat'),
+            data=self.get_api_data('admin', 'cat')
+        )
+
+        self.assertTrue(response.status_code == 200)
+        json_response = json.loads(response.data.decode('utf-8'))
+        self.assertIsNotNone(json_response.get('token'))
+        admin_token = json_response['token']
+        print('test ok')
+
+        print('In test_core_api_functionality...')
+        print('testing admin create mandatory question')
+        # admin create mandatory question
+        response = self.client.get(
+            url_for('api.create_question'),
+            headers=self.get_api_headers('admin', 'cat'),
+            data=json.dumps({
+                'qType': 2,
+                'title': 'test question',
+                'optional': False
+            })
+        )
+
+        q1 = Question.query.filter_by(description='test question').first()
+        self.assertTrue(q1 is not None)
+        print('test ok')
+
+        print('In test_core_api_functionality...')
+        print('testing admin create optional question')
+        # admin create optional question
+        response = self.client.get(
+            url_for('api.create_question'),
+            headers=self.get_api_headers('admin', 'cat'),
+            data=json.dumps({
+                'qType': 2,
+                'title': 'test optional question',
+                'optional': True
+            })
+        )
+        q2 = Question.query.filter_by(
+            description='test optional question').first()
+        self.assertTrue(q2 is not None)
+        print('test ok')
+
+        print('In test_core_api_functionality...')
+        print('testing admin create survey')
+        # admin create survey
+        response = self.client.post(
+            url_for('api.create_survey'),
+            headers=self.get_api_headers(admin_token, ''),
+            data=json.dumps({
+                'start': '2017-10-23T03:17:55.000Z',
+                'end': '2017-11-29T03:17:55.000Z',
+                'title': 'test',
+                'course': 'COMP2511 17s2',
+                'questions_opt': [{'id': q2.id}],
+                'questions_man': [{'id': q1.id}],
+            })
+        )
+        self.assertTrue(response.status_code == 200)
+        json_response = json.loads(response.data.decode('utf-8'))
+        self.assertTrue(json_response['success'] is True)
+        survey = Survey.query.all()[0]
+        self.assertTrue(survey is not None)
+        self.assertTrue(survey.status == 'review')
+        print('test ok')
+
+        print('In test_core_api_functionality...')
+        print('testing staff review survey')
+        # staff review survey
+        # login staff and get token
+        response = self.client.get(
+            url_for('api.get_token'),
+            headers=self.get_api_headers('staff', 'cat'),
+            data=self.get_api_data('staff', 'cat')
+        )
+        self.assertTrue(response.status_code == 200)
+        json_response = json.loads(response.data.decode('utf-8'))
+        self.assertIsNotNone(json_response.get('token'))
+        staff_token = json_response['token']
+
+        # send modify survey request
+        response = self.client.post(
+            url_for('api.modify_survey'),
+            headers=self.get_api_headers(staff_token, ''),
+            data=json.dumps({
+                'id': survey.id,
+                'start': survey.start_date,
+                'end': survey.end_date,
+                'title': 'test',
+                'purpose': 'review',
+                'course': 'COMP2511 17s2',
+                'status': 'open',
+                'questions_opt': [],
+                'questions_man': [],
+            })
+        )
+
+        self.assertTrue(response.status_code == 200)
+        json_response = json.loads(response.data.decode('utf-8'))
+        self.assertTrue(json_response['success'] is True)
+        survey = Survey.query.all()[0]
+        self.assertTrue(survey is not None)
+        self.assertTrue(survey.status == 'open')
+        print('test ok')
+
+        print('In test_core_api_functionality...')
+        print('testing student answer survey')
+        # student answer survey
+        # login student and get token
+        response = self.client.get(
+            url_for('api.get_token'),
+            headers=self.get_api_headers('student', 'cat'),
+            data=self.get_api_data('student', 'cat')
+        )
+        self.assertTrue(response.status_code == 200)
+        json_response = json.loads(response.data.decode('utf-8'))
+        self.assertIsNotNone(json_response.get('token'))
+        student_token = json_response['token']
+
+        # send answer survey form
+        response = self.client.post(
+            url_for('main.answer', hash_str=survey.id_hash) +
+            '?token=' + student_token,
+            headers=self.get_api_headers(student_token, ''),
+            data=json.dumps({
+                str(q1.id): 'q1',
+                str(q1.id): 'q2'
+            })
+        )
+        self.assertTrue(response.status_code == 302)
+        self.assertTrue(Answer.query.all() is not None)
+        self.assertTrue(b'thank' in response.data)
+        print('test ok')
+
+        print('In test_core_api_functionality...')
+        print('testing guest login')
+        response = self.client.get(
+            url_for('api.get_token'),
+            headers=self.get_api_headers('guest', 'cat'),
+            data=self.get_api_data('guest', 'cat')
+        )
+        self.assertTrue(response.status_code == 200)
+        json_response = json.loads(response.data.decode('utf-8'))
+        self.assertIsNotNone(json_response.get('token'))
+        guest_token = json_response['token']
+        self.assertTrue(guest_token is not None)
+        print('test ok')
+
+        print('In test_core_api_functionality...')
+        print('testing guest answer survey')
+        response = self.client.post(
+            url_for('main.answer', hash_str=survey.id_hash) +
+            '?token=' + guest_token,
+            headers=self.get_api_headers(student_token, ''),
+            data=json.dumps({
+                str(q1.id): 'q1',
+                str(q1.id): 'q2'
+            })
+        )
+        self.assertTrue(response.status_code == 302)
+        self.assertTrue(Answer.query.all() is not None)
+        self.assertTrue(b'thank' in response.data)
+        print('test ok')
+
+        print('In test_core_api_functionality...')
+        print('testing admin close survey')
+        # admin close the survey
+        response = self.client.post(
+            url_for('api.modify_survey'),
+            headers=self.get_api_headers(admin_token, ''),
+            data=json.dumps({
+                'id': survey.id,
+                'start': survey.start_date,
+                'end': survey.end_date,
+                'title': 'test',
+                'purpose': 'update_status',
+                'course': 'COMP2511 17s2',
+                'status': 'closed',
+                'questions_opt': [],
+                'questions_man': [],
+            })
+        )
+
+        survey = Survey.query.all()[0]
+        self.assertTrue(response.status_code == 200)
+        json_response = json.loads(response.data.decode('utf-8'))
+        self.assertTrue(json_response['success'] is True)
+        survey = Survey.query.all()[0]
+        self.assertTrue(survey is not None)
+        self.assertTrue(survey.status == 'closed')
+        print('test ok')
+
+        print('In test_core_api_functionality...')
+        print('testing student answer survey after closed')
+        # student answer after closed
+        response = self.client.post(
+            url_for('main.answer', hash_str=survey.id_hash) +
+            '?token=' + student_token,
+            headers=self.get_api_headers(student_token, '')
+        )
+        self.assertTrue(response.status_code == 302)
+        self.assertTrue(b'not' in response.data)
+        print('test ok')
+
+        print('In test_core_api_functionality...')
+        print('testing student get piechart')
+        # student get survey result
+        response = self.client.post(
+            url_for('api.fetch_pie_chart'),
+            headers=self.get_api_headers(student_token, ''),
+            data=json.dumps({
+                'survey': survey.id,
+                'question': q1.id
+            })
+        )
+        self.assertTrue(response.status_code == 200)
+        print('test ok')
+
+        print('In test_core_api_functionality...')
+        print('testing admin delete question')
+        # admin delete question
+        response = self.client.get(
+            url_for('api.delete_question'),
+            headers=self.get_api_headers('admin', 'cat'),
+            data=json.dumps({'id': q2.id})
+        )
+        q2 = Question.get_by_id(q2.id)
+        self.assertTrue(q2.deleted is True)
+        print('test ok')
