@@ -12,7 +12,7 @@
 
       <el-table-column min-width="250px" label="Title">
         <template scope="scope">
-          <span class="link-type" @click="handleUpdate(scope.row)">{{scope.row.title}}</span>
+          <span>{{scope.row.title}}</span>
         </template>
       </el-table-column>
 
