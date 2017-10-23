@@ -534,6 +534,7 @@ export default {
       })
     },
     resetTemp() {
+      this.getCourse()
       this.temp = {
         id: undefined,
         timestamp: 0,

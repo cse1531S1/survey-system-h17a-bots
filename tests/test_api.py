@@ -173,7 +173,6 @@ class APITestCase(unittest.TestCase):
         db.session.add(u)
         db.session.commit()
 
-        # get list of posts with the unverified account
         response = self.client.get(
             url_for('api.get_token'),
             headers=self.get_api_headers('guest', 'cat'),
