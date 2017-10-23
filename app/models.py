@@ -51,7 +51,7 @@ UserCourse = db.Table('user_course',
                       )
 
 
-class Role(db.Model):
+class Role(db.Model, DatabaseUtil):
     """
     The role of the user.
     Currently having: admin, staff, student and guest.
