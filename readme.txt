@@ -45,21 +45,22 @@ WTForms==2.1
 
 Section 2.
 
-Firstly, you need to activate virtual environment and install all the dependencies by "pip install -r requirement.txt"
+Firstly, you will need to activate the Python virtual environment and install all of the dependencies by entering "pip install -r requirement.txt" in the console while in the project’s root directory.
 
-Secondly, you need to setup the database by typing "python manage.py reset" command in the project root directory.
+Secondly, you will need to setup the database by entering ”python manage.py reset" in the console while in the project’s root directory.
 
-Thirdly, you need to load the enrolments.csv passwords.csv and courses.csv
-you can do this py typing "python manage.py load" after putting all required files in the project root directory
-(That would be quite slow)
+Thirdly, you will need to load the enrolments.csv passwords.csv and courses.csv into the database. The steps to do so are as follows:
+You will first need to make sure all the required csv files are in the project’s root directory.
+Then you have to enter "python manage.py load” in the console while in the project’s root directory. 
+Please note that the loading will take awhile to complete.
 
-Finally, you can run the server by typing "python manage.py run" command in the project root directory.
-and the server will be running on 127.0.0.1:9528 now
+Finally, you will be able to run the server by entering "python manage.py run" in the console while in the project’s root directory.
+The server will now be running on http://127.0.0.1:9528/ or http://localhost:9528/
 
 Section 3.
 
-To run all the test cases, first you need to unzip the test.zip file. and put all the .py files into the tests/ directory
-Then you can run the unitest by typing "python manage.py test" command in the project root directory
+In order to run all of the test cases, you need to first unzip the test.zip file, and put all of the .py files into the tests directory.
+Then, you can run the unit tests by entering "python manage.py test" in the console while in the project’s root directory
 
 list of test cases:
 test_404                                        (test_api.APITestCase)
